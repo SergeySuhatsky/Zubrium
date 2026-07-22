@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="Zubrium.Domain/Zubrium.Domain.csproj" />
+  <Project Path="Zubrium.Maui/Zubrium.Maui.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
+  <Project Path="Zubrium.Persistence/Zubrium.Persistence.csproj" />
+  <Project Path="Zubrium.SpacedRepetition/Zubrium.SpacedRepetition.csproj" />
+  <Project Path="Zubrium.Tests/Zubrium.Tests.csproj" />
+</Solution>
