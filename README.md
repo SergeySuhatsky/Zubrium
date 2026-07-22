@@ -2,7 +2,7 @@
 
 ## Часть 1. MAUI-страницы — режим карточек (без данных)
 
-- [ ] 1. Создание solution: `App.Domain`, `App.Content`, `App.Persistence`, `App.Rendering` (существующий), `App.Maui` — отдельные проекты, чтобы Domain/Content тестировались без MAUI-раннера.
+- [x] 1. Создание solution: `App.Domain`, `App.Content`, `App.Persistence`, `App.Rendering` (существующий), `App.Maui` — отдельные проекты, чтобы Domain/Content тестировались без MAUI-раннера.
 - [ ] 2. Подключение NuGet: `Markdig`, `CommunityToolkit.Mvvm`, `CommunityToolkit.Maui`, `sqlite-net-pcl`, тест-проект `xUnit`.
 - [ ] 3. `CardStudyPage.xaml` с захардкоженным текстом во всех трёх секциях (front/brief/detailed): никакого биндинга, просто `MarkdownView Text="..."` прямо в XAML, чтобы сразу убедиться, что рендер MarkdownRenderService работает внутри этой страницы.
 - [ ] 4. `SwipeableCardView` — кастомный `ContentView` на `PanGestureRecognizer`: слежение за `TranslationX`, наклон карточки пропорционально смещению, визуальные индикаторы «✓» и «✗» по краям, которые появляются при смещении. Логика свайпа полностью захардкожена — события `SwipedLeft`/`SwipedRight` только пишут в консоль.

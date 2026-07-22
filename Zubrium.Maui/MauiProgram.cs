@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Zubrium.Maui.Services.MarkdownRender;
 
 namespace Zubrium.Maui
 {
@@ -14,9 +15,9 @@ namespace Zubrium.Maui
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
-
+            builder.Services.AddSingleton<IMarkdownRenderService, MarkdownRenderService>();
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();
