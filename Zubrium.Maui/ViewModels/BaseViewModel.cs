@@ -7,7 +7,7 @@ using Zubrium.Content;
 
 namespace Zubrium.Maui.ViewModels
 {
-    public partial class BaseViewModel : ObservableObject, IQueryAttributable
+    public abstract partial class BaseViewModel : ObservableObject, IQueryAttributable
     {
 
         protected readonly IContentRepository _repository;
@@ -17,9 +17,7 @@ namespace Zubrium.Maui.ViewModels
             _repository = repository;
         }
 
-        public virtual async void ApplyQueryAttributes(IDictionary<string, object> query)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract void ApplyQueryAttributes(IDictionary<string, object> query);
+
     }
 }
