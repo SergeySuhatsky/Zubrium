@@ -2,6 +2,7 @@
   <Folder Name="/Элементы решения/">
     <File Path="README.md" />
   </Folder>
+  <Project Path="Zubrium.Content/Zubrium.Content.csproj" />
   <Project Path="Zubrium.Domain/Zubrium.Domain.csproj" />
   <Project Path="Zubrium.Maui/Zubrium.Maui.csproj">
     <Deploy Solution="Debug|*" />
