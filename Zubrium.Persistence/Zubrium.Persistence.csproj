@@ -6,4 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="sqlite-net-pcl" Version="1.11.285" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Zubrium.Domain\Zubrium.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
