@@ -4,11 +4,44 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:Zubrium.Maui"
-    Title="Zubrium.Maui">
+    xmlns:articles="clr-namespace:Zubrium.Maui.Features.Articles"
+    xmlns:quizs="clr-namespace:Zubrium.Maui.Features.Quizs"
+    xmlns:settings="clr-namespace:Zubrium.Maui.Features.Settings"
+    xmlns:cards="clr-namespace:Zubrium.Maui.Features.Cards"
+    xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+    Title="Zubrium.Maui"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.TabBarBackgroundColor="Aqua">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+
+    <TabBar>
+        <Tab Title="MainPage" Icon="{mi:Material Icon=Style, IconColor=Gray}">
+            <ShellContent
+            ContentTemplate="{DataTemplate cards:CardsPage}"
+            Route="MainPage" 
+                />
+        </Tab>
+
+        <Tab Title="ArticlePage" Icon="{mi:Material Icon=Style, IconColor=Gray}">
+            <ShellContent
+            ContentTemplate="{DataTemplate quizs:QuizzePage}"
+            Route="QuizzePage"/>
+        </Tab>
+
+        <Tab Title="ArticlePage1" Icon="appicon.png">
+            <ShellContent
+            ContentTemplate="{DataTemplate articles:ArticlePage}"
+            Route="ArticlePage"/>
+        </Tab>
+
+        <Tab Title="ArticlePage2" Icon="appicon.png">
+            <ShellContent
+    ContentTemplate="{DataTemplate settings:SettingsMenuPage}"
+    Route="SettingsMenuPage"/>
+        </Tab>
+
+
+
+    </TabBar>
 
 </Shell>
