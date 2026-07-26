@@ -6,42 +6,44 @@
     xmlns:local="clr-namespace:Zubrium.Maui"
     xmlns:articles="clr-namespace:Zubrium.Maui.Features.Articles"
     xmlns:quizs="clr-namespace:Zubrium.Maui.Features.Quizs"
-    xmlns:settings="clr-namespace:Zubrium.Maui.Features.Settings"
     xmlns:cards="clr-namespace:Zubrium.Maui.Features.Cards"
+    xmlns:generals="clr-namespace:Zubrium.Maui.Features.Generals"
     xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
     Title="Zubrium.Maui"
     Shell.FlyoutBehavior="Disabled"
-    Shell.TabBarBackgroundColor="Aqua">
-
+    Shell.TabBarBackgroundColor="White"
+    Shell.TabBarUnselectedColor="Gray">
 
     <TabBar>
-        <Tab Title="MainPage" Icon="{mi:Material Icon=Style, IconColor=Gray}">
+        <Tab Title="Учить" Icon="{mi:Material Icon=School, IconColor=Gray, IconSize=32}">
             <ShellContent
-            ContentTemplate="{DataTemplate cards:CardsPage}"
-            Route="MainPage" 
-                />
+                ContentTemplate="{DataTemplate generals:CardsPage}"
+                Route="MainPage" />
         </Tab>
 
-        <Tab Title="ArticlePage" Icon="{mi:Material Icon=Style, IconColor=Gray}">
+        <Tab Title="Карты" Icon="{mi:Material Icon=FilterNone, IconColor=Gray, IconSize=32}">
             <ShellContent
-            ContentTemplate="{DataTemplate quizs:QuizzePage}"
-            Route="QuizzePage"/>
+                ContentTemplate="{DataTemplate cards:DecksPage}"
+                Route="QuizzePage"/>
         </Tab>
 
-        <Tab Title="ArticlePage1" Icon="appicon.png">
+        <Tab Title="Статьи" Icon="{mi:Material Icon=Article, IconColor=Gray, IconSize=32}">
             <ShellContent
-            ContentTemplate="{DataTemplate articles:ArticlePage}"
-            Route="ArticlePage"/>
+                ContentTemplate="{DataTemplate articles:ArticlePage}"
+                Route="ArticlePage"/>
         </Tab>
 
-        <Tab Title="ArticlePage2" Icon="appicon.png">
+        <Tab Title="Квизы" Icon="{mi:Material Icon=Quiz, IconColor=Gray, IconSize=32}">
             <ShellContent
-    ContentTemplate="{DataTemplate settings:SettingsMenuPage}"
-    Route="SettingsMenuPage"/>
+                ContentTemplate="{DataTemplate quizs:QuizzePage}"
+                Route="QuizzePage"/>
         </Tab>
 
-
+        <Tab Title="Меню" Icon="{mi:Material Icon=Settings, IconColor=Gray, IconSize=32}">
+            <ShellContent 
+                ContentTemplate="{DataTemplate generals:SettingsMenuPage}" 
+                Route="SettingsMenuPage"/>
+        </Tab>
 
     </TabBar>
-
 </Shell>
