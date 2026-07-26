@@ -4,7 +4,7 @@ using System.Text;
 using Zubrium.Content;
 using Zubrium.Maui.ViewModels;
 
-namespace Zubrium.Maui.Features.Cards
+namespace Zubrium.Maui.Features.Generals
 {
     public partial class CardsViewModel : BaseViewModel
     {

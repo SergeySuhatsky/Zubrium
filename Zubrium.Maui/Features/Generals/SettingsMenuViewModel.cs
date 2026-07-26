@@ -4,7 +4,7 @@ using System.Text;
 using Zubrium.Content;
 using Zubrium.Maui.ViewModels;
 
-namespace Zubrium.Maui.Features.Settings
+namespace Zubrium.Maui.Features.Generals
 {
     public partial class SettingsMenuViewModel :BaseViewModel
     {

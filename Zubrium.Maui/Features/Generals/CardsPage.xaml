@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:md="clr-namespace:Zubrium.Maui.Views.Controls"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             xmlns:local="clr-namespace:Zubrium.Maui.Features.Generals"
+             x:Class="Zubrium.Maui.Features.Generals.CardsPage"
+             x:DataType="local:CardsViewModel"
+             BackgroundColor="#F4F5F8">
+    <!-- Светло-серый фон страницы -->
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,30,20,30" Spacing="12">
+
+            <!-- ========================================== -->
+            <!-- СЕКЦИЯ 1: ИНТЕРВАЛЬНОЕ ПОВТОРЕНИЕ        -->
+            <!-- ========================================== -->
+
+            <!-- Заголовок секции 1 -->
+            <Label Text="Интервальное повторение"
+                   FontSize="13"
+                   TextColor="#9595A5"
+                   Margin="8,0,0,0"
+                   TextTransform="Uppercase"
+                   FontAttributes="Bold" />
+
+            <!-- Карточка с блоками (Border) -->
+            <Border BackgroundColor="White"
+                    Stroke="#EAECEF"
+                    StrokeThickness="1"
+                    Padding="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#000000" Offset="0,4" Radius="12" Opacity="0.03" />
+                </Border.Shadow>
+
+                <VerticalStackLayout>
+
+                    <!-- 1. Выбор категории -->
+                    <Grid ColumnDefinitions="Auto, *, Auto" Padding="16,18" ColumnSpacing="16" BackgroundColor="Transparent">
+                        <Grid.Behaviors>
+                            <toolkit:TouchBehavior Command="{Binding SelectCategoryCommand}"
+                                                   DefaultBackgroundColor="Transparent"
+                                                   PressedBackgroundColor="#F2F2F6"
+                                                   DefaultOpacity="1.0"
+                                                   PressedOpacity="0.5"
+                                                   PressedAnimationDuration="100"
+                                                   DefaultAnimationDuration="100" />
+                        </Grid.Behaviors>
+
+                        <Image Grid.Column="0" Source="{mi:Material Icon=Edit, IconColor=Gray}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
+                        <Label Grid.Column="1" Text="Выбрана 1 категория" FontSize="16" TextColor="#2C2C2E" VerticalOptions="Center" />
+                        <Image Grid.Column="2" Source="{mi:Material Icon=Category, IconColor=Gray}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
+                    </Grid>
+
+                    <!-- Разделитель -->
+                    <BoxView HeightRequest="1" Color="#F2F2F6" Margin="16,0" />
+
+                    <!-- 2. Учить новые слова -->
+                    <Grid ColumnDefinitions="Auto, *" Padding="16,18" ColumnSpacing="16" BackgroundColor="Transparent">
+                        <Grid.Behaviors>
+                            <toolkit:TouchBehavior Command="{Binding LearnNewWordsCommand}"
+                                                   DefaultBackgroundColor="Transparent"
+                                                   PressedBackgroundColor="#F2F2F6"
+                                                   DefaultOpacity="1.0"
+                                                   PressedOpacity="0.5"
+                                                   PressedAnimationDuration="100"
+                                                   DefaultAnimationDuration="100" />
+                        </Grid.Behaviors>
+
+                        <Image Grid.Column="0" Source="{mi:Material Icon=AddCircleOutline, IconColor=#D94D7A}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
+
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                            <Label Text="Учить новые слова" FontSize="16" TextColor="#2C2C2E" />
+                            <Label Text="Выучено сегодня: 0 из 5" FontSize="13" TextColor="#8E8E93" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <!-- Разделитель -->
+                    <BoxView HeightRequest="1" Color="#F2F2F6" Margin="16,0" />
+
+                    <!-- 3. Повторить слова -->
+                    <Grid ColumnDefinitions="Auto, *" Padding="16,18" ColumnSpacing="16" BackgroundColor="Transparent">
+                        <Grid.Behaviors>
+                            <toolkit:TouchBehavior Command="{Binding RepeatWordsCommand}"
+                                                   DefaultBackgroundColor="Transparent"
+                                                   PressedBackgroundColor="#F2F2F6"
+                                                   DefaultOpacity="1.0"
+                                                   PressedOpacity="0.5"
+                                                   PressedAnimationDuration="100"
+                                                   DefaultAnimationDuration="100" />
+                        </Grid.Behaviors>
+
+                        <Image Grid.Column="0" Source="{mi:Material Icon=Autorenew, IconColor=#EBB24B}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
+
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                            <Label Text="Повторить слова" FontSize="16" TextColor="#2C2C2E" />
+                            <Label Text="В выбранных категориях нет слов для повторения" FontSize="13" TextColor="#8E8E93" LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <!-- Разделитель -->
+                    <BoxView HeightRequest="1" Color="#F2F2F6" Margin="16,0" />
+
+                    <!-- 4. Смешанный режим -->
+                    <Grid ColumnDefinitions="Auto, *" Padding="16,18" ColumnSpacing="16" BackgroundColor="Transparent">
+                        <Grid.Behaviors>
+                            <toolkit:TouchBehavior Command="{Binding MixedModeCommand}"
+                                                   DefaultBackgroundColor="Transparent"
+                                                   PressedBackgroundColor="#F2F2F6"
+                                                   DefaultOpacity="1.0"
+                                                   PressedOpacity="0.5"
+                                                   PressedAnimationDuration="100"
+                                                   DefaultAnimationDuration="100" />
+                        </Grid.Behaviors>
+
+                        <Image Grid.Column="0" Source="{mi:Material Icon=LightbulbOutline, IconColor=#6487E1}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
+
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                            <Label Text="Смешанный режим" FontSize="16" TextColor="#2C2C2E" />
+                            <Label Text="Будут появляться новые слова и слова для повторения" FontSize="13" TextColor="#8E8E93" LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ========================================== -->
+            <!-- СЕКЦИЯ 2: ИЗУЧЕНИЯ                       -->
+            <!-- ========================================== -->
+
+            <!-- Заголовок секции 2 (добавлен отступ сверху Margin="8,16,0,0") -->
+            <Label Text="Изучение"
+                   FontSize="13"
+                   TextColor="#9595A5"
+                   Margin="8,16,0,0"
+                   TextTransform="Uppercase"
+                   FontAttributes="Bold" />
+
+            <!-- Карточка с новыми кнопками -->
+            <Border BackgroundColor="White"
+                    Stroke="#EAECEF"
+                    StrokeThickness="1"
+                    Padding="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#000000" Offset="0,4" Radius="12" Opacity="0.03" />
+                </Border.Shadow>
+
+                <VerticalStackLayout>
+
+                    <!-- 1. Пройти квиз -->
+                    <Grid ColumnDefinitions="Auto, *" Padding="16,18" ColumnSpacing="16" BackgroundColor="Transparent">
+                        <Grid.Behaviors>
+                            <toolkit:TouchBehavior Command="{Binding TakeQuizCommand}"
+                                                   DefaultBackgroundColor="Transparent"
+                                                   PressedBackgroundColor="#F2F2F6"
+                                                   DefaultOpacity="1.0"
+                                                   PressedOpacity="0.5"
+                                                   PressedAnimationDuration="100"
+                                                   DefaultAnimationDuration="100" />
+                        </Grid.Behaviors>
+
+                        <Image Grid.Column="0" Source="{mi:Material Icon=Quiz, IconColor=#9C27B0}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                            <Label Grid.Column="1" Text="Пройти квиз" FontSize="16" TextColor="#2C2C2E" VerticalOptions="Center" />
+                            <Label Text="Проверить знания" FontSize="13" TextColor="#8E8E93" LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                        
+                    </Grid>
+
+                    <!-- Разделитель -->
+                    <BoxView HeightRequest="1" Color="#F2F2F6" Margin="16,0" />
+
+                    <!-- 2. Прочитать статью -->
+                    <Grid ColumnDefinitions="Auto, *" Padding="16,18" ColumnSpacing="16" BackgroundColor="Transparent">
+                        <Grid.Behaviors>
+                            <toolkit:TouchBehavior Command="{Binding ReadArticleCommand}"
+                                                   DefaultBackgroundColor="Transparent"
+                                                   PressedBackgroundColor="#F2F2F6"
+                                                   DefaultOpacity="1.0"
+                                                   PressedOpacity="0.5"
+                                                   PressedAnimationDuration="100"
+                                                   DefaultAnimationDuration="100" />
+                        </Grid.Behaviors>
+
+                        <Image Grid.Column="0" Source="{mi:Material Icon=Article, IconColor=#009688}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                            <Label Grid.Column="1" Text="Прочитать статью" FontSize="16" TextColor="#2C2C2E" VerticalOptions="Center" />
+                            <Label Text="Изучить материал" FontSize="13" TextColor="#8E8E93" LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                        
+                        
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

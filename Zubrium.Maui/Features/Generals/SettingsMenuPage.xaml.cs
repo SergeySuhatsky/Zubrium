@@ -1,4 +1,4 @@
-namespace Zubrium.Maui.Features.Settings;
+namespace Zubrium.Maui.Features.Generals;
 
 public partial class SettingsMenuPage : ContentPage
 {

@@ -89,16 +89,22 @@
 	  <MauiXaml Update="Features\Articles\ArticlePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Features\Cards\DecksPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Features\Quizs\QuizzePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Features\Settings\SettingsMenuPage.xaml">
+	  <MauiXaml Update="Features\Generals\SettingsMenuPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Features\Cards\CardsPage.xaml.cs">
+	  <Compile Update="Features\Cards\DecksPage.xaml.cs">
+	    <DependentUpon>DecksPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Features\Generals\CardsPage.xaml.cs">
 	    <DependentUpon>CardsPage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Features\Quizs\QuizzePage.xaml.cs">

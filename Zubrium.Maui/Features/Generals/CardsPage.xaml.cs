@@ -1,6 +1,6 @@
 ﻿using Zubrium.Maui.Services.MarkdownRender;
 
-namespace Zubrium.Maui.Features.Cards;
+namespace Zubrium.Maui.Features.Generals;
 
 public partial class CardsPage : ContentPage
 {

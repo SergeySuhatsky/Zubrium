@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:Zubrium.Maui.Features.Settings"
-             x:Class="Zubrium.Maui.Features.Settings.SettingsMenuPage"
+             xmlns:local="clr-namespace:Zubrium.Maui.Features.Generals"
+             x:Class="Zubrium.Maui.Features.Generals.SettingsMenuPage"
              x:DataType="local:SettingsMenuViewModel"
              Title="SettingsMenuPage">
     <VerticalStackLayout>

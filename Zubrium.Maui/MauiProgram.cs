@@ -5,9 +5,7 @@ using Zubrium.Content;
 using Zubrium.Maui.ViewModels;
 using Zubrium.Maui.Features.Articles;
 using MauiIcons.Material;
-using Zubrium.Maui.Features.Settings;
 using Zubrium.Maui.Features.Quizs;
-using Zubrium.Maui.Features.Cards;
 using Microsoft.Maui.Controls;
 using System.Reflection;
 
