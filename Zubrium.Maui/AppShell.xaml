@@ -35,7 +35,7 @@
 
         <Tab Title="Квизы" Icon="{mi:Material Icon=Quiz, IconColor=Gray, IconSize=32}">
             <ShellContent
-                ContentTemplate="{DataTemplate quizs:QuizzePage}"
+                ContentTemplate="{DataTemplate quizs:QuizzesPage}"
                 Route="QuizzePage"/>
         </Tab>
 

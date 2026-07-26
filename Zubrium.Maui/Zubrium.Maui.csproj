@@ -92,7 +92,10 @@
 	  <MauiXaml Update="Features\Cards\DecksPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Features\Quizs\QuizzePage.xaml">
+	  <MauiXaml Update="Features\Quizs\PickQuizPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Features\Quizs\QuizzesPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Features\Generals\SettingsMenuPage.xaml">
@@ -107,8 +110,8 @@
 	  <Compile Update="Features\Generals\CardsPage.xaml.cs">
 	    <DependentUpon>CardsPage.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Features\Quizs\QuizzePage.xaml.cs">
-	    <DependentUpon>QuizzePage.xaml</DependentUpon>
+	  <Compile Update="Features\Quizs\QuizzesPage.xaml.cs">
+	    <DependentUpon>QuizzesPage.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 

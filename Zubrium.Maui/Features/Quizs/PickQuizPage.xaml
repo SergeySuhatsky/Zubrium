@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:Zubrium.Maui.Features.Quizs"
-             x:Class="Zubrium.Maui.Features.Quizs.QuizzePage"
-             x:DataType="local:QuizzesViewModel"
-             Title="NewPage1">
+             x:Class="Zubrium.Maui.Features.Quizs.PickQuizPage"
+             Title="PickQuizPage">
     <VerticalStackLayout>
         <Label 
             Text="Welcome to .NET MAUI!"

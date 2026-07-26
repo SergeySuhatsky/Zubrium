@@ -1,8 +1,8 @@
 namespace Zubrium.Maui.Features.Quizs;
 
-public partial class QuizzePage : ContentPage
+public partial class QuizzesPage : ContentPage
 {
-	public QuizzePage(QuizzesViewModel viewModel)
+	public QuizzesPage(QuizzesViewModel viewModel)
 	{
 		InitializeComponent();
         BindingContext = viewModel;
