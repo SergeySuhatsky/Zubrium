@@ -107,8 +107,8 @@
 	  <Compile Update="Features\Cards\DecksPage.xaml.cs">
 	    <DependentUpon>DecksPage.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Features\Generals\CardsPage.xaml.cs">
-	    <DependentUpon>CardsPage.xaml</DependentUpon>
+	  <Compile Update="Features\Generals\StudyPage.xaml.cs">
+	    <DependentUpon>StudyPage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Features\Quizs\QuizzesPage.xaml.cs">
 	    <DependentUpon>QuizzesPage.xaml</DependentUpon>

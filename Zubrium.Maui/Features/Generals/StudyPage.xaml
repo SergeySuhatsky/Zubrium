@@ -5,8 +5,8 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
              xmlns:local="clr-namespace:Zubrium.Maui.Features.Generals"
-             x:Class="Zubrium.Maui.Features.Generals.CardsPage"
-             x:DataType="local:CardsViewModel"
+             x:Class="Zubrium.Maui.Features.Generals.StudyPage"
+             x:DataType="local:StudyViewModel"
              BackgroundColor="#F4F5F8">
     <!-- Светло-серый фон страницы -->
 
@@ -41,9 +41,11 @@
 
                     <!-- 1. Выбор категории -->
                     <Grid ColumnDefinitions="Auto, *, Auto" Padding="16,18" ColumnSpacing="16" BackgroundColor="Transparent">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectCategoryCommand}" />
+                        </Grid.GestureRecognizers>
                         <Grid.Behaviors>
-                            <toolkit:TouchBehavior Command="{Binding SelectCategoryCommand}"
-                                                   DefaultBackgroundColor="Transparent"
+                            <toolkit:TouchBehavior DefaultBackgroundColor="Transparent"
                                                    PressedBackgroundColor="#F2F2F6"
                                                    DefaultOpacity="1.0"
                                                    PressedOpacity="0.5"
@@ -51,9 +53,9 @@
                                                    DefaultAnimationDuration="100" />
                         </Grid.Behaviors>
 
-                        <Image Grid.Column="0" Source="{mi:Material Icon=Edit, IconColor=Gray}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
-                        <Label Grid.Column="1" Text="Выбрана 1 категория" FontSize="16" TextColor="#2C2C2E" VerticalOptions="Center" />
-                        <Image Grid.Column="2" Source="{mi:Material Icon=Category, IconColor=Gray}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
+                        <Image Grid.Column="0" Source="{mi:Material Icon=Edit, IconColor=Gray}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" InputTransparent="True"/>
+                        <Label Grid.Column="1" Text="Выбрана 1 категория" FontSize="16" TextColor="#2C2C2E" VerticalOptions="Center" InputTransparent="True"/>
+                        <Image Grid.Column="2" Source="{mi:Material Icon=Category, IconColor=Gray}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" InputTransparent="True"/>
                     </Grid>
 
                     <!-- Разделитель -->
@@ -61,9 +63,11 @@
 
                     <!-- 2. Учить новые слова -->
                     <Grid ColumnDefinitions="Auto, *" Padding="16,18" ColumnSpacing="16" BackgroundColor="Transparent">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding LearnNewWordsCommand}" />
+                        </Grid.GestureRecognizers>
                         <Grid.Behaviors>
-                            <toolkit:TouchBehavior Command="{Binding LearnNewWordsCommand}"
-                                                   DefaultBackgroundColor="Transparent"
+                            <toolkit:TouchBehavior DefaultBackgroundColor="Transparent"
                                                    PressedBackgroundColor="#F2F2F6"
                                                    DefaultOpacity="1.0"
                                                    PressedOpacity="0.5"
@@ -71,9 +75,9 @@
                                                    DefaultAnimationDuration="100" />
                         </Grid.Behaviors>
 
-                        <Image Grid.Column="0" Source="{mi:Material Icon=AddCircleOutline, IconColor=#D94D7A}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
+                        <Image Grid.Column="0" Source="{mi:Material Icon=AddCircleOutline, IconColor=#D94D7A}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" InputTransparent="True"/>
 
-                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4" InputTransparent="True">
                             <Label Text="Учить новые слова" FontSize="16" TextColor="#2C2C2E" />
                             <Label Text="Выучено сегодня: 0 из 5" FontSize="13" TextColor="#8E8E93" />
                         </VerticalStackLayout>
@@ -84,9 +88,11 @@
 
                     <!-- 3. Повторить слова -->
                     <Grid ColumnDefinitions="Auto, *" Padding="16,18" ColumnSpacing="16" BackgroundColor="Transparent">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding RepeatWordsCommand}" />
+                        </Grid.GestureRecognizers>
                         <Grid.Behaviors>
-                            <toolkit:TouchBehavior Command="{Binding RepeatWordsCommand}"
-                                                   DefaultBackgroundColor="Transparent"
+                            <toolkit:TouchBehavior DefaultBackgroundColor="Transparent"
                                                    PressedBackgroundColor="#F2F2F6"
                                                    DefaultOpacity="1.0"
                                                    PressedOpacity="0.5"
@@ -94,9 +100,9 @@
                                                    DefaultAnimationDuration="100" />
                         </Grid.Behaviors>
 
-                        <Image Grid.Column="0" Source="{mi:Material Icon=Autorenew, IconColor=#EBB24B}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
+                        <Image Grid.Column="0" Source="{mi:Material Icon=Autorenew, IconColor=#EBB24B}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" InputTransparent="True"/>
 
-                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4" InputTransparent="True">
                             <Label Text="Повторить слова" FontSize="16" TextColor="#2C2C2E" />
                             <Label Text="В выбранных категориях нет слов для повторения" FontSize="13" TextColor="#8E8E93" LineBreakMode="WordWrap" />
                         </VerticalStackLayout>
@@ -107,9 +113,11 @@
 
                     <!-- 4. Смешанный режим -->
                     <Grid ColumnDefinitions="Auto, *" Padding="16,18" ColumnSpacing="16" BackgroundColor="Transparent">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding MixedModeCommand}" />
+                        </Grid.GestureRecognizers>
                         <Grid.Behaviors>
-                            <toolkit:TouchBehavior Command="{Binding MixedModeCommand}"
-                                                   DefaultBackgroundColor="Transparent"
+                            <toolkit:TouchBehavior DefaultBackgroundColor="Transparent"
                                                    PressedBackgroundColor="#F2F2F6"
                                                    DefaultOpacity="1.0"
                                                    PressedOpacity="0.5"
@@ -117,9 +125,9 @@
                                                    DefaultAnimationDuration="100" />
                         </Grid.Behaviors>
 
-                        <Image Grid.Column="0" Source="{mi:Material Icon=LightbulbOutline, IconColor=#6487E1}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
+                        <Image Grid.Column="0" Source="{mi:Material Icon=LightbulbOutline, IconColor=#6487E1}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" InputTransparent="True"/>
 
-                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4" InputTransparent="True">
                             <Label Text="Смешанный режим" FontSize="16" TextColor="#2C2C2E" />
                             <Label Text="Будут появляться новые слова и слова для повторения" FontSize="13" TextColor="#8E8E93" LineBreakMode="WordWrap" />
                         </VerticalStackLayout>
@@ -132,7 +140,7 @@
             <!-- СЕКЦИЯ 2: ИЗУЧЕНИЯ                       -->
             <!-- ========================================== -->
 
-            <!-- Заголовок секции 2 (добавлен отступ сверху Margin="8,16,0,0") -->
+            <!-- Заголовок секции 2 -->
             <Label Text="Изучение"
                    FontSize="13"
                    TextColor="#9595A5"
@@ -156,9 +164,11 @@
 
                     <!-- 1. Пройти квиз -->
                     <Grid ColumnDefinitions="Auto, *" Padding="16,18" ColumnSpacing="16" BackgroundColor="Transparent">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding TakeQuizCommand}" />
+                        </Grid.GestureRecognizers>
                         <Grid.Behaviors>
-                            <toolkit:TouchBehavior Command="{Binding TakeQuizCommand}"
-                                                   DefaultBackgroundColor="Transparent"
+                            <toolkit:TouchBehavior DefaultBackgroundColor="Transparent"
                                                    PressedBackgroundColor="#F2F2F6"
                                                    DefaultOpacity="1.0"
                                                    PressedOpacity="0.5"
@@ -166,12 +176,12 @@
                                                    DefaultAnimationDuration="100" />
                         </Grid.Behaviors>
 
-                        <Image Grid.Column="0" Source="{mi:Material Icon=Quiz, IconColor=#9C27B0}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
-                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
-                            <Label Grid.Column="1" Text="Пройти квиз" FontSize="16" TextColor="#2C2C2E" VerticalOptions="Center" />
+                        <Image Grid.Column="0" Source="{mi:Material Icon=Quiz, IconColor=#9C27B0}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" InputTransparent="True"/>
+
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4" InputTransparent="True">
+                            <Label Text="Пройти квиз" FontSize="16" TextColor="#2C2C2E" VerticalOptions="Center" />
                             <Label Text="Проверить знания" FontSize="13" TextColor="#8E8E93" LineBreakMode="WordWrap" />
                         </VerticalStackLayout>
-                        
                     </Grid>
 
                     <!-- Разделитель -->
@@ -179,9 +189,11 @@
 
                     <!-- 2. Прочитать статью -->
                     <Grid ColumnDefinitions="Auto, *" Padding="16,18" ColumnSpacing="16" BackgroundColor="Transparent">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ReadArticleCommand}" />
+                        </Grid.GestureRecognizers>
                         <Grid.Behaviors>
-                            <toolkit:TouchBehavior Command="{Binding ReadArticleCommand}"
-                                                   DefaultBackgroundColor="Transparent"
+                            <toolkit:TouchBehavior DefaultBackgroundColor="Transparent"
                                                    PressedBackgroundColor="#F2F2F6"
                                                    DefaultOpacity="1.0"
                                                    PressedOpacity="0.5"
@@ -189,13 +201,12 @@
                                                    DefaultAnimationDuration="100" />
                         </Grid.Behaviors>
 
-                        <Image Grid.Column="0" Source="{mi:Material Icon=Article, IconColor=#009688}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
-                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
-                            <Label Grid.Column="1" Text="Прочитать статью" FontSize="16" TextColor="#2C2C2E" VerticalOptions="Center" />
+                        <Image Grid.Column="0" Source="{mi:Material Icon=Article, IconColor=#009688}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" InputTransparent="True"/>
+
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4" InputTransparent="True">
+                            <Label Text="Прочитать статью" FontSize="16" TextColor="#2C2C2E" VerticalOptions="Center" />
                             <Label Text="Изучить материал" FontSize="13" TextColor="#8E8E93" LineBreakMode="WordWrap" />
                         </VerticalStackLayout>
-                        
-                        
                     </Grid>
 
                 </VerticalStackLayout>

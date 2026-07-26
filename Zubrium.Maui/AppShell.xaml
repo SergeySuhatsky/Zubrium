@@ -17,7 +17,7 @@
     <TabBar>
         <Tab Title="Учить" Icon="{mi:Material Icon=School, IconColor=Gray, IconSize=32}">
             <ShellContent
-                ContentTemplate="{DataTemplate generals:CardsPage}"
+                ContentTemplate="{DataTemplate generals:StudyPage}"
                 Route="MainPage" />
         </Tab>
 
@@ -36,7 +36,7 @@
         <Tab Title="Квизы" Icon="{mi:Material Icon=Quiz, IconColor=Gray, IconSize=32}">
             <ShellContent
                 ContentTemplate="{DataTemplate quizs:QuizzesPage}"
-                Route="QuizzePage"/>
+                Route="QuizzesPage"/>
         </Tab>
 
         <Tab Title="Меню" Icon="{mi:Material Icon=Settings, IconColor=Gray, IconSize=32}">
