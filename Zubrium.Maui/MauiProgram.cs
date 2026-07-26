@@ -8,6 +8,8 @@ using MauiIcons.Material;
 using Zubrium.Maui.Features.Settings;
 using Zubrium.Maui.Features.Quizs;
 using Zubrium.Maui.Features.Cards;
+using Microsoft.Maui.Controls;
+using System.Reflection;
 
 namespace Zubrium.Maui
 {
@@ -25,22 +27,38 @@ namespace Zubrium.Maui
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
+
+            // Register markdown render service
             builder.Services.AddSingleton<IMarkdownRenderService, MarkdownRenderService>();
 
-            builder.Services.AddTransient<ArticlePage>();
-            builder.Services.AddTransient<ArticleViewModel>();
-
-            builder.Services.AddTransient<SettingsMenuPage>();
-            builder.Services.AddTransient<SettingsMenuViewModel>();
-
-            builder.Services.AddTransient<QuizzePage>();
-            builder.Services.AddTransient<QuizzesViewModel>();
-
-            builder.Services.AddTransient<CardsPage>();
-            builder.Services.AddTransient<CardsViewModel>();
-
+            // Register SQLite content repository
             string dbPath = Path.Combine(FileSystem.AppDataDirectory, "ZubriumData.db3");
             builder.Services.AddSingleton<IContentRepository>(s => new SqliteContentRepository(dbPath));
+
+
+            // Register pages and view models using reflection
+            var assembly = Assembly.GetExecutingAssembly();
+
+            var viewModels = assembly.GetTypes()
+                .Where(t => t.IsClass
+                            && !t.IsAbstract
+                            && t.IsSubclassOf(typeof(BaseViewModel)));
+            foreach (var viewModel in viewModels)
+            {
+                builder.Services.AddTransient(viewModel);
+            }
+
+            var pages = assembly.GetTypes()
+                .Where(t => t.IsClass
+                            && !t.IsAbstract
+                            && t.IsSubclassOf(typeof(ContentPage)));
+
+            foreach (var page in pages)
+            {
+                builder.Services.AddTransient(page);
+            }
+                
+
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
