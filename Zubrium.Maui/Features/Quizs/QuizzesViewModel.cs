@@ -21,9 +21,9 @@ namespace Zubrium.Maui.Features.Quizs
         }
 
         [RelayCommand]
-        public async void Import()
+        public async Task Import()
         {
-            App.Current.MainPage.DisplayAlert("Радыфв","sd","sda");
+            await Shell.Current.GoToAsync(nameof(Generals.ImportPage));
         }
     }
 }

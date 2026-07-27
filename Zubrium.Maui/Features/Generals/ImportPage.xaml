@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             xmlns:local="clr-namespace:Zubrium.Maui.Features.Generals"
+             x:Class="Zubrium.Maui.Features.Generals.ImportPage"
+             x:DataType="local:ImportViewModel"
+             BackgroundColor="#F4F5F8">
+
+    <Grid RowDefinitions="*, Auto">
+
+        <!-- Основной контент со скроллом -->
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="20,10,20,40" Spacing="0">
+
+                <!-- Шапка (Крестик и Заголовок) -->
+                <Grid ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,24">
+                    <ImageButton Grid.Column="0" 
+                                 Source="{mi:Material Icon=Close, IconColor=#1C1C1E}" 
+                                 BackgroundColor="Transparent"
+                                 WidthRequest="32" HeightRequest="32"
+                                 Command="{Binding CloseCommand}"/>
+                    <Label Grid.Column="1" 
+                           Text="Добавить контент" 
+                           FontSize="20" 
+                           FontAttributes="Bold" 
+                           TextColor="#1C1C1E" 
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center"/>
+                </Grid>
+
+                <!-- Вкладки: Вставить текст / Файл -->
+                <Grid ColumnDefinitions="*, *" ColumnSpacing="12" Margin="0,0,0,24">
+                    <!-- Активная вкладка "Вставить текст" -->
+                    <Border Grid.Column="0" 
+                            BackgroundColor="#1C1C1E" 
+                            StrokeThickness="0" 
+                            Padding="0,12">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+                        <Label Text="Вставить текст" 
+                               TextColor="White" 
+                               FontAttributes="Bold" 
+                               HorizontalOptions="Center" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SwitchToPasteTextCommand}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+
+                    <!-- Неактивная вкладка "Файл" -->
+                    <Border Grid.Column="1" 
+                            BackgroundColor="White" 
+                            Stroke="#EAECEF" 
+                            StrokeThickness="1" 
+                            Padding="0,12">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+                        <Label Text="Файл с устройства" 
+                               TextColor="#1C1C1E" 
+                               FontAttributes="Bold" 
+                               HorizontalOptions="Center" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SwitchToFileCommand}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </Grid>
+
+                <!-- Поле ввода текста -->
+                <Border BackgroundColor="White" 
+                        Stroke="#EAECEF" 
+                        StrokeThickness="1" 
+                        Padding="12" 
+                        HeightRequest="160">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16" />
+                    </Border.StrokeShape>
+                    <Editor Placeholder="Вставьте текст или Markdown..." 
+                            PlaceholderColor="#8E8E93"
+                            TextColor="#1C1C1E"
+                            BackgroundColor="Transparent"
+                            Text="{Binding InputText}"
+                            AutoSize="TextChanges"/>
+                </Border>
+
+                <!-- Кнопка "Вставить из буфера обмена" -->
+                <HorizontalStackLayout Spacing="6" Margin="0,12,0,24" HorizontalOptions="Start">
+                    <HorizontalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding PasteFromClipboardCommand}" />
+                    </HorizontalStackLayout.GestureRecognizers>
+                    <Image Source="{mi:Material Icon=ContentPaste, IconColor=#6278E6}" WidthRequest="20" HeightRequest="20"/>
+                    <Label Text="Вставить из буфера обмена" 
+                           TextColor="#6278E6" 
+                           FontSize="14" 
+                           FontAttributes="Bold" 
+                           VerticalOptions="Center"/>
+                </HorizontalStackLayout>
+
+                <!-- Выбор категории -->
+                <Label Text="КАТЕГОРИЯ" FontSize="13" TextColor="#9595A5" FontAttributes="Bold" Margin="4,0,0,8" />
+                <Border BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="16,14" Margin="0,0,0,24">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16" />
+                    </Border.StrokeShape>
+                    <Grid ColumnDefinitions="Auto, *, Auto">
+                        <BoxView Grid.Column="0" Color="#9C27B0" WidthRequest="12" HeightRequest="12" CornerRadius="6" VerticalOptions="Center" Margin="0,0,12,0" />
+                        <Label Grid.Column="1" Text="Топология" TextColor="#1C1C1E" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+
+                        <!-- Исправлено: цвет без кавычек -->
+                        <Image Grid.Column="2" Source="{mi:Material Icon=KeyboardArrowDown, IconColor=#8E8E93}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
+                    </Grid>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectCategoryCommand}" />
+                    </Border.GestureRecognizers>
+                </Border>
+
+                <!-- Что импортировать -->
+                <!-- Что импортировать -->
+                <Label Text="ЧТО ИМПОРТИРОВАТЬ" FontSize="13" TextColor="#9595A5" FontAttributes="Bold" Margin="4,0,0,8" />
+                <VerticalStackLayout Spacing="10" Margin="0,0,0,24">
+
+                    <!-- Карточка 1: Карточки -->
+                    <Border StrokeThickness="1" Padding="16">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="16" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleCardsImportCommand}" />
+                        </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsCardsImportSelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="#6278E6" />
+                                <Setter Property="Stroke" Value="#6278E6" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsCardsImportSelected}" Value="False">
+                                <Setter Property="BackgroundColor" Value="White" />
+                                <Setter Property="Stroke" Value="#EAECEF" />
+                            </DataTrigger>
+                        </Border.Triggers>
+
+                        <Grid ColumnDefinitions="Auto, *">
+                            <!-- ИСПРАВЛЕНИЕ: Две иконки с переключением видимости -->
+                            <Grid Grid.Column="0" VerticalOptions="Center" Margin="0,0,16,0">
+                                <!-- Белая иконка (видна, когда выбрано) -->
+                                <Image Source="{mi:Material Icon=Style, IconColor=White}" WidthRequest="28" HeightRequest="28" IsVisible="False">
+                                    <Image.Triggers>
+                                        <DataTrigger TargetType="Image" Binding="{Binding IsCardsImportSelected}" Value="True">
+                                            <Setter Property="IsVisible" Value="True" />
+                                        </DataTrigger>
+                                    </Image.Triggers>
+                                </Image>
+                                <!-- Серая иконка (видна, когда НЕ выбрано) -->
+                                <Image Source="{mi:Material Icon=Style, IconColor=#8E8E93}" WidthRequest="28" HeightRequest="28" IsVisible="True">
+                                    <Image.Triggers>
+                                        <DataTrigger TargetType="Image" Binding="{Binding IsCardsImportSelected}" Value="True">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
+                                    </Image.Triggers>
+                                </Image>
+                            </Grid>
+
+                            <!-- Текст -->
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="Карточки" FontSize="16" FontAttributes="Bold">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsCardsImportSelected}" Value="True">
+                                            <Setter Property="TextColor" Value="White" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsCardsImportSelected}" Value="False">
+                                            <Setter Property="TextColor" Value="#1C1C1E" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                                <Label Text="Найдено: 3" FontSize="13">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsCardsImportSelected}" Value="True">
+                                            <Setter Property="TextColor" Value="#E0E6FF" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsCardsImportSelected}" Value="False">
+                                            <Setter Property="TextColor" Value="#8E8E93" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+
+                    <!-- Карточка 2: Квизы -->
+                    <Border StrokeThickness="1" Padding="16">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="16" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleQuizzesImportCommand}" />
+                        </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsQuizzesImportSelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="#6278E6" />
+                                <Setter Property="Stroke" Value="#6278E6" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsQuizzesImportSelected}" Value="False">
+                                <Setter Property="BackgroundColor" Value="White" />
+                                <Setter Property="Stroke" Value="#EAECEF" />
+                            </DataTrigger>
+                        </Border.Triggers>
+
+                        <Grid ColumnDefinitions="Auto, *">
+                            <!-- ИСПРАВЛЕНИЕ: Две иконки с переключением видимости -->
+                            <Grid Grid.Column="0" VerticalOptions="Center" Margin="0,0,16,0">
+                                <Image Source="{mi:Material Icon=Science, IconColor=White}" WidthRequest="28" HeightRequest="28" IsVisible="False">
+                                    <Image.Triggers>
+                                        <DataTrigger TargetType="Image" Binding="{Binding IsQuizzesImportSelected}" Value="True">
+                                            <Setter Property="IsVisible" Value="True" />
+                                        </DataTrigger>
+                                    </Image.Triggers>
+                                </Image>
+                                <Image Source="{mi:Material Icon=Science, IconColor=#8E8E93}" WidthRequest="28" HeightRequest="28" IsVisible="True">
+                                    <Image.Triggers>
+                                        <DataTrigger TargetType="Image" Binding="{Binding IsQuizzesImportSelected}" Value="True">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
+                                    </Image.Triggers>
+                                </Image>
+                            </Grid>
+
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="Квизы" FontSize="16" FontAttributes="Bold">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsQuizzesImportSelected}" Value="True">
+                                            <Setter Property="TextColor" Value="White" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsQuizzesImportSelected}" Value="False">
+                                            <Setter Property="TextColor" Value="#1C1C1E" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                                <Label Text="Найдено: 1" FontSize="13">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsQuizzesImportSelected}" Value="True">
+                                            <Setter Property="TextColor" Value="#E0E6FF" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsQuizzesImportSelected}" Value="False">
+                                            <Setter Property="TextColor" Value="#8E8E93" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+
+                    <!-- Карточка 3: Статьи -->
+                    <Border StrokeThickness="1" Padding="16">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="16" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleArticlesImportCommand}" />
+                        </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsArticlesImportSelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="#6278E6" />
+                                <Setter Property="Stroke" Value="#6278E6" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsArticlesImportSelected}" Value="False">
+                                <Setter Property="BackgroundColor" Value="White" />
+                                <Setter Property="Stroke" Value="#EAECEF" />
+                            </DataTrigger>
+                        </Border.Triggers>
+
+                        <Grid ColumnDefinitions="Auto, *">
+                            <!-- ИСПРАВЛЕНИЕ: Две иконки с переключением видимости -->
+                            <Grid Grid.Column="0" VerticalOptions="Center" Margin="0,0,16,0">
+                                <Image Source="{mi:Material Icon=Article, IconColor=White}" WidthRequest="28" HeightRequest="28" IsVisible="False">
+                                    <Image.Triggers>
+                                        <DataTrigger TargetType="Image" Binding="{Binding IsArticlesImportSelected}" Value="True">
+                                            <Setter Property="IsVisible" Value="True" />
+                                        </DataTrigger>
+                                    </Image.Triggers>
+                                </Image>
+                                <Image Source="{mi:Material Icon=Article, IconColor=#8E8E93}" WidthRequest="28" HeightRequest="28" IsVisible="True">
+                                    <Image.Triggers>
+                                        <DataTrigger TargetType="Image" Binding="{Binding IsArticlesImportSelected}" Value="True">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
+                                    </Image.Triggers>
+                                </Image>
+                            </Grid>
+
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="Статьи" FontSize="16" FontAttributes="Bold">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsArticlesImportSelected}" Value="True">
+                                            <Setter Property="TextColor" Value="White" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsArticlesImportSelected}" Value="False">
+                                            <Setter Property="TextColor" Value="#1C1C1E" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                                <Label Text="Найдено: 1" FontSize="13">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsArticlesImportSelected}" Value="True">
+                                            <Setter Property="TextColor" Value="#E0E6FF" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsArticlesImportSelected}" Value="False">
+                                            <Setter Property="TextColor" Value="#8E8E93" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+
+                </VerticalStackLayout>
+
+                <!-- Предпросмотр -->
+                <Label Text="ПРЕДПРОСМОТР" FontSize="13" TextColor="#9595A5" FontAttributes="Bold" Margin="4,0,0,12" />
+
+                <Grid ColumnDefinitions="*, *, *" ColumnSpacing="8" Margin="0,0,0,16">
+                    <!-- Таб 1: Карточки -->
+                    <Border Grid.Column="0" StrokeThickness="1" Padding="0,12" IsEnabled="{Binding IsCardsImportSelected}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleCardsPreviewCommand}" />
+                        </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsCardsPreviewActive}" Value="True">
+                                <Setter Property="BackgroundColor" Value="#1C1C1E" />
+                                <Setter Property="Stroke" Value="#1C1C1E" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsCardsPreviewActive}" Value="False">
+                                <Setter Property="BackgroundColor" Value="White" />
+                                <Setter Property="Stroke" Value="#EAECEF" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsCardsImportSelected}" Value="False">
+                                <Setter Property="Opacity" Value="0.5" />
+                                <Setter Property="BackgroundColor" Value="#F2F2F6" />
+                            </DataTrigger>
+                        </Border.Triggers>
+
+                        <Label Text="Карточки" HorizontalOptions="Center" FontAttributes="Bold">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsCardsPreviewActive}" Value="True">
+                                    <Setter Property="TextColor" Value="White" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsCardsPreviewActive}" Value="False">
+                                    <Setter Property="TextColor" Value="#1C1C1E" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </Border>
+
+                    <!-- Таб 2: Квизы -->
+                    <Border Grid.Column="1" StrokeThickness="1" Padding="0,12" IsEnabled="{Binding IsQuizzesImportSelected}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleQuizzesPreviewCommand}" />
+                        </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsQuizzesPreviewActive}" Value="True">
+                                <Setter Property="BackgroundColor" Value="#1C1C1E" />
+                                <Setter Property="Stroke" Value="#1C1C1E" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsQuizzesPreviewActive}" Value="False">
+                                <Setter Property="BackgroundColor" Value="White" />
+                                <Setter Property="Stroke" Value="#EAECEF" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsQuizzesImportSelected}" Value="False">
+                                <Setter Property="Opacity" Value="0.5" />
+                                <Setter Property="BackgroundColor" Value="#F2F2F6" />
+                            </DataTrigger>
+                        </Border.Triggers>
+
+                        <Label Text="Квизы" HorizontalOptions="Center" FontAttributes="Bold">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsQuizzesPreviewActive}" Value="True">
+                                    <Setter Property="TextColor" Value="White" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsQuizzesPreviewActive}" Value="False">
+                                    <Setter Property="TextColor" Value="#1C1C1E" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </Border>
+
+                    <!-- Таб 3: Статьи -->
+                    <Border Grid.Column="2" StrokeThickness="1" Padding="0,12" IsEnabled="{Binding IsArticlesImportSelected}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleArticlesPreviewCommand}" />
+                        </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsArticlesPreviewActive}" Value="True">
+                                <Setter Property="BackgroundColor" Value="#1C1C1E" />
+                                <Setter Property="Stroke" Value="#1C1C1E" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsArticlesPreviewActive}" Value="False">
+                                <Setter Property="BackgroundColor" Value="White" />
+                                <Setter Property="Stroke" Value="#EAECEF" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsArticlesImportSelected}" Value="False">
+                                <Setter Property="Opacity" Value="0.5" />
+                                <Setter Property="BackgroundColor" Value="#F2F2F6" />
+                            </DataTrigger>
+                        </Border.Triggers>
+
+                        <Label Text="Статьи" HorizontalOptions="Center" FontAttributes="Bold">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsArticlesPreviewActive}" Value="True">
+                                    <Setter Property="TextColor" Value="White" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsArticlesPreviewActive}" Value="False">
+                                    <Setter Property="TextColor" Value="#1C1C1E" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </Border>
+                </Grid>
+
+                <!-- Окно контента предпросмотра (заглушка) -->
+                <Border BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="16" IsVisible="{Binding IsAnyPreviewActive}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout>
+                        <HorizontalStackLayout Spacing="6" Margin="0,0,0,8">
+                            <BoxView Color="#9C27B0" WidthRequest="8" HeightRequest="8" CornerRadius="4" VerticalOptions="Center"/>
+                            <Label Text="Card" FontSize="12" TextColor="#8E8E93" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                        <Label Text="Что такое гомеоморфизм?" FontSize="16" FontAttributes="Bold" TextColor="#1C1C1E" Margin="0,0,0,8" />
+                        <Label Text="Непрерывная биекция с непрерывным обратным отображением." TextColor="#34C759" FontSize="14" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Нижняя панель с кнопкой импорта -->
+        <Border Grid.Row="1" BackgroundColor="White" StrokeThickness="0" Padding="20,16,20,32">
+            <Border.Shadow>
+                <Shadow Brush="#000000" Offset="0,-4" Radius="12" Opacity="0.05" />
+            </Border.Shadow>
+
+            <Button Text="{Binding ImportButtonText, FallbackValue='Импортировать 3 карточки + 1 квиз'}" 
+                    BackgroundColor="#1C1C1E" 
+                    TextColor="White" 
+                    FontAttributes="Bold" 
+                    FontSize="16" 
+                    HeightRequest="56" 
+                    CornerRadius="16" 
+                    ImageSource="{mi:Material Icon=Download, IconColor=White}"
+                    Command="{Binding ImportCommand}"/>
+        </Border>
+
+    </Grid>
+</ContentPage>
