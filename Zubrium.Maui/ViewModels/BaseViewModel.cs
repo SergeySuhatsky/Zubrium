@@ -19,5 +19,12 @@ namespace Zubrium.Maui.ViewModels
 
         public abstract void ApplyQueryAttributes(IDictionary<string, object> query);
 
+
+        [RelayCommand]
+        public virtual async Task GoBack()
+        {
+            // Возврат на предыдущую страницу
+            await Shell.Current.GoToAsync("..");
+        }
     }
 }
