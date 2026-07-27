@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Zubrium.Content;
@@ -16,6 +18,12 @@ namespace Zubrium.Maui.Features.Quizs
         public override void ApplyQueryAttributes(IDictionary<string, object> query)
         {
 
+        }
+
+        [RelayCommand]
+        public async void Import()
+        {
+            App.Current.MainPage.DisplayAlert("Радыфв","sd","sda");
         }
     }
 }
