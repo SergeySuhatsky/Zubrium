@@ -9,19 +9,17 @@
              x:DataType="local:ImportViewModel"
              BackgroundColor="#F4F5F8">
 
+    
     <Grid RowDefinitions="*, Auto">
-
+        
+        
         <!-- Основной контент со скроллом -->
         <ScrollView Grid.Row="0">
+
             <VerticalStackLayout Padding="20,10,20,40" Spacing="0">
 
-                <!-- Шапка (Крестик и Заголовок) -->
-                <Grid ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,24">
-                    <ImageButton Grid.Column="0" 
-                                 Source="{mi:Material Icon=Close, IconColor=#1C1C1E}" 
-                                 BackgroundColor="Transparent"
-                                 WidthRequest="32" HeightRequest="32"
-                                 Command="{Binding CloseCommand}"/>
+                <Grid Margin="0,0,0,24">
+                    <controls:DesktopBackButton />
                     <Label Grid.Column="1" 
                            Text="Добавить контент" 
                            FontSize="20" 
@@ -33,71 +31,176 @@
 
                 <!-- Вкладки: Вставить текст / Файл -->
                 <Grid ColumnDefinitions="*, *" ColumnSpacing="12" Margin="0,0,0,24">
-                    <!-- Активная вкладка "Вставить текст" -->
-                    <Border Grid.Column="0" 
-                            BackgroundColor="#1C1C1E" 
-                            StrokeThickness="0" 
-                            Padding="0,12">
+                    <!-- Вкладка "Вставить текст" -->
+                    <Border Grid.Column="0" StrokeThickness="1" Padding="0,12">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="12" />
                         </Border.StrokeShape>
-                        <Label Text="Вставить текст" 
-                               TextColor="White" 
-                               FontAttributes="Bold" 
-                               HorizontalOptions="Center" />
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding SwitchToPasteTextCommand}" />
                         </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsPasteTextMode}" Value="True">
+                                <Setter Property="BackgroundColor" Value="#1C1C1E" />
+                                <Setter Property="Stroke" Value="#1C1C1E" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsPasteTextMode}" Value="False">
+                                <Setter Property="BackgroundColor" Value="White" />
+                                <Setter Property="Stroke" Value="#EAECEF" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Label Text="Вставить текст" HorizontalOptions="Center" FontAttributes="Bold">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsPasteTextMode}" Value="True">
+                                    <Setter Property="TextColor" Value="White" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsPasteTextMode}" Value="False">
+                                    <Setter Property="TextColor" Value="#1C1C1E" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
                     </Border>
 
-                    <!-- Неактивная вкладка "Файл" -->
-                    <Border Grid.Column="1" 
-                            BackgroundColor="White" 
-                            Stroke="#EAECEF" 
-                            StrokeThickness="1" 
-                            Padding="0,12">
+                    <!-- Вкладка "Файл с устройства" -->
+                    <Border Grid.Column="1" StrokeThickness="1" Padding="0,12">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="12" />
                         </Border.StrokeShape>
-                        <Label Text="Файл с устройства" 
-                               TextColor="#1C1C1E" 
-                               FontAttributes="Bold" 
-                               HorizontalOptions="Center" />
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding SwitchToFileCommand}" />
                         </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsFileMode}" Value="True">
+                                <Setter Property="BackgroundColor" Value="#1C1C1E" />
+                                <Setter Property="Stroke" Value="#1C1C1E" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsFileMode}" Value="False">
+                                <Setter Property="BackgroundColor" Value="White" />
+                                <Setter Property="Stroke" Value="#EAECEF" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Label Text="Файл с устройства" HorizontalOptions="Center" FontAttributes="Bold">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsFileMode}" Value="True">
+                                    <Setter Property="TextColor" Value="White" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsFileMode}" Value="False">
+                                    <Setter Property="TextColor" Value="#1C1C1E" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
                     </Border>
                 </Grid>
 
-                <!-- Поле ввода текста -->
-                <Border BackgroundColor="White" 
-                        Stroke="#EAECEF" 
-                        StrokeThickness="1" 
-                        Padding="12" 
-                        HeightRequest="160">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="16" />
-                    </Border.StrokeShape>
-                    <Editor Placeholder="Вставьте текст или Markdown..." 
-                            PlaceholderColor="#8E8E93"
-                            TextColor="#1C1C1E"
-                            BackgroundColor="Transparent"
-                            Text="{Binding InputText}"
-                            AutoSize="TextChanges"/>
-                </Border>
+                <!-- Контент для режима "Вставить текст" -->
+                <VerticalStackLayout IsVisible="{Binding IsPasteTextMode}" Spacing="12" Margin="0,0,0,24">
+                    <!-- Кнопка предпросмотра блокируется (IsEnabled), если нет контента (HasContent = false) -->
+                    <!-- Кнопка "Посмотреть код контента" -->
+                    <!-- Кнопка "Посмотреть код контента" -->
+                    <Border StrokeThickness="1" 
+                        HeightRequest="48"
+                        IsEnabled="{Binding HasContent}">
+                        
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
 
-                <!-- Кнопка "Вставить из буфера обмена" -->
-                <HorizontalStackLayout Spacing="6" Margin="0,12,0,24" HorizontalOptions="Start">
-                    <HorizontalStackLayout.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding PasteFromClipboardCommand}" />
-                    </HorizontalStackLayout.GestureRecognizers>
-                    <Image Source="{mi:Material Icon=ContentPaste, IconColor=#6278E6}" WidthRequest="20" HeightRequest="20"/>
-                    <Label Text="Вставить из буфера обмена" 
-                           TextColor="#6278E6" 
-                           FontSize="14" 
-                           FontAttributes="Bold" 
-                           VerticalOptions="Center"/>
-                </HorizontalStackLayout>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenCodePreviewCommand}" />
+                        </Border.GestureRecognizers>
+
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding HasContent}" Value="True">
+                                <Setter Property="BackgroundColor" Value="#6278E6" />
+                                <Setter Property="Stroke" Value="#6278E6" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding HasContent}" Value="False">
+                                <Setter Property="BackgroundColor" Value="#E0E0E0" />
+                                <Setter Property="Stroke" Value="#E0E0E0" />
+                                <Setter Property="Opacity" Value="0.5" />
+                            </DataTrigger>
+                        </Border.Triggers>
+
+                        <!-- Контейнер для центрирования иконки и текста -->
+                        <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8">
+
+                            <!-- Grid накладывает иконки друг на друга -->
+                            <Grid>
+                                <!-- Иконка для состояния HasContent = True (Белая) -->
+                                <Image Source="{mi:Material Icon=Code, IconColor=White}" WidthRequest="24" HeightRequest="24" IsVisible="False">
+                                    <Image.Triggers>
+                                        <DataTrigger TargetType="Image" Binding="{Binding HasContent}" Value="True">
+                                            <Setter Property="IsVisible" Value="True" />
+                                        </DataTrigger>
+                                    </Image.Triggers>
+                                </Image>
+
+                                <!-- Иконка для состояния HasContent = False (Черная) -->
+                                <Image Source="{mi:Material Icon=Code, IconColor=Black}" WidthRequest="24" HeightRequest="24" IsVisible="True">
+                                    <Image.Triggers>
+                                        <DataTrigger TargetType="Image" Binding="{Binding HasContent}" Value="True">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
+                                    </Image.Triggers>
+                                </Image>
+                            </Grid>
+
+                            <!-- Текст -->
+                            <Label Text="Посмотреть код контента" 
+                                VerticalOptions="Center"
+                                FontAttributes="Bold">
+                                
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding HasContent}" Value="True">
+                                        <Setter Property="TextColor" Value="White" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label" Binding="{Binding HasContent}" Value="False">
+                                        <Setter Property="TextColor" Value="Black" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Кнопка "Вставить из буфера обмена" -->
+                    <Border StrokeThickness="0" 
+                            HeightRequest="48"
+                            BackgroundColor="#6278E6">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding PasteFromClipboardCommand}" />
+                        </Border.GestureRecognizers>
+
+                        <!-- Контейнер для центрирования иконки и текста -->
+                        <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8">
+
+                            <!-- Одна иконка, так как состояние кнопки не меняется -->
+                            <Image Source="{mi:Material Icon=ContentPaste, IconColor=White}" WidthRequest="24" HeightRequest="24" />
+
+                            <!-- Текст -->
+                            <Label Text="Вставить из буфера обмена" 
+                                VerticalOptions="Center"
+                                TextColor="White" 
+                                FontAttributes="Bold" />
+                        </HorizontalStackLayout>
+                    </Border>
+
+
+                </VerticalStackLayout>
+
+                <!-- Контент для режима "Файл с устройства" -->
+                <VerticalStackLayout IsVisible="{Binding IsFileMode}" Spacing="12" Margin="0,0,0,24">
+                    <Button Text="Выбрать файл" 
+                            BackgroundColor="#6278E6" 
+                            TextColor="White" 
+                            FontAttributes="Bold" 
+                            HeightRequest="48"
+                            CornerRadius="12"
+                            Command="{Binding PickFileCommand}" />
+                </VerticalStackLayout>
 
                 <!-- Выбор категории -->
                 <Label Text="КАТЕГОРИЯ" FontSize="13" TextColor="#9595A5" FontAttributes="Bold" Margin="4,0,0,8" />
@@ -108,8 +211,6 @@
                     <Grid ColumnDefinitions="Auto, *, Auto">
                         <BoxView Grid.Column="0" Color="#9C27B0" WidthRequest="12" HeightRequest="12" CornerRadius="6" VerticalOptions="Center" Margin="0,0,12,0" />
                         <Label Grid.Column="1" Text="Топология" TextColor="#1C1C1E" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
-
-                        <!-- Исправлено: цвет без кавычек -->
                         <Image Grid.Column="2" Source="{mi:Material Icon=KeyboardArrowDown, IconColor=#8E8E93}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
                     </Grid>
                     <Border.GestureRecognizers>
@@ -117,7 +218,6 @@
                     </Border.GestureRecognizers>
                 </Border>
 
-                <!-- Что импортировать -->
                 <!-- Что импортировать -->
                 <Label Text="ЧТО ИМПОРТИРОВАТЬ" FontSize="13" TextColor="#9595A5" FontAttributes="Bold" Margin="4,0,0,8" />
                 <VerticalStackLayout Spacing="10" Margin="0,0,0,24">
@@ -142,9 +242,7 @@
                         </Border.Triggers>
 
                         <Grid ColumnDefinitions="Auto, *">
-                            <!-- ИСПРАВЛЕНИЕ: Две иконки с переключением видимости -->
                             <Grid Grid.Column="0" VerticalOptions="Center" Margin="0,0,16,0">
-                                <!-- Белая иконка (видна, когда выбрано) -->
                                 <Image Source="{mi:Material Icon=Style, IconColor=White}" WidthRequest="28" HeightRequest="28" IsVisible="False">
                                     <Image.Triggers>
                                         <DataTrigger TargetType="Image" Binding="{Binding IsCardsImportSelected}" Value="True">
@@ -152,7 +250,6 @@
                                         </DataTrigger>
                                     </Image.Triggers>
                                 </Image>
-                                <!-- Серая иконка (видна, когда НЕ выбрано) -->
                                 <Image Source="{mi:Material Icon=Style, IconColor=#8E8E93}" WidthRequest="28" HeightRequest="28" IsVisible="True">
                                     <Image.Triggers>
                                         <DataTrigger TargetType="Image" Binding="{Binding IsCardsImportSelected}" Value="True">
@@ -161,8 +258,6 @@
                                     </Image.Triggers>
                                 </Image>
                             </Grid>
-
-                            <!-- Текст -->
                             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
                                 <Label Text="Карточки" FontSize="16" FontAttributes="Bold">
                                     <Label.Triggers>
@@ -208,7 +303,6 @@
                         </Border.Triggers>
 
                         <Grid ColumnDefinitions="Auto, *">
-                            <!-- ИСПРАВЛЕНИЕ: Две иконки с переключением видимости -->
                             <Grid Grid.Column="0" VerticalOptions="Center" Margin="0,0,16,0">
                                 <Image Source="{mi:Material Icon=Science, IconColor=White}" WidthRequest="28" HeightRequest="28" IsVisible="False">
                                     <Image.Triggers>
@@ -225,7 +319,6 @@
                                     </Image.Triggers>
                                 </Image>
                             </Grid>
-
                             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
                                 <Label Text="Квизы" FontSize="16" FontAttributes="Bold">
                                     <Label.Triggers>
@@ -271,7 +364,6 @@
                         </Border.Triggers>
 
                         <Grid ColumnDefinitions="Auto, *">
-                            <!-- ИСПРАВЛЕНИЕ: Две иконки с переключением видимости -->
                             <Grid Grid.Column="0" VerticalOptions="Center" Margin="0,0,16,0">
                                 <Image Source="{mi:Material Icon=Article, IconColor=White}" WidthRequest="28" HeightRequest="28" IsVisible="False">
                                     <Image.Triggers>
@@ -288,7 +380,6 @@
                                     </Image.Triggers>
                                 </Image>
                             </Grid>
-
                             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
                                 <Label Text="Статьи" FontSize="16" FontAttributes="Bold">
                                     <Label.Triggers>
@@ -313,6 +404,16 @@
                             </VerticalStackLayout>
                         </Grid>
                     </Border>
+
+                    <Button Text="{Binding ImportButtonText}" 
+                        BackgroundColor="#1C1C1E" 
+                        TextColor="White" 
+                        FontAttributes="Bold" 
+                        FontSize="16" 
+                        HeightRequest="56" 
+                        CornerRadius="16" 
+                        ImageSource="{mi:Material Icon=Download, IconColor=White}"
+                        Command="{Binding ImportCommand}"/>
 
                 </VerticalStackLayout>
 
@@ -339,7 +440,7 @@
                             </DataTrigger>
                             <DataTrigger TargetType="Border" Binding="{Binding IsCardsImportSelected}" Value="False">
                                 <Setter Property="Opacity" Value="0.5" />
-                                <Setter Property="BackgroundColor" Value="#F2F2F6" />
+                                <Setter Property="BackgroundColor" Value="#E0E0E0" />
                             </DataTrigger>
                         </Border.Triggers>
 
@@ -374,7 +475,7 @@
                             </DataTrigger>
                             <DataTrigger TargetType="Border" Binding="{Binding IsQuizzesImportSelected}" Value="False">
                                 <Setter Property="Opacity" Value="0.5" />
-                                <Setter Property="BackgroundColor" Value="#F2F2F6" />
+                                <Setter Property="BackgroundColor" Value="#E0E0E0" />
                             </DataTrigger>
                         </Border.Triggers>
 
@@ -409,7 +510,7 @@
                             </DataTrigger>
                             <DataTrigger TargetType="Border" Binding="{Binding IsArticlesImportSelected}" Value="False">
                                 <Setter Property="Opacity" Value="0.5" />
-                                <Setter Property="BackgroundColor" Value="#F2F2F6" />
+                                <Setter Property="BackgroundColor" Value="#E0E0E0" />
                             </DataTrigger>
                         </Border.Triggers>
 
@@ -426,6 +527,8 @@
                     </Border>
                 </Grid>
 
+                
+                
                 <!-- Окно контента предпросмотра (заглушка) -->
                 <Border BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="16" IsVisible="{Binding IsAnyPreviewActive}">
                     <Border.StrokeShape>
@@ -444,22 +547,59 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <!-- Нижняя панель с кнопкой импорта -->
-        <Border Grid.Row="1" BackgroundColor="White" StrokeThickness="0" Padding="20,16,20,32">
-            <Border.Shadow>
-                <Shadow Brush="#000000" Offset="0,-4" Radius="12" Opacity="0.05" />
-            </Border.Shadow>
 
-            <Button Text="{Binding ImportButtonText, FallbackValue='Импортировать 3 карточки + 1 квиз'}" 
-                    BackgroundColor="#1C1C1E" 
-                    TextColor="White" 
-                    FontAttributes="Bold" 
-                    FontSize="16" 
-                    HeightRequest="56" 
-                    CornerRadius="16" 
-                    ImageSource="{mi:Material Icon=Download, IconColor=White}"
-                    Command="{Binding ImportCommand}"/>
-        </Border>
+        <!-- ========================================== -->
+        <!-- ВСПЛЫВАШКА РЕДАКТОРА КОДА (OVERLAY)        -->
+        <!-- ========================================== -->
+        <Grid Grid.RowSpan="2" 
+              BackgroundColor="#80000000" 
+              IsVisible="{Binding IsCodePreviewVisible}" 
+              InputTransparent="False">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CloseCodePreviewCommand}" />
+            </Grid.GestureRecognizers>
+
+            <Border BackgroundColor="White" 
+                    Margin="24,60" 
+                    Padding="16" 
+                    VerticalOptions="Center" 
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,10" Radius="20" Opacity="0.1" />
+                </Border.Shadow>
+                <!-- Перехватываем клики внутри карточки -->
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer />
+                </Border.GestureRecognizers>
+
+                <Grid RowDefinitions="Auto, *, Auto" RowSpacing="16">
+                    <Label Grid.Row="0" Text="Код контента" FontSize="18" FontAttributes="Bold" TextColor="#1C1C1E" HorizontalOptions="Center" />
+
+                    <Border Grid.Row="1" BackgroundColor="#F4F5F8" StrokeThickness="0" Padding="12">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+                        <Editor Text="{Binding InputText}"
+                                Placeholder="Markdown код здесь..."
+                                TextColor="#1C1C1E"
+                                BackgroundColor="Transparent"
+                                AutoSize="TextChanges" />
+                    </Border>
+
+                    <Button Grid.Row="2" 
+                            Text="Готово" 
+                            BackgroundColor="#1C1C1E" 
+                            TextColor="White" 
+                            FontAttributes="Bold" 
+                            HeightRequest="48"
+                            CornerRadius="12"
+                            Command="{Binding CloseCodePreviewCommand}" />
+                </Grid>
+            </Border>
+        </Grid>
 
     </Grid>
 </ContentPage>

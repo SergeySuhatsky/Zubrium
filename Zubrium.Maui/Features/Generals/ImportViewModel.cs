@@ -12,11 +12,25 @@ namespace Zubrium.Maui.Features.Generals
     {
 
         // ==========================================
-        // СВОЙСТВА ДЛЯ ТЕКСТА
+        // СВОЙСТВА РЕЖИМОВ И ТЕКСТА
         // ==========================================
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsFileMode))]
+        public partial bool IsPasteTextMode { get; set; } = true;
+
+        // Вычисляемое свойство: если не текст, значит режим файла
+        public bool IsFileMode => !IsPasteTextMode;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasContent))]
         public partial string InputText { get; set; } = string.Empty;
+
+        // Кнопка "Посмотреть код контента" будет активна только если есть текст
+        public bool HasContent => !string.IsNullOrEmpty(InputText);
+
+        [ObservableProperty]
+        public partial bool IsCodePreviewVisible { get; set; }
 
         [ObservableProperty]
         public partial string ImportButtonText { get; set; } = "Импортировать 3 карточки + 1 квиз";
@@ -24,7 +38,6 @@ namespace Zubrium.Maui.Features.Generals
         // ==========================================
         // СВОЙСТВА ДЛЯ СЕКЦИИ "ЧТО ИМПОРТИРОВАТЬ"
         // ==========================================
-        // По умолчанию сделаем их включенными (True)
 
         [ObservableProperty]
         public partial bool IsCardsImportSelected { get; set; } = true;
@@ -33,7 +46,7 @@ namespace Zubrium.Maui.Features.Generals
         public partial bool IsQuizzesImportSelected { get; set; } = true;
 
         [ObservableProperty]
-        public partial bool IsArticlesImportSelected { get; set; } = false; // Для примера выключено, как на вашем скрине
+        public partial bool IsArticlesImportSelected { get; set; } = false;
 
         // ==========================================
         // СВОЙСТВА ДЛЯ СЕКЦИИ "ПРЕДПРОСМОТР"
@@ -52,41 +65,38 @@ namespace Zubrium.Maui.Features.Generals
         public partial bool IsArticlesPreviewActive { get; set; }
 
         // Вычисляемое свойство для отображения окна контента (заглушки)
-        // Оно будет автоматически обновляться благодаря [NotifyPropertyChangedFor] выше
         public bool IsAnyPreviewActive => IsCardsPreviewActive || IsQuizzesPreviewActive || IsArticlesPreviewActive;
-
-        public ImportViewModel(IContentRepository repository) : base(repository)
-        {
-        }
 
         public override void ApplyQueryAttributes(IDictionary<string, object> query)
         {
 
         }
 
-
-        // ==========================================
-        // НАВИГАЦИЯ И ВЕРХНИЙ БЛОК
-        // ==========================================
-
-        [RelayCommand]
-        public async Task Close()
+        public ImportViewModel(IContentRepository repository) : base(repository)
         {
-            // Возврат на предыдущую страницу
-            await Shell.Current.GoToAsync("..");
         }
+
+
+        // ==========================================
+        // НАВИГАЦИЯ И ВКЛАДКИ (СВЕРХУ)
+        // ==========================================
+
 
         [RelayCommand]
         public void SwitchToPasteText()
         {
-            // Логика переключения на вкладку вставки текста
+            IsPasteTextMode = true;
         }
 
         [RelayCommand]
         public void SwitchToFile()
         {
-            // Логика переключения на вкладку файла
+            IsPasteTextMode = false;
         }
+
+        // ==========================================
+        // ДЕЙСТВИЯ С КОНТЕНТОМ (КНОПКИ И ПОПАП)
+        // ==========================================
 
         [RelayCommand]
         public async Task PasteFromClipboard()
@@ -95,6 +105,39 @@ namespace Zubrium.Maui.Features.Generals
             {
                 InputText = await Clipboard.Default.GetTextAsync();
             }
+        }
+
+        [RelayCommand]
+        public async Task PickFile()
+        {
+            try
+            {
+                var result = await FilePicker.Default.PickAsync();
+                if (result != null)
+                {
+                    // Закомментировано: пример чтения текста из файла
+                    // InputText = await File.ReadAllTextAsync(result.FullPath);
+
+                    // Если мы хотим сразу показать код после выбора файла:
+                    // IsCodePreviewVisible = true;
+                }
+            }
+            catch (Exception)
+            {
+                // Обработка отмены выбора файла
+            }
+        }
+
+        [RelayCommand]
+        public void OpenCodePreview()
+        {
+            IsCodePreviewVisible = true;
+        }
+
+        [RelayCommand]
+        public void CloseCodePreview()
+        {
+            IsCodePreviewVisible = false;
         }
 
         // ==========================================
@@ -123,8 +166,6 @@ namespace Zubrium.Maui.Features.Generals
         public void ToggleCardsImport()
         {
             IsCardsImportSelected = !IsCardsImportSelected;
-
-            // Если отключили категорию, нужно выключить и её предпросмотр
             if (!IsCardsImportSelected) IsCardsPreviewActive = false;
         }
 
@@ -149,17 +190,14 @@ namespace Zubrium.Maui.Features.Generals
         [RelayCommand]
         public void ToggleCardsPreview()
         {
-            // Защита: нельзя включить предпросмотр, если карточка импорта отключена
             if (!IsCardsImportSelected) return;
 
-            // Если нажимаем на уже активный таб — он снимается
             if (IsCardsPreviewActive)
             {
                 IsCardsPreviewActive = false;
                 return;
             }
 
-            // Включаем этот таб и выключаем остальные (можно выбрать только один)
             IsCardsPreviewActive = true;
             IsQuizzesPreviewActive = false;
             IsArticlesPreviewActive = false;
