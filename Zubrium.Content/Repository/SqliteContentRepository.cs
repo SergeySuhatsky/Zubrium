@@ -2,7 +2,7 @@
 using Zubrium.Persistence;
 using SQLite;
 
-namespace Zubrium.Content
+namespace Zubrium.Content.Repository
 {
     public class SqliteContentRepository : IContentRepository
     {

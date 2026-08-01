@@ -8,6 +8,7 @@ using MauiIcons.Material;
 using Zubrium.Maui.Features.Quizs;
 using Microsoft.Maui.Controls;
 using System.Reflection;
+using Zubrium.Content.Repository;
 
 namespace Zubrium.Maui
 {

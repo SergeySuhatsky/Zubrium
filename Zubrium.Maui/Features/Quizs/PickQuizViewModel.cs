@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Zubrium.Content;
+using Zubrium.Content.Repository;
 using Zubrium.Maui.ViewModels;
 
 namespace Zubrium.Maui.Features.Quizs
