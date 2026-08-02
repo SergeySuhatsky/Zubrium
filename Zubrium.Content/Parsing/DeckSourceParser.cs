@@ -44,7 +44,7 @@ namespace Zubrium.Content.Parsing
                 if (container.Info == "card")
                 {
                     var card = CardBuilder.FromContainer(container, rawMarkdown);
-                    currentDeck.Cards.Add(card);
+                    result.Cards.Add(card);
                     Console.WriteLine($"[Карточка] Успешно распарсена: {card.Id}");
                 }
                 else if (container.Info == "quiz")
@@ -59,12 +59,6 @@ namespace Zubrium.Content.Parsing
                     result.Articles.Add(article);
                     Console.WriteLine($"[Статья] Успешно распарсена: {article.Title}");
                 }
-            }
-
-            // Добавляем колоду в результат, если в ней есть хотя бы одна карточка
-            if (currentDeck.Cards.Any())
-            {
-                result.Decks.Add(currentDeck);
             }
 
             return result;

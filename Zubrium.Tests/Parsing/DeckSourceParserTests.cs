@@ -22,8 +22,7 @@ namespace Zubrium.Tests.Parsing
             var parser = new DeckSourceParser();
             var result = parser.Parse(TestFixtures.FullSampleDeckSource);
 
-            Assert.Single(result.Decks);
-            Assert.Equal(2, result.Decks[0].Cards.Count);
+            Assert.Equal(2, result.Cards.Count);
         }
 
         [Fact]
@@ -59,7 +58,7 @@ namespace Zubrium.Tests.Parsing
             var parser = new DeckSourceParser();
             var result = parser.Parse(noCards);
 
-            Assert.Empty(result.Decks);
+            Assert.Empty(result.Cards);
         }
 
         [Fact]
@@ -70,7 +69,7 @@ namespace Zubrium.Tests.Parsing
             var parser = new DeckSourceParser();
             var result = parser.Parse(plain);
 
-            Assert.Empty(result.Decks);
+            Assert.Empty(result.Cards);
             Assert.Empty(result.Quizzes);
             Assert.Empty(result.Articles);
             Assert.Null(result.CategoryHint);
@@ -93,11 +92,11 @@ namespace Zubrium.Tests.Parsing
 
             Assert.Equal(first.CategoryHint, second.CategoryHint);
 
-            Assert.Equal(first.Decks[0].Cards.Count, second.Decks[0].Cards.Count);
-            for (int i = 0; i < first.Decks[0].Cards.Count; i++)
+            Assert.Equal(first.Cards.Count, second.Cards.Count);
+            for (int i = 0; i < first.Cards.Count; i++)
             {
-                var a = first.Decks[0].Cards[i];
-                var b = second.Decks[0].Cards[i];
+                var a = first.Cards[i];
+                var b = second.Cards[i];
                 Assert.Equal(a.Title, b.Title);
                 Assert.Equal(a.FrontMarkdown, b.FrontMarkdown);
                 Assert.Equal(a.BriefMarkdown, b.BriefMarkdown);
@@ -127,7 +126,7 @@ namespace Zubrium.Tests.Parsing
             var result = parser.Parse(TestFixtures.FullSampleDeckSource);
 
             Assert.Equal("Топология 🔢", result.CategoryHint);
-            Assert.Equal(2, result.Decks[0].Cards.Count);
+            Assert.Equal(2, result.Cards.Count);
         }
     }
 }
