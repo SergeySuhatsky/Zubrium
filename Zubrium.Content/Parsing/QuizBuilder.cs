@@ -58,7 +58,9 @@ namespace Zubrium.Content.Parsing
                     : "Без названия";
             }
 
-            return new QuizBlock(questions, title);
+            string id = attributes.Id ?? Guid.NewGuid().ToString("N");
+
+            return new QuizBlock(id, questions, title);
         }
 
         private static (string Question, List<AnswerOption> Options) ParseQuestionAndOptions(string content)
