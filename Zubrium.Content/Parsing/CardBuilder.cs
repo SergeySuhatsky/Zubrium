@@ -41,7 +41,23 @@ namespace Zubrium.Content.Parsing
                 briefMarkdown = briefSplit[1].Trim();
             }
 
-            return new Card(id, frontMarkdown, briefMarkdown, detailedMarkdown);
+            // 3. Пытаемся получить заголовок из атрибутов
+            string? title = attributes.Properties?.FirstOrDefault(p => p.Key == "title").Value;
+
+            // Если в атрибутах нет, ищем первый заголовок H1 в тексте
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                var firstH1 = frontMarkdown
+                    .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                    .FirstOrDefault(line => line.StartsWith("# "));
+
+                title = firstH1 != null
+                    ? firstH1.Substring(2).Trim()
+                    : "Без названия";
+            }
+
+
+            return new Card(id, frontMarkdown, briefMarkdown, title, detailedMarkdown);
         }
 
         private static string ExtractInnerMarkdown(string containerText)

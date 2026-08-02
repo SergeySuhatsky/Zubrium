@@ -11,9 +11,7 @@ namespace Zubrium.Content.Parsing
     {
         public static QuizBlock FromContainer(CustomContainer block, string rawSource)
         {
-            // 1. Извлекаем заголовок квиза
-            var attributes = block.GetAttributes();
-            string? title = attributes.Properties?.FirstOrDefault(p => p.Key == "title").Value;
+            
 
             // 2. Достаем внутренний текст контейнера
             var span = block.Span;
@@ -44,7 +42,23 @@ namespace Zubrium.Content.Parsing
                 questions.Add(new QuizQuestion(questionMarkdown, options, explanation));
             }
 
-            return new QuizBlock(title, questions);
+            // 1. Извлекаем заголовок квиза
+            var attributes = block.GetAttributes();
+            string title = attributes.Properties?.FirstOrDefault(p => p.Key == "title").Value;
+
+            // Если в атрибутах нет, ищем первый заголовок H2 в тексте
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                var firstH1 = questionBlocks.FirstOrDefault()?
+                    .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                    .FirstOrDefault(line => line.StartsWith("## "));
+
+                title = firstH1 != null
+                    ? firstH1.Substring(2).Trim()
+                    : "Без названия";
+            }
+
+            return new QuizBlock(questions, title);
         }
 
         private static (string Question, List<AnswerOption> Options) ParseQuestionAndOptions(string content)

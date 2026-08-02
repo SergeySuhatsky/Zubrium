@@ -6,11 +6,12 @@ namespace Zubrium.Domain
 {
     public class Article
     {
-        public Article(string id, string title, string bodyMarkdown)
+        public Article(string id, string bodyMarkdown, string title = "Заголовок статьи", string? categoryId = null)
         {
             Id = id;
             Title = title;
             BodyMarkdown = bodyMarkdown;
+            CategoryId = categoryId;
         }
 
         public string Id { get; set; }
@@ -18,6 +19,8 @@ namespace Zubrium.Domain
         public string Title { get; set; }
         
         public string BodyMarkdown { get; set; }
+
+        public string CategoryId { get; set; }
 
 
     }

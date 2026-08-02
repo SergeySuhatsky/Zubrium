@@ -35,7 +35,7 @@ namespace Zubrium.Content.Parsing
                     : "Без названия";
             }
 
-            return new Article(id, title, bodyMarkdown);
+            return new Article(id, bodyMarkdown, title);
         }
 
         private static string ExtractInnerMarkdown(string containerText)
