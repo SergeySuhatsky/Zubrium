@@ -4,7 +4,7 @@ using System.Text;
 using Zubrium.Domain;
 using Zubrium.Persistence;
 
-namespace Zubrium.Content
+namespace Zubrium.Content.Repository
 {
     public interface IContentRepository
     {

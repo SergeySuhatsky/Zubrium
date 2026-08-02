@@ -11,5 +11,8 @@ namespace Zubrium.Persistence
         public string Title { get; set; }
 
         public string BodyMarkdown { get; set; }
+
+        [Indexed]
+        public string CategoryId { get; set; }
     }
 }
