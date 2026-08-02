@@ -15,6 +15,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Zubrium.Content\Zubrium.Content.csproj" />
+    <ProjectReference Include="..\Zubrium.Domain\Zubrium.Domain.csproj" />
+    <ProjectReference Include="..\Zubrium.Persistence\Zubrium.Persistence.csproj" />
+    <ProjectReference Include="..\Zubrium.SpacedRepetition\Zubrium.SpacedRepetition.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 
