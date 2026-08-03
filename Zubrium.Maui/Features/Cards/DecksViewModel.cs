@@ -30,12 +30,6 @@ public partial class DecksViewModel : BaseViewModel
         }
     }
 
-    [RelayCommand]
-    public async Task PushDataToDb() 
-    {
-
-        await _repository.PushData();
-    }
 
     [RelayCommand]
     public async Task LoadArticle(string articleId)

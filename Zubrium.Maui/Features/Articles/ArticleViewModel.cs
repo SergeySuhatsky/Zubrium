@@ -31,13 +31,6 @@ public partial class ArticleViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    public async Task PushDataToDb() 
-    {
-
-        await _repository.PushData();
-    }
-
-    [RelayCommand]
     public async Task LoadArticle(string articleId)
     {
         var article = await _repository.GetArticleAsync("2");

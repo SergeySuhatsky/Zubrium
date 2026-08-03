@@ -2,20 +2,37 @@
 using System.Collections.Generic;
 using System.Text;
 using Zubrium.Domain;
-using Zubrium.Persistence;
+using Zubrium.Persistence.Entities;
 
 namespace Zubrium.Content.Repository
 {
     public interface IContentRepository
     {
-        public async Task<ArticleEntity> GetArticleAsync(string articleId)
-        {
-            throw new NotImplementedException();
-        }
+        
 
-        public async Task PushData()
-        {
-            throw new NotImplementedException();
-        }
+        // --- Статьи (Articles) ---
+        Task<ArticleEntity> GetArticleAsync(string articleId);
+        Task<List<ArticleEntity>> GetArticlesAsync();
+        Task<List<ArticleEntity>> GetArticlesByCategoryAsync(string categoryId);
+        Task SaveArticlesAsync(IEnumerable<ArticleEntity> articles);
+        Task<int> SaveArticleAsync(ArticleEntity article);
+
+        // --- Карточки (Cards) ---
+        Task<CardEntity> GetCardAsync(string cardId);
+        Task<List<CardEntity>> GetCardsAsync();
+        Task<List<CardEntity>> GetCardsByCategoryAsync(string categoryId);
+        Task<int> SaveCardAsync(CardEntity card);
+        Task SaveCardsAsync(IEnumerable<CardEntity> cards);
+
+        // --- Квизы (Quizzes) ---
+        Task<QuizBlockEntity> GetQuizBlockAsync(string quizId);
+        Task<List<QuizBlockEntity>> GetQuizBlocksAsync();
+        Task<List<QuizBlockEntity>> GetQuizBlocksByCategoryAsync(string categoryId);
+        Task<int> SaveQuizBlockAsync(QuizBlockEntity quiz);
+        Task SaveQuizBlocksAsync(IEnumerable<QuizBlockEntity> quizzes);
+
+
+        // --- Импорт ContentSet ---
+        Task InsertContentSet(ParsedContentSet contentSet, bool isArticles = true, bool isQuizes = true, bool isCards = true);
     }
 }
