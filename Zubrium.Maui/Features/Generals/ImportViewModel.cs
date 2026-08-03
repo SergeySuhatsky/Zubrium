@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Zubrium.Content.Parsing;
 using Zubrium.Content.Repository;
@@ -40,6 +41,9 @@ namespace Zubrium.Maui.Features.Generals
         [NotifyPropertyChangedFor(nameof(HasCards))]
         [NotifyPropertyChangedFor(nameof(HasQuizzes))]
         [NotifyPropertyChangedFor(nameof(HasArticles))]
+        [NotifyPropertyChangedFor(nameof(PreviewCards))]
+        [NotifyPropertyChangedFor(nameof(PreviewQuizzes))]
+        [NotifyPropertyChangedFor(nameof(PreviewArticles))]
         public partial ParsedContentSet? ParsedContentSet { get; set; }
 
         [ObservableProperty]
@@ -57,6 +61,11 @@ namespace Zubrium.Maui.Features.Generals
         public bool HasCards => CardsFoundCount > 0;
         public bool HasQuizzes => QuizzesFoundCount > 0;
         public bool HasArticles => ArticlesFoundCount > 0;
+
+        // Вычисляемые свойства для предпросмотра всех найденных элементов
+        public IEnumerable<Card>? PreviewCards => ParsedContentSet?.Cards;
+        public IEnumerable<QuizBlock>? PreviewQuizzes => ParsedContentSet?.Quizzes;
+        public IEnumerable<Article>? PreviewArticles => ParsedContentSet?.Articles;
 
         // ==========================================
         // СВОЙСТВА ДЛЯ СЕКЦИИ "ЧТО ИМПОРТИРОВАТЬ"
