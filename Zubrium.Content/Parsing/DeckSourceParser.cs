@@ -10,7 +10,7 @@ using Zubrium.Domain;
 
 namespace Zubrium.Content.Parsing
 {
-    public class DeckSourceParser
+    public class DeckSourceParser : IDeckSourceParser
     {
         public ParsedContentSet Parse(string rawMarkdown)
         {
