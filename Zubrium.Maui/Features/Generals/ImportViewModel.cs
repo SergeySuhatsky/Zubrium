@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Zubrium.Content.Parsing;
 using Zubrium.Content.Repository;
 using Zubrium.Maui.ViewModels;
 
@@ -10,6 +11,7 @@ namespace Zubrium.Maui.Features.Generals
 {
     public partial class ImportViewModel: BaseViewModel
     {
+        private readonly IDeckSourceParser _parser;
 
         // ==========================================
         // СВОЙСТВА РЕЖИМОВ И ТЕКСТА
@@ -72,8 +74,9 @@ namespace Zubrium.Maui.Features.Generals
 
         }
 
-        public ImportViewModel(IContentRepository repository) : base(repository)
+        public ImportViewModel(IContentRepository repository, IDeckSourceParser parser) : base(repository)
         {
+            _parser = parser;
         }
 
 
@@ -154,6 +157,11 @@ namespace Zubrium.Maui.Features.Generals
         [RelayCommand]
         public async Task Import()
         {
+            await _repository.CleanDb();
+            var result = _parser.Parse(InputText);
+
+            await _repository.InsertContentSet(result);
+
             // Логика финального импорта
             await Task.CompletedTask;
         }
