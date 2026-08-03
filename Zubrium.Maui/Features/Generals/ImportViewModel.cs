@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using Zubrium.Content.Parsing;
 using Zubrium.Content.Repository;
+using Zubrium.Domain;
 using Zubrium.Maui.ViewModels;
 
 namespace Zubrium.Maui.Features.Generals
@@ -31,11 +32,31 @@ namespace Zubrium.Maui.Features.Generals
         // Кнопка "Посмотреть код контента" будет активна только если есть текст
         public bool HasContent => !string.IsNullOrEmpty(InputText);
 
+        // Хранение результата парсирования для получения количества элементов
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(CardsFoundCount))]
+        [NotifyPropertyChangedFor(nameof(QuizzesFoundCount))]
+        [NotifyPropertyChangedFor(nameof(ArticlesFoundCount))]
+        [NotifyPropertyChangedFor(nameof(HasCards))]
+        [NotifyPropertyChangedFor(nameof(HasQuizzes))]
+        [NotifyPropertyChangedFor(nameof(HasArticles))]
+        public partial ParsedContentSet? ParsedContentSet { get; set; }
+
         [ObservableProperty]
         public partial bool IsCodePreviewVisible { get; set; }
 
         [ObservableProperty]
-        public partial string ImportButtonText { get; set; } = "Импортировать 3 карточки + 1 квиз";
+        public partial string ImportButtonText { get; set; } = "Импортировать";
+
+        // Вычисляемые свойства для количества найденных элементов
+        public int CardsFoundCount => ParsedContentSet?.Cards?.Count ?? 0;
+        public int QuizzesFoundCount => ParsedContentSet?.Quizzes?.Count ?? 0;
+        public int ArticlesFoundCount => ParsedContentSet?.Articles?.Count ?? 0;
+
+        // Вычисляемые свойства для проверки наличия элементов
+        public bool HasCards => CardsFoundCount > 0;
+        public bool HasQuizzes => QuizzesFoundCount > 0;
+        public bool HasArticles => ArticlesFoundCount > 0;
 
         // ==========================================
         // СВОЙСТВА ДЛЯ СЕКЦИИ "ЧТО ИМПОРТИРОВАТЬ"
@@ -107,6 +128,8 @@ namespace Zubrium.Maui.Features.Generals
             if (Clipboard.Default.HasText)
             {
                 InputText = await Clipboard.Default.GetTextAsync();
+                // Парсируем контент при вставке текста
+                ParsedContentSet = _parser.Parse(InputText);
             }
         }
 
@@ -118,11 +141,12 @@ namespace Zubrium.Maui.Features.Generals
                 var result = await FilePicker.Default.PickAsync();
                 if (result != null)
                 {
-                    // Закомментировано: пример чтения текста из файла
-                    // InputText = await File.ReadAllTextAsync(result.FullPath);
-
-                    // Если мы хотим сразу показать код после выбора файла:
-                    // IsCodePreviewVisible = true;
+                    // Читаем текст из файла
+                    InputText = await File.ReadAllTextAsync(result.FullPath);
+                    // Парсируем контент при выборе файла
+                    ParsedContentSet = _parser.Parse(InputText);
+                    // Показываем окно предпросмотра кода
+                    IsCodePreviewVisible = true;
                 }
             }
             catch (Exception)
@@ -157,8 +181,9 @@ namespace Zubrium.Maui.Features.Generals
         [RelayCommand]
         public async Task Import()
         {
-            await _repository.CleanDb();
+            // Парсируем контент и сохраняем результат для отображения количества элементов
             var result = _parser.Parse(InputText);
+            ParsedContentSet = result;
 
             await _repository.InsertContentSet(result);
 
@@ -173,6 +198,8 @@ namespace Zubrium.Maui.Features.Generals
         [RelayCommand]
         public void ToggleCardsImport()
         {
+            // Активируем только если есть найденные карточки
+            if (!HasCards) return;
             IsCardsImportSelected = !IsCardsImportSelected;
             if (!IsCardsImportSelected) IsCardsPreviewActive = false;
         }
@@ -180,6 +207,8 @@ namespace Zubrium.Maui.Features.Generals
         [RelayCommand]
         public void ToggleQuizzesImport()
         {
+            // Активируем только если есть найденные квизы
+            if (!HasQuizzes) return;
             IsQuizzesImportSelected = !IsQuizzesImportSelected;
             if (!IsQuizzesImportSelected) IsQuizzesPreviewActive = false;
         }
@@ -187,6 +216,8 @@ namespace Zubrium.Maui.Features.Generals
         [RelayCommand]
         public void ToggleArticlesImport()
         {
+            // Активируем только если есть найденные статьи
+            if (!HasArticles) return;
             IsArticlesImportSelected = !IsArticlesImportSelected;
             if (!IsArticlesImportSelected) IsArticlesPreviewActive = false;
         }

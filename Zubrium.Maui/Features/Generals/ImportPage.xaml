@@ -111,8 +111,8 @@
 
                         <Border.Triggers>
                             <DataTrigger TargetType="Border" Binding="{Binding HasContent}" Value="True">
-                                <Setter Property="BackgroundColor" Value="#6278E6" />
-                                <Setter Property="Stroke" Value="#6278E6" />
+                                <Setter Property="BackgroundColor" Value="#1C1C1E" />
+                                <Setter Property="Stroke" Value="#1C1C1E" />
                             </DataTrigger>
                             <DataTrigger TargetType="Border" Binding="{Binding HasContent}" Value="False">
                                 <Setter Property="BackgroundColor" Value="#E0E0E0" />
@@ -193,6 +193,60 @@
 
                 <!-- Контент для режима "Файл с устройства" -->
                 <VerticalStackLayout IsVisible="{Binding IsFileMode}" Spacing="12" Margin="0,0,0,24">
+                    <!-- Кнопка "Посмотреть код контента" для режима ФАЙЛ -->
+                    <Border StrokeThickness="1" 
+                        HeightRequest="48"
+                        IsEnabled="{Binding HasContent}">
+
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenCodePreviewCommand}" />
+                        </Border.GestureRecognizers>
+
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding HasContent}" Value="True">
+                                <Setter Property="BackgroundColor" Value="#1C1C1E" />
+                                <Setter Property="Stroke" Value="#1C1C1E" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding HasContent}" Value="False">
+                                <Setter Property="BackgroundColor" Value="#E0E0E0" />
+                                <Setter Property="Stroke" Value="#E0E0E0" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8">
+                            <Image Source="{mi:Material Icon=Code, IconColor=White}" WidthRequest="24" HeightRequest="24" IsVisible="False">
+                                <Image.Triggers>
+                                    <DataTrigger TargetType="Image" Binding="{Binding HasContent}" Value="True">
+                                        <Setter Property="IsVisible" Value="True" />
+                                    </DataTrigger>
+                                </Image.Triggers>
+                            </Image>
+                            <Image Source="{mi:Material Icon=Code, IconColor=#8E8E93}" WidthRequest="24" HeightRequest="24" IsVisible="True">
+                                <Image.Triggers>
+                                    <DataTrigger TargetType="Image" Binding="{Binding HasContent}" Value="True">
+                                        <Setter Property="IsVisible" Value="False" />
+                                    </DataTrigger>
+                                </Image.Triggers>
+                            </Image>
+                            <Label Text="Посмотреть код контента" 
+                                VerticalOptions="Center"
+                                FontAttributes="Bold">
+
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding HasContent}" Value="True">
+                                        <Setter Property="TextColor" Value="White" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label" Binding="{Binding HasContent}" Value="False">
+                                        <Setter Property="TextColor" Value="Black" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </HorizontalStackLayout>
+                    </Border>
+
                     <Button Text="Выбрать файл" 
                             BackgroundColor="#6278E6" 
                             TextColor="White" 
@@ -223,7 +277,7 @@
                 <VerticalStackLayout Spacing="10" Margin="0,0,0,24">
 
                     <!-- Карточка 1: Карточки -->
-                    <Border StrokeThickness="1" Padding="16">
+                    <Border StrokeThickness="1" Padding="16" IsEnabled="{Binding HasCards}" Opacity="1">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="16" />
                         </Border.StrokeShape>
@@ -231,13 +285,25 @@
                             <TapGestureRecognizer Command="{Binding ToggleCardsImportCommand}" />
                         </Border.GestureRecognizers>
                         <Border.Triggers>
+                            <!-- Активна и выбрана -->
                             <DataTrigger TargetType="Border" Binding="{Binding IsCardsImportSelected}" Value="True">
                                 <Setter Property="BackgroundColor" Value="#6278E6" />
                                 <Setter Property="Stroke" Value="#6278E6" />
                             </DataTrigger>
-                            <DataTrigger TargetType="Border" Binding="{Binding IsCardsImportSelected}" Value="False">
+                            <!-- Активна, но не выбрана -->
+                            <MultiTrigger TargetType="Border">
+                                <MultiTrigger.Conditions>
+                                    <BindingCondition Binding="{Binding IsCardsImportSelected}" Value="False" />
+                                    <BindingCondition Binding="{Binding HasCards}" Value="True" />
+                                </MultiTrigger.Conditions>
                                 <Setter Property="BackgroundColor" Value="White" />
                                 <Setter Property="Stroke" Value="#EAECEF" />
+                            </MultiTrigger>
+                            <!-- Неактивна (нет элементов) -->
+                            <DataTrigger TargetType="Border" Binding="{Binding HasCards}" Value="False">
+                                <Setter Property="BackgroundColor" Value="#F5F5F5" />
+                                <Setter Property="Stroke" Value="#E0E0E0" />
+                                <Setter Property="Opacity" Value="0.6" />
                             </DataTrigger>
                         </Border.Triggers>
 
@@ -264,18 +330,32 @@
                                         <DataTrigger TargetType="Label" Binding="{Binding IsCardsImportSelected}" Value="True">
                                             <Setter Property="TextColor" Value="White" />
                                         </DataTrigger>
-                                        <DataTrigger TargetType="Label" Binding="{Binding IsCardsImportSelected}" Value="False">
+                                        <MultiTrigger TargetType="Label">
+                                            <MultiTrigger.Conditions>
+                                                <BindingCondition Binding="{Binding IsCardsImportSelected}" Value="False" />
+                                                <BindingCondition Binding="{Binding HasCards}" Value="True" />
+                                            </MultiTrigger.Conditions>
                                             <Setter Property="TextColor" Value="#1C1C1E" />
+                                        </MultiTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding HasCards}" Value="False">
+                                            <Setter Property="TextColor" Value="#9E9E9E" />
                                         </DataTrigger>
                                     </Label.Triggers>
                                 </Label>
-                                <Label Text="Найдено: 3" FontSize="13">
+                                <Label Text="{Binding CardsFoundCount, StringFormat='Найдено: {0}'}" FontSize="13">
                                     <Label.Triggers>
                                         <DataTrigger TargetType="Label" Binding="{Binding IsCardsImportSelected}" Value="True">
                                             <Setter Property="TextColor" Value="#E0E6FF" />
                                         </DataTrigger>
-                                        <DataTrigger TargetType="Label" Binding="{Binding IsCardsImportSelected}" Value="False">
+                                        <MultiTrigger TargetType="Label">
+                                            <MultiTrigger.Conditions>
+                                                <BindingCondition Binding="{Binding IsCardsImportSelected}" Value="False" />
+                                                <BindingCondition Binding="{Binding HasCards}" Value="True" />
+                                            </MultiTrigger.Conditions>
                                             <Setter Property="TextColor" Value="#8E8E93" />
+                                        </MultiTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding HasCards}" Value="False">
+                                            <Setter Property="TextColor" Value="#B0B0B0" />
                                         </DataTrigger>
                                     </Label.Triggers>
                                 </Label>
@@ -284,7 +364,7 @@
                     </Border>
 
                     <!-- Карточка 2: Квизы -->
-                    <Border StrokeThickness="1" Padding="16">
+                    <Border StrokeThickness="1" Padding="16" IsEnabled="{Binding HasQuizzes}" Opacity="1">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="16" />
                         </Border.StrokeShape>
@@ -292,13 +372,25 @@
                             <TapGestureRecognizer Command="{Binding ToggleQuizzesImportCommand}" />
                         </Border.GestureRecognizers>
                         <Border.Triggers>
+                            <!-- Активна и выбрана -->
                             <DataTrigger TargetType="Border" Binding="{Binding IsQuizzesImportSelected}" Value="True">
                                 <Setter Property="BackgroundColor" Value="#6278E6" />
                                 <Setter Property="Stroke" Value="#6278E6" />
                             </DataTrigger>
-                            <DataTrigger TargetType="Border" Binding="{Binding IsQuizzesImportSelected}" Value="False">
+                            <!-- Активна, но не выбрана -->
+                            <MultiTrigger TargetType="Border">
+                                <MultiTrigger.Conditions>
+                                    <BindingCondition Binding="{Binding IsQuizzesImportSelected}" Value="False" />
+                                    <BindingCondition Binding="{Binding HasQuizzes}" Value="True" />
+                                </MultiTrigger.Conditions>
                                 <Setter Property="BackgroundColor" Value="White" />
                                 <Setter Property="Stroke" Value="#EAECEF" />
+                            </MultiTrigger>
+                            <!-- Неактивна (нет элементов) -->
+                            <DataTrigger TargetType="Border" Binding="{Binding HasQuizzes}" Value="False">
+                                <Setter Property="BackgroundColor" Value="#F5F5F5" />
+                                <Setter Property="Stroke" Value="#E0E0E0" />
+                                <Setter Property="Opacity" Value="0.6" />
                             </DataTrigger>
                         </Border.Triggers>
 
@@ -325,18 +417,32 @@
                                         <DataTrigger TargetType="Label" Binding="{Binding IsQuizzesImportSelected}" Value="True">
                                             <Setter Property="TextColor" Value="White" />
                                         </DataTrigger>
-                                        <DataTrigger TargetType="Label" Binding="{Binding IsQuizzesImportSelected}" Value="False">
+                                        <MultiTrigger TargetType="Label">
+                                            <MultiTrigger.Conditions>
+                                                <BindingCondition Binding="{Binding IsQuizzesImportSelected}" Value="False" />
+                                                <BindingCondition Binding="{Binding HasQuizzes}" Value="True" />
+                                            </MultiTrigger.Conditions>
                                             <Setter Property="TextColor" Value="#1C1C1E" />
+                                        </MultiTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding HasQuizzes}" Value="False">
+                                            <Setter Property="TextColor" Value="#9E9E9E" />
                                         </DataTrigger>
                                     </Label.Triggers>
                                 </Label>
-                                <Label Text="Найдено: 1" FontSize="13">
+                                <Label Text="{Binding QuizzesFoundCount, StringFormat='Найдено: {0}'}" FontSize="13">
                                     <Label.Triggers>
                                         <DataTrigger TargetType="Label" Binding="{Binding IsQuizzesImportSelected}" Value="True">
                                             <Setter Property="TextColor" Value="#E0E6FF" />
                                         </DataTrigger>
-                                        <DataTrigger TargetType="Label" Binding="{Binding IsQuizzesImportSelected}" Value="False">
+                                        <MultiTrigger TargetType="Label">
+                                            <MultiTrigger.Conditions>
+                                                <BindingCondition Binding="{Binding IsQuizzesImportSelected}" Value="False" />
+                                                <BindingCondition Binding="{Binding HasQuizzes}" Value="True" />
+                                            </MultiTrigger.Conditions>
                                             <Setter Property="TextColor" Value="#8E8E93" />
+                                        </MultiTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding HasQuizzes}" Value="False">
+                                            <Setter Property="TextColor" Value="#B0B0B0" />
                                         </DataTrigger>
                                     </Label.Triggers>
                                 </Label>
@@ -345,7 +451,7 @@
                     </Border>
 
                     <!-- Карточка 3: Статьи -->
-                    <Border StrokeThickness="1" Padding="16">
+                    <Border StrokeThickness="1" Padding="16" IsEnabled="{Binding HasArticles}" Opacity="1">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="16" />
                         </Border.StrokeShape>
@@ -353,13 +459,25 @@
                             <TapGestureRecognizer Command="{Binding ToggleArticlesImportCommand}" />
                         </Border.GestureRecognizers>
                         <Border.Triggers>
+                            <!-- Активна и выбрана -->
                             <DataTrigger TargetType="Border" Binding="{Binding IsArticlesImportSelected}" Value="True">
                                 <Setter Property="BackgroundColor" Value="#6278E6" />
                                 <Setter Property="Stroke" Value="#6278E6" />
                             </DataTrigger>
-                            <DataTrigger TargetType="Border" Binding="{Binding IsArticlesImportSelected}" Value="False">
+                            <!-- Активна, но не выбрана -->
+                            <MultiTrigger TargetType="Border">
+                                <MultiTrigger.Conditions>
+                                    <BindingCondition Binding="{Binding IsArticlesImportSelected}" Value="False" />
+                                    <BindingCondition Binding="{Binding HasArticles}" Value="True" />
+                                </MultiTrigger.Conditions>
                                 <Setter Property="BackgroundColor" Value="White" />
                                 <Setter Property="Stroke" Value="#EAECEF" />
+                            </MultiTrigger>
+                            <!-- Неактивна (нет элементов) -->
+                            <DataTrigger TargetType="Border" Binding="{Binding HasArticles}" Value="False">
+                                <Setter Property="BackgroundColor" Value="#F5F5F5" />
+                                <Setter Property="Stroke" Value="#E0E0E0" />
+                                <Setter Property="Opacity" Value="0.6" />
                             </DataTrigger>
                         </Border.Triggers>
 
@@ -386,18 +504,32 @@
                                         <DataTrigger TargetType="Label" Binding="{Binding IsArticlesImportSelected}" Value="True">
                                             <Setter Property="TextColor" Value="White" />
                                         </DataTrigger>
-                                        <DataTrigger TargetType="Label" Binding="{Binding IsArticlesImportSelected}" Value="False">
+                                        <MultiTrigger TargetType="Label">
+                                            <MultiTrigger.Conditions>
+                                                <BindingCondition Binding="{Binding IsArticlesImportSelected}" Value="False" />
+                                                <BindingCondition Binding="{Binding HasArticles}" Value="True" />
+                                            </MultiTrigger.Conditions>
                                             <Setter Property="TextColor" Value="#1C1C1E" />
+                                        </MultiTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding HasArticles}" Value="False">
+                                            <Setter Property="TextColor" Value="#9E9E9E" />
                                         </DataTrigger>
                                     </Label.Triggers>
                                 </Label>
-                                <Label Text="Найдено: 1" FontSize="13">
+                                <Label Text="{Binding ArticlesFoundCount, StringFormat='Найдено: {0}'}" FontSize="13">
                                     <Label.Triggers>
                                         <DataTrigger TargetType="Label" Binding="{Binding IsArticlesImportSelected}" Value="True">
                                             <Setter Property="TextColor" Value="#E0E6FF" />
                                         </DataTrigger>
-                                        <DataTrigger TargetType="Label" Binding="{Binding IsArticlesImportSelected}" Value="False">
+                                        <MultiTrigger TargetType="Label">
+                                            <MultiTrigger.Conditions>
+                                                <BindingCondition Binding="{Binding IsArticlesImportSelected}" Value="False" />
+                                                <BindingCondition Binding="{Binding HasArticles}" Value="True" />
+                                            </MultiTrigger.Conditions>
                                             <Setter Property="TextColor" Value="#8E8E93" />
+                                        </MultiTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding HasArticles}" Value="False">
+                                            <Setter Property="TextColor" Value="#B0B0B0" />
                                         </DataTrigger>
                                     </Label.Triggers>
                                 </Label>
