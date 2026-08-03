@@ -16,12 +16,13 @@ namespace Zubrium.Content.Parsing
             // 2. Достаем внутренний текст контейнера
             var span = block.Span;
             string fullText = rawSource.Substring(span.Start, span.Length);
+            fullText = fullText.Replace("\r\n", "\n").Replace("\r", "\n");  
             string innerText = ExtractInnerMarkdown(fullText);
 
             var questions = new List<QuizQuestion>();
 
             // 3. Разбиваем блок на отдельные вопросы по разделителю "---" 
-            var questionBlocks = innerText.Split(new[] { "\n---\n", "\r\n---\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            var questionBlocks = innerText.Split(new[] { "\n---\n" }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var qBlock in questionBlocks)
             {

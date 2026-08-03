@@ -40,11 +40,18 @@ namespace Zubrium.Content.Parsing
 
         private static string ExtractInnerMarkdown(string containerText)
         {
-            var lines = containerText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+            // 1. Приводим все переносы к единому виду и убираем пустые строки по краям
+            containerText = containerText.Replace("\r\n", "\n").Replace("\r", "\n").Trim();
+
+            var lines = containerText.Split('\n');
+
+            // 2. Теперь мы точно знаем, что lines[0] — это ":::", а последняя строка — это ":::"
             if (lines.Length >= 2)
             {
+                // Пропускаем первую строку и берём всё, кроме последней, затем склеиваем
                 return string.Join("\n", lines.Skip(1).Take(lines.Length - 2)).Trim();
             }
+
             return containerText;
         }
     }

@@ -9,6 +9,7 @@ using Zubrium.Maui.Features.Quizs;
 using Microsoft.Maui.Controls;
 using System.Reflection;
 using Zubrium.Content.Repository;
+using Zubrium.Content.Parsing;
 
 namespace Zubrium.Maui
 {
@@ -29,6 +30,8 @@ namespace Zubrium.Maui
 
             // Register markdown render service
             builder.Services.AddSingleton<IMarkdownRenderService, MarkdownRenderService>();
+            // Register markdown parser service
+            builder.Services.AddSingleton<IDeckSourceParser, DeckSourceParser>();
 
             // Register SQLite content repository
             string dbPath = Path.Combine(FileSystem.AppDataDirectory, "ZubriumData.db3");

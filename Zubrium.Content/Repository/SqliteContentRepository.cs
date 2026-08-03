@@ -1,7 +1,7 @@
 ﻿using Zubrium.Domain;
-using Zubrium.Persistence;
 using SQLite;
-
+using Zubrium.Persistence.Entities;
+using Zubrium.Persistence.Mappers;
 namespace Zubrium.Content.Repository
 {
     public class SqliteContentRepository : IContentRepository
@@ -11,34 +11,152 @@ namespace Zubrium.Content.Repository
         public SqliteContentRepository(string dbPath)
         {
             _db = new SQLiteAsyncConnection(dbPath);
+
             _db.CreateTableAsync<ArticleEntity>().Wait();
+            _db.CreateTableAsync<CardEntity>().Wait();
+            _db.CreateTableAsync<QuizBlockEntity>().Wait();
         }
+
+        // ==========================================
+        // МЕТОДЫ ДЛЯ СТАТЕЙ (ARTICLES)
+        // ==========================================
 
         public async Task<ArticleEntity> GetArticleAsync(string articleId)
         {
             return await _db.Table<ArticleEntity>().Where(a => a.Id == articleId).FirstOrDefaultAsync();
         }
 
-        public async Task PushData() 
+        public async Task<List<ArticleEntity>> GetArticlesAsync()
         {
-            await _db.InsertAsync
-                (
-                    new List<ArticleEntity>
-                    {
-                        new ArticleEntity
-                        {
-                            Id = "1",
-                            Title = "Sample Article 1",
-                            BodyMarkdown = "This is the content of sample article 1."
-                        },
-                        new ArticleEntity
-                        {
-                            Id = "2",
-                            Title = "Sample Article 2",
-                            BodyMarkdown = "This is the content of sample article 2."
-                        }
-                    }
-                );
+            return await _db.Table<ArticleEntity>().ToListAsync();
+        }
+
+        public async Task<List<ArticleEntity>> GetArticlesByCategoryAsync(string categoryId)
+        {
+            return await _db.Table<ArticleEntity>().Where(a => a.CategoryId == categoryId).ToListAsync();
+        }
+
+        // ==========================================
+        // МЕТОДЫ ДЛЯ КАРТОЧЕК (CARDS)
+        // ==========================================
+
+        public async Task<CardEntity> GetCardAsync(string cardId)
+        {
+            return await _db.Table<CardEntity>().Where(c => c.Id == cardId).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<CardEntity>> GetCardsAsync()
+        {
+            return await _db.Table<CardEntity>().ToListAsync();
+        }
+
+        public async Task<List<CardEntity>> GetCardsByCategoryAsync(string categoryId)
+        {
+            return await _db.Table<CardEntity>().Where(c => c.CategoryId == categoryId).ToListAsync();
+        }
+
+        // ==========================================
+        // МЕТОДЫ ДЛЯ КВИЗОВ (QUIZZES)
+        // ==========================================
+
+        public async Task<QuizBlockEntity> GetQuizBlockAsync(string quizId)
+        {
+            return await _db.Table<QuizBlockEntity>().Where(q => q.Id == quizId).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<QuizBlockEntity>> GetQuizBlocksAsync()
+        {
+            return await _db.Table<QuizBlockEntity>().ToListAsync();
+        }
+
+        public async Task<List<QuizBlockEntity>> GetQuizBlocksByCategoryAsync(string categoryId)
+        {
+            return await _db.Table<QuizBlockEntity>().Where(q => q.CategoryId == categoryId).ToListAsync();
+        }
+
+        // ==========================================
+        // МЕТОДЫ ИМПОРТА
+        // ==========================================
+
+        public async Task InsertContentSet(ParsedContentSet contentSet, bool isAddArticles = true, bool isAddQuizes = true, bool isAddCards = true)
+        {
+            // Используется InsertAllAsync для вставки коллекций целиком
+            if (isAddArticles && contentSet.Articles.Count > 0)
+            {
+                var articleEntities = contentSet.Articles.Select(a => a.ToEntity()).ToList();
+                await _db.InsertAllAsync(articleEntities);
+            }
+
+            if (isAddCards && contentSet.Cards.Count > 0)
+            {
+                var cardEntities = contentSet.Cards.Select(c => c.ToEntity()).ToList();
+                await _db.InsertAllAsync(cardEntities);
+            }
+
+            if (isAddQuizes && contentSet.Quizzes.Count > 0)
+            {
+                var quizEntities = contentSet.Quizzes.Select(q => q.ToEntity()).ToList();
+                await _db.InsertAllAsync(quizEntities);
+            }
+        }
+
+
+        // ==========================================
+        // СОХРАНЕНИЕ / ОБНОВЛЕНИЕ ОДИНОЧНЫХ ЭЛЕМЕНТОВ
+        // ==========================================
+
+        public async Task<int> SaveArticleAsync(ArticleEntity article)
+        {
+            // Вставляет запись. Если запись с таким Id уже есть — обновляет её.
+            return await _db.InsertOrReplaceAsync(article);
+        }
+
+        public async Task<int> SaveCardAsync(CardEntity card)
+        {
+            return await _db.InsertOrReplaceAsync(card);
+        }
+
+        public async Task<int> SaveQuizBlockAsync(QuizBlockEntity quiz)
+        {
+            return await _db.InsertOrReplaceAsync(quiz);
+        }
+
+        // ==========================================
+        // СОХРАНЕНИЕ / ОБНОВЛЕНИЕ СПИСКОВ ЭЛЕМЕНТОВ
+        // ==========================================
+
+        public async Task SaveArticlesAsync(IEnumerable<ArticleEntity> articles)
+        {
+            // Запуск синхронных операций обновления внутри асинхронной транзакции для скорости
+            await _db.RunInTransactionAsync(conn =>
+            {
+                foreach (var article in articles)
+                {
+                    conn.InsertOrReplace(article);
+                }
+            });
+        }
+
+        public async Task SaveCardsAsync(IEnumerable<CardEntity> cards)
+        {
+            await _db.RunInTransactionAsync(conn =>
+            {
+                foreach (var card in cards)
+                {
+                    conn.InsertOrReplace(card);
+                }
+            });
+        }
+
+        public async Task SaveQuizBlocksAsync(IEnumerable<QuizBlockEntity> quizzes)
+        {
+            await _db.RunInTransactionAsync(conn =>
+            {
+                foreach (var quiz in quizzes)
+                {
+                    conn.InsertOrReplace(quiz);
+                }
+            });
         }
     }
 }

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Zubrium.Persistence
+namespace Zubrium.Persistence.Entities
 {
     public class CategoryEntity
     {
