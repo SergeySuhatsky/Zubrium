@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Zubrium.Persistence
+namespace Zubrium.Persistence.Entities
 {
     [Table("Cards")]
     public class CardEntity
@@ -20,7 +20,7 @@ namespace Zubrium.Persistence
         public string? DetailedMarkdown { get; set; }
 
         [Indexed]
-        public string CategoryId { get; set; }
+        public string? CategoryId { get; set; }
 
 
     }
