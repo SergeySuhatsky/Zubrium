@@ -36,6 +36,9 @@ namespace Zubrium.Maui.Services.MarkdownRender
         // Внутренние структуры для передачи данных
         private readonly record struct RenderedBlock(IView View, string Text);
 
+        // Семафор для предотвращения одновременного доступа к шрифтам
+        private readonly SemaphoreSlim _mathRenderSemaphore = new SemaphoreSlim(1, 1);
+
         private sealed class LatexImage : Image
         {
             public string Latex { get; set; } = string.Empty;
@@ -121,7 +124,7 @@ namespace Zubrium.Maui.Services.MarkdownRender
             }
         }
 
-        public async Task<View> RenderToViewAsync(string markdown, MarkdownRenderOptions options)
+        public async Task<View> RenderToViewAsync(string markdown, MarkdownRenderOptions options, CancellationToken token = default)
         {
             var container = new VerticalStackLayout();
 
@@ -134,9 +137,10 @@ namespace Zubrium.Maui.Services.MarkdownRender
 
                 foreach (var block in document)
                 {
+                    token.ThrowIfCancellationRequested();
                     if (block is LinkReferenceDefinitionGroup) continue;
 
-                    var rendered = await RenderBlockAsync(block, options, indentLevel: 0);
+                    var rendered = await RenderBlockAsync(block, options, indentLevel: 0, token);
                     if (rendered.HasValue && rendered.Value.View is View view)
                     {
                         AttachCopyGesture(view, rendered.Value.Text);
@@ -145,6 +149,10 @@ namespace Zubrium.Maui.Services.MarkdownRender
                 }
 
                 container.Children.Add(BuildCopyAllButton(markdown));
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.WriteLine("[MarkdownRenderService] Render canceled by user input.");
             }
             catch (Exception ex)
             {
@@ -216,13 +224,13 @@ namespace Zubrium.Maui.Services.MarkdownRender
             return btn;
         }
 
-        private async Task<RenderedBlock?> RenderBlockAsync(Block block, MarkdownRenderOptions options, int indentLevel)
+        private async Task<RenderedBlock?> RenderBlockAsync(Block block, MarkdownRenderOptions options, int indentLevel, CancellationToken token)
         {
             switch (block)
             {
                 case ParagraphBlock paragraph:
                     {
-                        var rb = await RenderParagraphAsync(paragraph, options);
+                        var rb = await RenderParagraphAsync(paragraph, options, token);
                         if (rb.View is View v) v.Margin = new Thickness(0, 4, 0, 4);
                         return rb;
                     }
@@ -267,18 +275,18 @@ namespace Zubrium.Maui.Services.MarkdownRender
                 case MathBlock math:
                     {
                         var latex = math.Lines.ToString();
-                        var view = await CreateLatexViewAsync(latex, options);
-                        var wrapper = new ScrollView
+                        var view = await CreateLatexViewAsync(latex, options, token);
+                        var wrapper = new ContentView
                         {
-                            Orientation = ScrollOrientation.Horizontal,
                             Content = view,
-                            Margin = new Thickness(0, 10, 0, 10)
+                            Margin = new Thickness(0, 10, 0, 10),
+                            HorizontalOptions = LayoutOptions.Start
                         };
                         return new RenderedBlock(wrapper, latex);
                     }
 
                 case CodeBlock code:
-                    return await RenderCodeBlockAsync(code, options);
+                    return await RenderCodeBlockAsync(code, options, token);
 
                 case ThematicBreakBlock:
                     {
@@ -294,19 +302,19 @@ namespace Zubrium.Maui.Services.MarkdownRender
 
                 case ListBlock list:
                     {
-                        var view = await RenderListAsync(list, options, indentLevel);
+                        var view = await RenderListAsync(list, options, indentLevel, token);
                         view.Margin = new Thickness(0, 4);
                         return new RenderedBlock(view, string.Empty);
                     }
 
                 case QuoteBlock quote:
                     {
-                        var view = await RenderQuoteAsync(quote, options);
+                        var view = await RenderQuoteAsync(quote, options, token);
                         return new RenderedBlock(view, string.Empty);
                     }
 
                 case Table table:
-                    return await RenderTableAsync(table, options);
+                    return await RenderTableAsync(table, options, token);
 
                 default:
                     {
@@ -324,7 +332,7 @@ namespace Zubrium.Maui.Services.MarkdownRender
             }
         }
 
-        private async Task<RenderedBlock> RenderParagraphAsync(ParagraphBlock paragraph, MarkdownRenderOptions options)
+        private async Task<RenderedBlock> RenderParagraphAsync(ParagraphBlock paragraph, MarkdownRenderOptions options, CancellationToken token)
         {
             bool needsViews = paragraph.Inline?.Descendants()
                 .Any(i => i is MathInline || (i is LinkInline l && l.IsImage)) ?? false;
@@ -354,7 +362,7 @@ namespace Zubrium.Maui.Services.MarkdownRender
             };
 
             var sb = new StringBuilder();
-            foreach (var cv in await RenderInlinesToViewsAsync(paragraph.Inline, options))
+            foreach (var cv in await RenderInlinesToViewsAsync(paragraph.Inline, options, token))
             {
                 container.Children.Add(cv.View);
                 sb.Append(cv.Text);
@@ -363,7 +371,7 @@ namespace Zubrium.Maui.Services.MarkdownRender
             return new RenderedBlock(container, sb.ToString());
         }
 
-        private async Task<RenderedBlock> RenderCodeBlockAsync(CodeBlock code, MarkdownRenderOptions options)
+        private async Task<RenderedBlock> RenderCodeBlockAsync(CodeBlock code, MarkdownRenderOptions options, CancellationToken token)
         {
             var codeText = code.Lines.ToString();
             string? lang = (code is FencedCodeBlock fenced) ? fenced.Info?.Trim().ToLowerInvariant() : null;
@@ -374,7 +382,7 @@ namespace Zubrium.Maui.Services.MarkdownRender
                 var nestedDoc = Markdown.Parse(codeText, _pipeline);
                 foreach (var nestedBlock in nestedDoc)
                 {
-                    var rb = await RenderBlockAsync(nestedBlock, options, 0);
+                    var rb = await RenderBlockAsync(nestedBlock, options, 0,token);
                     if (rb.HasValue && rb.Value.View != null) inner.Children.Add(rb.Value.View);
                 }
                 return new RenderedBlock(WrapInCodeBorder(inner, options.CodeBackgroundColor), codeText);
@@ -418,7 +426,7 @@ namespace Zubrium.Maui.Services.MarkdownRender
             };
         }
 
-        private async Task<RenderedBlock> RenderTableAsync(Table table, MarkdownRenderOptions options)
+        private async Task<RenderedBlock> RenderTableAsync(Table table, MarkdownRenderOptions options, CancellationToken token)
         {
             var outerBorder = new Border
             {
@@ -456,7 +464,7 @@ namespace Zubrium.Maui.Services.MarkdownRender
 
                     foreach (var cellBlock in cell)
                     {
-                        var rendered = await RenderBlockAsync(cellBlock, options, 0);
+                        var rendered = await RenderBlockAsync(cellBlock, options, 0, token);
                         if (rendered?.View is View cellBlockView)
                         {
                             cellBlockView.Margin = Thickness.Zero;
@@ -494,12 +502,12 @@ namespace Zubrium.Maui.Services.MarkdownRender
             return new RenderedBlock(outerBorder, string.Empty);
         }
 
-        private async Task<View> RenderQuoteAsync(QuoteBlock quote, MarkdownRenderOptions options)
+        private async Task<View> RenderQuoteAsync(QuoteBlock quote, MarkdownRenderOptions options, CancellationToken token)
         {
             var content = new VerticalStackLayout { Spacing = 2 };
             foreach (var block in quote)
             {
-                var rendered = await RenderBlockAsync(block, options, 0);
+                var rendered = await RenderBlockAsync(block, options, 0, token);
                 if (rendered?.View != null)
                     content.Children.Add(rendered.Value.View);
             }
@@ -525,7 +533,7 @@ namespace Zubrium.Maui.Services.MarkdownRender
             return grid;
         }
 
-        private async Task<View> RenderListAsync(ListBlock list, MarkdownRenderOptions options, int indentLevel)
+        private async Task<View> RenderListAsync(ListBlock list, MarkdownRenderOptions options, int indentLevel, CancellationToken token)
         {
             var container = new VerticalStackLayout { Spacing = 2 };
             int index = list.IsOrdered && int.TryParse(list.OrderedStart, out int start) ? start : 1;
@@ -577,7 +585,7 @@ namespace Zubrium.Maui.Services.MarkdownRender
                 foreach (var subBlock in item)
                 {
                     int nextIndent = subBlock is ListBlock ? indentLevel + 1 : indentLevel;
-                    var rendered = await RenderBlockAsync(subBlock, options, nextIndent);
+                    var rendered = await RenderBlockAsync(subBlock, options, nextIndent, token);
                     if (rendered?.View != null)
                         itemContent.Children.Add(rendered.Value.View);
                 }
@@ -693,13 +701,14 @@ namespace Zubrium.Maui.Services.MarkdownRender
             return formatted;
         }
 
-        private async Task<List<RenderedBlock>> RenderInlinesToViewsAsync(ContainerInline? container, MarkdownRenderOptions options)
+        private async Task<List<RenderedBlock>> RenderInlinesToViewsAsync(ContainerInline? container, MarkdownRenderOptions options, CancellationToken token)
         {
             var views = new List<RenderedBlock>();
             if (container == null) return views;
 
             foreach (var inline in container)
             {
+                token.ThrowIfCancellationRequested();
                 switch (inline)
                 {
                     case LineBreakInline lb:
@@ -722,7 +731,7 @@ namespace Zubrium.Maui.Services.MarkdownRender
                         break;
 
                     case EmphasisInline emp:
-                        var innerViews = await RenderInlinesToViewsAsync(emp, options);
+                        var innerViews = await RenderInlinesToViewsAsync(emp, options, token);
                         foreach (var cv in innerViews)
                         {
                             if (cv.View is Label lblEmp)
@@ -749,7 +758,7 @@ namespace Zubrium.Maui.Services.MarkdownRender
                         break;
 
                     case LinkInline link:
-                        var innerLinks = await RenderInlinesToViewsAsync(link, options);
+                        var innerLinks = await RenderInlinesToViewsAsync(link, options, token);
                         foreach (var cv in innerLinks)
                         {
                             if (cv.View is Label lblLink)
@@ -776,29 +785,38 @@ namespace Zubrium.Maui.Services.MarkdownRender
 
                     case MathInline math:
                         var latex = math.Content.ToString();
-                        var view = await CreateLatexViewAsync(latex, options);
+                        var view = await CreateLatexViewAsync(latex, options, token);
                         views.Add(new RenderedBlock(view, latex));
                         break;
 
                     case ContainerInline ci:
-                        views.AddRange(await RenderInlinesToViewsAsync(ci, options));
+                        views.AddRange(await RenderInlinesToViewsAsync(ci, options, token));
                         break;
                 }
             }
             return views;
         }
 
-        private async Task<LatexImage> CreateLatexViewAsync(string latex, MarkdownRenderOptions options)
+        private async Task<LatexImage> CreateLatexViewAsync(string latex, MarkdownRenderOptions options, CancellationToken token)
         {
-            var (source, w, h) = RenderLatexToSource(latex, options);
-            return new LatexImage
+            await _mathRenderSemaphore.WaitAsync(token);
+            try {
+                var (source, w, h) = await Task.Run(() => RenderLatexToSource(latex, options), token);
+                return new LatexImage
+                {
+                    Source = source,
+                    WidthRequest = w,
+                    HeightRequest = h,
+                    Latex = latex,
+                    Aspect = Aspect.AspectFit
+                };
+            }
+
+            finally 
             {
-                Source = source,
-                WidthRequest = w,
-                HeightRequest = h,
-                Latex = latex,
-                Aspect = Aspect.AspectFit
-            };
+                _mathRenderSemaphore.Release();
+            }
+            
         }
 
         private (ImageSource source, float width, float height) RenderLatexToSource(string latex, MarkdownRenderOptions options)

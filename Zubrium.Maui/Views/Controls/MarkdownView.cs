@@ -170,7 +170,7 @@ namespace Zubrium.Maui.Views.Controls
             };
 
             // 4. Запрашиваем готовое визуальное дерево у синглтон-сервиса
-            var renderedView = await _renderService.RenderToViewAsync(currentText, options);
+            var renderedView = await _renderService.RenderToViewAsync(currentText, options, token);
 
             // 5. Обновляем UI в главном потоке
             if (!token.IsCancellationRequested)

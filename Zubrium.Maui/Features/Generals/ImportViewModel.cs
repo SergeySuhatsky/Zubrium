@@ -78,7 +78,7 @@ namespace Zubrium.Maui.Features.Generals
         public partial bool IsQuizzesImportSelected { get; set; } = true;
 
         [ObservableProperty]
-        public partial bool IsArticlesImportSelected { get; set; } = false;
+        public partial bool IsArticlesImportSelected { get; set; } = true;
 
         // ==========================================
         // СВОЙСТВА ДЛЯ СЕКЦИИ "ПРЕДПРОСМОТР"
