@@ -11,4 +11,20 @@ public partial class ImportPage : ContentPage
 		BindingContext = viewModel;
 
     }
+
+    private void OnScrollViewScrolled(object sender, ScrolledEventArgs e)
+    {
+        if (sender is ScrollView scrollView)
+        {
+            // Проверяем: Текущая позиция Y >= (Вся высота контента - Высота видимого окна - 200 пикселей запаса)
+            if (scrollView.ScrollY >= scrollView.ContentSize.Height - scrollView.Height - 200)
+            {
+                if (BindingContext is ImportViewModel vm)
+                {
+                    // Вызываем команду подгрузки
+                    vm.LoadNextChunkCommand.Execute(null);
+                }
+            }
+        }
+    }
 }

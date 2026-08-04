@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using Zubrium.Content.Parsing;
@@ -41,9 +42,6 @@ namespace Zubrium.Maui.Features.Generals
         [NotifyPropertyChangedFor(nameof(HasCards))]
         [NotifyPropertyChangedFor(nameof(HasQuizzes))]
         [NotifyPropertyChangedFor(nameof(HasArticles))]
-        [NotifyPropertyChangedFor(nameof(PreviewCards))]
-        [NotifyPropertyChangedFor(nameof(PreviewQuizzes))]
-        [NotifyPropertyChangedFor(nameof(PreviewArticles))]
         public partial ParsedContentSet? ParsedContentSet { get; set; }
 
         [ObservableProperty]
@@ -63,9 +61,34 @@ namespace Zubrium.Maui.Features.Generals
         public bool HasArticles => ArticlesFoundCount > 0;
 
         // Вычисляемые свойства для предпросмотра всех найденных элементов
-        public IEnumerable<Card>? PreviewCards => IsCardsPreviewActive ? ParsedContentSet?.Cards : null;
-        public IEnumerable<QuizBlock>? PreviewQuizzes => IsQuizzesPreviewActive ? ParsedContentSet?.Quizzes : null;
-        public IEnumerable<Article>? PreviewArticles => IsArticlesPreviewActive ? ParsedContentSet?.Articles : null;
+        public ObservableCollection<Card> PreviewCards { get; } = new();
+        public ObservableCollection<QuizBlock> PreviewQuizzes { get; } = new();
+        public ObservableCollection<Article> PreviewArticles { get; } = new();
+
+        //Счетчики загруженных элементов
+        private int _cardsLoaded = 0;
+        private int _quizzesLoaded = 0;
+        private int _articlesLoaded = 0;
+
+        // 3. Метод CommunityToolkit, который автоматически вызывается при изменении ParsedContentSet
+partial void OnParsedContentSetChanged(ParsedContentSet? value)
+        {
+            // Сбрасываем счетчики и очищаем списки при новом импорте
+            _cardsLoaded = 0;
+            _quizzesLoaded = 0;
+            _articlesLoaded = 0;
+            PreviewCards.Clear();
+            PreviewQuizzes.Clear();
+            PreviewArticles.Clear();
+
+            // Сразу подгружаем первую порцию для активной вкладки
+            LoadNextChunk();
+        }
+
+        // Также подгружаем первую порцию, если пользователь просто переключил пустую вкладку
+        partial void OnIsCardsPreviewActiveChanged(bool value) { if (value && _cardsLoaded == 0) LoadNextChunk(); }
+        partial void OnIsQuizzesPreviewActiveChanged(bool value) { if (value && _quizzesLoaded == 0) LoadNextChunk(); }
+        partial void OnIsArticlesPreviewActiveChanged(bool value) { if (value && _articlesLoaded == 0) LoadNextChunk(); }
 
         // ==========================================
         // СВОЙСТВА ДЛЯ СЕКЦИИ "ЧТО ИМПОРТИРОВАТЬ"
@@ -284,6 +307,35 @@ namespace Zubrium.Maui.Features.Generals
             IsArticlesPreviewActive = true;
             IsCardsPreviewActive = false;
             IsQuizzesPreviewActive = false;
+        }
+
+        // 4. Команда подгрузки следующего чанка
+        [RelayCommand]
+        public void LoadNextChunk()
+        {
+            if (ParsedContentSet == null) return;
+
+            if (IsCardsPreviewActive && ParsedContentSet.Cards != null && _cardsLoaded < ParsedContentSet.Cards.Count)
+            {
+                // Берем следующие 5 карточек
+                var chunk = ParsedContentSet.Cards.Skip(_cardsLoaded).Take(5).ToList();
+                foreach (var item in chunk) PreviewCards.Add(item);
+                _cardsLoaded += chunk.Count;
+            }
+            else if (IsQuizzesPreviewActive && ParsedContentSet.Quizzes != null && _quizzesLoaded < ParsedContentSet.Quizzes.Count)
+            {
+                // Берем следующие 3 квиза
+                var chunk = ParsedContentSet.Quizzes.Skip(_quizzesLoaded).Take(3).ToList();
+                foreach (var item in chunk) PreviewQuizzes.Add(item);
+                _quizzesLoaded += chunk.Count;
+            }
+            else if (IsArticlesPreviewActive && ParsedContentSet.Articles != null && _articlesLoaded < ParsedContentSet.Articles.Count)
+            {
+                // Берем следующие 3 статьи
+                var chunk = ParsedContentSet.Articles.Skip(_articlesLoaded).Take(3).ToList();
+                foreach (var item in chunk) PreviewArticles.Add(item);
+                _articlesLoaded += chunk.Count;
+            }
         }
     }
 }

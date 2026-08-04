@@ -15,7 +15,7 @@
         
         
         <!-- Основной контент со скроллом -->
-        <ScrollView Grid.Row="0">
+        <ScrollView Grid.Row="0" x:Name="MainScrollView" Scrolled="OnScrollViewScrolled" VerticalScrollBarVisibility="Always">
 
             <VerticalStackLayout Padding="20,10,20,40" Spacing="0">
 
