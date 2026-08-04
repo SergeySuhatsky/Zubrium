@@ -144,6 +144,14 @@ partial void OnParsedContentSetChanged(ParsedContentSet? value)
         [NotifyPropertyChangedFor(nameof(PreviewArticles))]
         public partial bool IsArticlesPreviewActive { get; set; }
 
+
+        [ObservableProperty]
+        public partial bool IsToastVisible { get; set; }
+
+        [ObservableProperty]
+        public partial string ToastMessage { get; set; } = string.Empty;
+
+
         // Вычисляемое свойство для отображения окна контента (заглушки)
         public bool IsAnyPreviewActive => IsCardsPreviewActive || IsQuizzesPreviewActive || IsArticlesPreviewActive;
 
@@ -311,18 +319,36 @@ partial void OnParsedContentSetChanged(ParsedContentSet? value)
                 }
 
                 await _repository.InsertContentSet(result);
+                ShowToast("Контент успешно импортирован!");
 
-                var toast = Toast.Make("Контент успешно импортирован!", ToastDuration.Long, 16);
-                await toast.Show();
+
+
             }
             catch (Exception ex)
             {
-                await Toast.Make($"Ошибка импорта: {ex.Message}", ToastDuration.Long, 14).Show();
+                
             }
             finally
             {
                 IsImporting = false;
             }
+        }
+
+        private void ShowToast(string message)
+        {
+            ToastMessage = message;
+            IsToastVisible = true;
+
+            // Запускаем таймер в фоне, чтобы не блокировать UI
+            Task.Run(async () =>
+            {
+                await Task.Delay(3000);
+                // Обязательно возвращаемся в главный поток для изменения UI
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    IsToastVisible = false;
+                });
+            });
         }
 
         // ==========================================
