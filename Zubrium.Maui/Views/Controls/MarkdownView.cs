@@ -14,6 +14,11 @@ namespace Zubrium.Maui.Views.Controls
         private IMarkdownRenderService? _renderService;
         private CancellationTokenSource? _renderCts;
 
+        // Внутренние элементы для отображения загрузки и контента
+        private readonly Grid _rootGrid;
+        private readonly ActivityIndicator _loadingIndicator;
+        private readonly ContentView _markdownContainer;
+
         #region Bindable Properties
 
         public static readonly BindableProperty TextProperty = BindableProperty.Create(
@@ -106,6 +111,32 @@ namespace Zubrium.Maui.Views.Controls
         {
             // Устанавливаем базовые отступы, если нужно
             Padding = new Thickness(0);
+
+            // Создаем спиннер загрузки
+            _loadingIndicator = new ActivityIndicator
+            {
+                IsRunning = false,
+                IsVisible = false,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                Margin = new Thickness(10),
+                WidthRequest = 24,
+                HeightRequest = 24
+            };
+
+            // Привязываем цвет спиннера к цвету текста компонента
+            _loadingIndicator.SetBinding(ActivityIndicator.ColorProperty, new Binding(nameof(TextColor), source: this));
+
+            // Контейнер, в который будет помещаться отрендеренный Markdown
+            _markdownContainer = new ContentView();
+
+            // Сетка, накладывающая спиннер поверх текста
+            _rootGrid = new Grid();
+            _rootGrid.Children.Add(_markdownContainer);
+            _rootGrid.Children.Add(_loadingIndicator);
+
+            // Устанавливаем сетку как единственный корневой элемент контрола
+            this.Content = _rootGrid;
         }
 
         /// <summary>
@@ -157,6 +188,17 @@ namespace Zubrium.Maui.Views.Controls
                 return;
             }
 
+            // Показываем спиннер и слегка затемняем старый контент перед началом рендера
+            if (!token.IsCancellationRequested)
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    _loadingIndicator.IsVisible = true;
+                    _loadingIndicator.IsRunning = true;
+                    _markdownContainer.Opacity = 0.5; // Эффект загрузки
+                });
+            }   
+
             // 3. Собираем опции на основе текущих BindableProperties
             var options = new MarkdownRenderOptions
             {
@@ -173,11 +215,15 @@ namespace Zubrium.Maui.Views.Controls
             var renderedView = await _renderService.RenderToViewAsync(currentText, options, token);
 
             // 5. Обновляем UI в главном потоке
+            // Прячем спиннер, возвращаем прозрачность и подменяем контент
             if (!token.IsCancellationRequested)
             {
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    this.Content = renderedView;
+                    _markdownContainer.Content = renderedView;
+                    _markdownContainer.Opacity = 1.0;
+                    _loadingIndicator.IsRunning = false;
+                    _loadingIndicator.IsVisible = false;
                 });
             }
         }
