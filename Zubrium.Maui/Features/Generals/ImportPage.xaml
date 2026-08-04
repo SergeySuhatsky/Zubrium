@@ -264,8 +264,8 @@
                         <RoundRectangle CornerRadius="16" />
                     </Border.StrokeShape>
                     <Grid ColumnDefinitions="Auto, *, Auto">
-                        <BoxView Grid.Column="0" Color="#9C27B0" WidthRequest="12" HeightRequest="12" CornerRadius="6" VerticalOptions="Center" Margin="0,0,12,0" />
-                        <Label Grid.Column="1" Text="Топология" TextColor="#1C1C1E" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+                        
+                        <Label Grid.Column="1" Text="{Binding SelectedCategoryText}" TextColor="#1C1C1E" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
                         <Image Grid.Column="2" Source="{mi:Material Icon=KeyboardArrowDown, IconColor=#8E8E93}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
                     </Grid>
                     <Border.GestureRecognizers>

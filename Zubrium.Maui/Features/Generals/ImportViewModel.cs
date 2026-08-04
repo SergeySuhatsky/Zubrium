@@ -1,14 +1,18 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Zubrium.Content.Parsing;
 using Zubrium.Content.Repository;
 using Zubrium.Domain;
 using Zubrium.Maui.ViewModels;
+using Zubrium.Persistence.Entities;
 
 namespace Zubrium.Maui.Features.Generals
 {
@@ -45,10 +49,22 @@ namespace Zubrium.Maui.Features.Generals
         public partial ParsedContentSet? ParsedContentSet { get; set; }
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(SelectedCategoryText))]
+        public partial CategoryDraft? SelectedCategory { get; set; }
+
+        public string SelectedCategoryText =>
+            string.IsNullOrWhiteSpace(SelectedCategory?.Name)
+                ? "Выберите категорию"
+                : SelectedCategory.Name;
+
+        [ObservableProperty]
         public partial bool IsCodePreviewVisible { get; set; }
 
         [ObservableProperty]
         public partial string ImportButtonText { get; set; } = "Импортировать";
+
+        [ObservableProperty]
+        public partial bool IsImporting { get; set; }
 
         // Вычисляемые свойства для количества найденных элементов
         public int CardsFoundCount => ParsedContentSet?.Cards?.Count ?? 0;
@@ -80,6 +96,12 @@ partial void OnParsedContentSetChanged(ParsedContentSet? value)
             PreviewCards.Clear();
             PreviewQuizzes.Clear();
             PreviewArticles.Clear();
+
+            // Если есть подсказка категории, пробуем её сопоставить или отложить создание
+            if (!string.IsNullOrWhiteSpace(value?.CategoryHint))
+            {
+                _ = MatchOrCreateCategoryAsync(value.CategoryHint);
+            }
 
             // Сразу подгружаем первую порцию для активной вкладки
             LoadNextChunk();
@@ -127,7 +149,35 @@ partial void OnParsedContentSetChanged(ParsedContentSet? value)
 
         public override void ApplyQueryAttributes(IDictionary<string, object> query)
         {
+            if (query.TryGetValue("SelectedCategory", out var categoryObj) && categoryObj is CategoryDraft category)
+            {
+                SelectedCategory = category;
+            }
+        }
 
+        private async Task MatchOrCreateCategoryAsync(string categoryName)
+        {
+            if (string.IsNullOrWhiteSpace(categoryName))
+            {
+                return;
+            }
+
+            var existingCategory = await _repository.GetCategoryByNameAsync(categoryName.Trim());
+            if (existingCategory != null)
+            {
+                SelectedCategory = new CategoryDraft
+                {
+                    Id = existingCategory.DbId,
+                    Name = existingCategory.Name
+                };
+            }
+            else
+            {
+                SelectedCategory = new CategoryDraft
+                {
+                    Name = categoryName.Trim()
+                };
+            }
         }
 
         public ImportViewModel(IContentRepository repository, IDeckSourceParser parser) : base(repository)
@@ -209,21 +259,70 @@ partial void OnParsedContentSetChanged(ParsedContentSet? value)
         [RelayCommand]
         public async Task SelectCategory()
         {
-            // Логика вызова окна/bottom sheet с выбором категории
-            await Task.CompletedTask;
+            var currentCategoryName = SelectedCategory?.Name ?? ParsedContentSet?.CategoryHint ?? string.Empty;
+            var navigationParameter = new Dictionary<string, object>
+            {
+                { "CurrentCategoryName", currentCategoryName }
+            };
+
+            await Shell.Current.GoToAsync(nameof(CategorySelectionPage), navigationParameter);
         }
 
         [RelayCommand]
         public async Task Import()
         {
-            // Парсируем контент и сохраняем результат для отображения количества элементов
-            var result = _parser.Parse(InputText);
-            ParsedContentSet = result;
+            IsImporting = true;
 
-            await _repository.InsertContentSet(result);
+            try
+            {
+                var result = _parser.Parse(InputText);
+                ParsedContentSet = result;
 
-            // Логика финального импорта
-            await Task.CompletedTask;
+                if (SelectedCategory != null)
+                {
+                    string finalCategoryId = SelectedCategory.Id ?? Guid.NewGuid().ToString("N");
+
+                    if (SelectedCategory.IsNew)
+                    {
+                        var newCategoryEntity = new CategoryEntity
+                        {
+                            DbId = finalCategoryId,
+                            Name = SelectedCategory.Name
+                        };
+
+                        await _repository.SaveCategoryAsync(newCategoryEntity);
+                        SelectedCategory.Id = finalCategoryId;
+                    }
+
+                    foreach (var article in result.Articles)
+                    {
+                        article.CategoryId = finalCategoryId;
+                    }
+
+                    foreach (var card in result.Cards)
+                    {
+                        card.CategoryId = finalCategoryId;
+                    }
+
+                    foreach (var quiz in result.Quizzes)
+                    {
+                        quiz.CategoryId = finalCategoryId;
+                    }
+                }
+
+                await _repository.InsertContentSet(result);
+
+                var toast = Toast.Make("Контент успешно импортирован!", ToastDuration.Long, 16);
+                await toast.Show();
+            }
+            catch (Exception ex)
+            {
+                await Toast.Make($"Ошибка импорта: {ex.Message}", ToastDuration.Long, 14).Show();
+            }
+            finally
+            {
+                IsImporting = false;
+            }
         }
 
         // ==========================================
