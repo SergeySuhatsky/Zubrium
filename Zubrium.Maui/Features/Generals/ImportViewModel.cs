@@ -63,9 +63,9 @@ namespace Zubrium.Maui.Features.Generals
         public bool HasArticles => ArticlesFoundCount > 0;
 
         // Вычисляемые свойства для предпросмотра всех найденных элементов
-        public IEnumerable<Card>? PreviewCards => ParsedContentSet?.Cards;
-        public IEnumerable<QuizBlock>? PreviewQuizzes => ParsedContentSet?.Quizzes;
-        public IEnumerable<Article>? PreviewArticles => ParsedContentSet?.Articles;
+        public IEnumerable<Card>? PreviewCards => IsCardsPreviewActive ? ParsedContentSet?.Cards : null;
+        public IEnumerable<QuizBlock>? PreviewQuizzes => IsQuizzesPreviewActive ? ParsedContentSet?.Quizzes : null;
+        public IEnumerable<Article>? PreviewArticles => IsArticlesPreviewActive ? ParsedContentSet?.Articles : null;
 
         // ==========================================
         // СВОЙСТВА ДЛЯ СЕКЦИИ "ЧТО ИМПОРТИРОВАТЬ"
@@ -86,14 +86,17 @@ namespace Zubrium.Maui.Features.Generals
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsAnyPreviewActive))]
+        [NotifyPropertyChangedFor(nameof(PreviewCards))]
         public partial bool IsCardsPreviewActive { get; set; }
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsAnyPreviewActive))]
+        [NotifyPropertyChangedFor(nameof(PreviewQuizzes))] 
         public partial bool IsQuizzesPreviewActive { get; set; }
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsAnyPreviewActive))]
+        [NotifyPropertyChangedFor(nameof(PreviewArticles))]
         public partial bool IsArticlesPreviewActive { get; set; }
 
         // Вычисляемое свойство для отображения окна контента (заглушки)
