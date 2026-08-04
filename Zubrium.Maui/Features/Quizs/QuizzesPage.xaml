@@ -5,8 +5,10 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
              xmlns:local="clr-namespace:Zubrium.Maui.Features.Quizs"
+             xmlns:vm="clr-namespace:Zubrium.Maui.ViewModels"
              x:Class="Zubrium.Maui.Features.Quizs.QuizzesPage"
              x:DataType="local:QuizzesViewModel"
+             x:Name="QuizzesPageRoot"
              BackgroundColor="#F4F5F8">
     <!-- Светло-серый фон страницы -->
 
@@ -53,6 +55,7 @@
                                VerticalOptions="Center"
                                Margin="0,0,12,0" />
                         <Entry Grid.Column="1"
+                               Text="{Binding SearchText}"
                                Placeholder="Поиск..."
                                PlaceholderColor="#8E8E93"
                                TextColor="#1C1C1E"
@@ -61,7 +64,6 @@
                     </Grid>
                 </Border>
 
-                <!-- Единый список категорий квизов -->
                 <Border BackgroundColor="White"
                         Stroke="#EAECEF"
                         StrokeThickness="1"
@@ -73,83 +75,50 @@
                         <Shadow Brush="#000000" Offset="0,4" Radius="12" Opacity="0.03" />
                     </Border.Shadow>
 
-                    <!-- Вы можете заменить этот StackLayout на CollectionView 
-                         или использовать BindableLayout.ItemsSource для динамических данных -->
-                    <VerticalStackLayout>
+                    <CollectionView ItemsSource="{Binding Categories}" SelectionMode="None">
+                        <CollectionView.EmptyView>
+                            <Label Text="Категорий пока нет" TextColor="#8E8E93" HorizontalOptions="Center" Margin="20" />
+                        </CollectionView.EmptyView>
 
-                        <!-- Категория 1 -->
-                        <Grid ColumnDefinitions="Auto, *" Padding="16,18" ColumnSpacing="16" BackgroundColor="Transparent">
-                            <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding OpenQuizCategoryCommand}" CommandParameter="Calculus" />
-                            </Grid.GestureRecognizers>
-                            <Grid.Behaviors>
-                                <toolkit:TouchBehavior DefaultBackgroundColor="Transparent"
-                                                       PressedBackgroundColor="#F2F2F6"
-                                                       DefaultOpacity="1.0"
-                                                       PressedOpacity="0.5"
-                                                       PressedAnimationDuration="100"
-                                                       DefaultAnimationDuration="100" />
-                            </Grid.Behaviors>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:CategoryDisplayModel">
+                                <VerticalStackLayout>
+                                    <Grid ColumnDefinitions="Auto, *" Padding="16,18" ColumnSpacing="16" BackgroundColor="Transparent">
+                                        <Grid.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding BindingContext.OpenCategoryCommand, Source={x:Reference QuizzesPageRoot}}"
+                                                                  CommandParameter="{Binding CategoryId}" />
+                                        </Grid.GestureRecognizers>
+                                        <Grid.Behaviors>
+                                            <toolkit:TouchBehavior DefaultBackgroundColor="Transparent"
+                                                                   PressedBackgroundColor="#F2F2F6"
+                                                                   DefaultOpacity="1.0"
+                                                                   PressedOpacity="0.5"
+                                                                   PressedAnimationDuration="100"
+                                                                   DefaultAnimationDuration="100" />
+                                        </Grid.Behaviors>
 
-                            <Image Grid.Column="0" Source="{mi:Material Icon=MenuBook, IconColor=#8E95A4}" WidthRequest="28" HeightRequest="28" VerticalOptions="Center" InputTransparent="True"/>
+                                        <Image Grid.Column="0"
+                                               Source="{mi:Material Icon=Quiz}"
+                                               WidthRequest="28"
+                                               HeightRequest="28"
+                                               VerticalOptions="Center"
+                                               InputTransparent="True">
+                                            <Image.Behaviors>
+                                                <toolkit:IconTintColorBehavior TintColor="{Binding IconColor}" />
+                                            </Image.Behaviors>
+                                        </Image>
 
-                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4" InputTransparent="True">
-                                <Label Text="Multivariable Calculus" FontSize="16" TextColor="#2C2C2E" FontAttributes="Bold" />
-                                <Label Text="22 квиза" FontSize="13" TextColor="#8E8E93" />
-                            </VerticalStackLayout>
-                        </Grid>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4" InputTransparent="True">
+                                            <Label Text="{Binding Name}" FontSize="16" TextColor="#2C2C2E" FontAttributes="Bold" />
+                                            <Label Text="{Binding ItemCountText}" FontSize="13" TextColor="#8E8E93" />
+                                        </VerticalStackLayout>
+                                    </Grid>
 
-                        <!-- Разделитель -->
-                        <BoxView HeightRequest="1" Color="#F2F2F6" Margin="16,0" />
-
-                        <!-- Категория 2 -->
-                        <Grid ColumnDefinitions="Auto, *" Padding="16,18" ColumnSpacing="16" BackgroundColor="Transparent">
-                            <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding OpenQuizCategoryCommand}" CommandParameter="Electronics" />
-                            </Grid.GestureRecognizers>
-                            <Grid.Behaviors>
-                                <toolkit:TouchBehavior DefaultBackgroundColor="Transparent"
-                                                       PressedBackgroundColor="#F2F2F6"
-                                                       DefaultOpacity="1.0"
-                                                       PressedOpacity="0.5"
-                                                       PressedAnimationDuration="100"
-                                                       DefaultAnimationDuration="100" />
-                            </Grid.Behaviors>
-
-                            <Image Grid.Column="0" Source="{mi:Material Icon=Memory, IconColor=#66BB6A}" WidthRequest="28" HeightRequest="28" VerticalOptions="Center" InputTransparent="True"/>
-
-                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4" InputTransparent="True">
-                                <Label Text="Электроника" FontSize="16" TextColor="#2C2C2E" FontAttributes="Bold" />
-                                <Label Text="41 квиз" FontSize="13" TextColor="#8E8E93" />
-                            </VerticalStackLayout>
-                        </Grid>
-
-                        <!-- Разделитель -->
-                        <BoxView HeightRequest="1" Color="#F2F2F6" Margin="16,0" />
-
-                        <!-- Категория 3 -->
-                        <Grid ColumnDefinitions="Auto, *" Padding="16,18" ColumnSpacing="16" BackgroundColor="Transparent">
-                            <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding OpenQuizCategoryCommand}" CommandParameter="Anatomy" />
-                            </Grid.GestureRecognizers>
-                            <Grid.Behaviors>
-                                <toolkit:TouchBehavior DefaultBackgroundColor="Transparent"
-                                                       PressedBackgroundColor="#F2F2F6"
-                                                       DefaultOpacity="1.0"
-                                                       PressedOpacity="0.5"
-                                                       PressedAnimationDuration="100"
-                                                       DefaultAnimationDuration="100" />
-                            </Grid.Behaviors>
-
-                            <Image Grid.Column="0" Source="{mi:Material Icon=Accessibility, IconColor=#FFA726}" WidthRequest="28" HeightRequest="28" VerticalOptions="Center" InputTransparent="True"/>
-
-                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4" InputTransparent="True">
-                                <Label Text="Анатомия" FontSize="16" TextColor="#2C2C2E" FontAttributes="Bold" />
-                                <Label Text="12 квизов" FontSize="13" TextColor="#8E8E93" />
-                            </VerticalStackLayout>
-                        </Grid>
-
-                    </VerticalStackLayout>
+                                    <BoxView HeightRequest="1" Color="#F2F2F6" Margin="16,0" />
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
                 </Border>
 
             </VerticalStackLayout>
