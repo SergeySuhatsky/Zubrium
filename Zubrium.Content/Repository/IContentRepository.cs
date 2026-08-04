@@ -31,6 +31,10 @@ namespace Zubrium.Content.Repository
         Task<int> SaveQuizBlockAsync(QuizBlockEntity quiz);
         Task SaveQuizBlocksAsync(IEnumerable<QuizBlockEntity> quizzes);
 
+        // --- Категории (Categories) ---
+        Task<CategoryEntity?> GetCategoryByNameAsync(string name);
+        Task<List<CategoryEntity>> GetAllCategoriesAsync();
+        Task<int> SaveCategoryAsync(CategoryEntity category);
 
         // --- Импорт ContentSet ---
         Task InsertContentSet(ParsedContentSet contentSet, bool isArticles = true, bool isQuizes = true, bool isCards = true);

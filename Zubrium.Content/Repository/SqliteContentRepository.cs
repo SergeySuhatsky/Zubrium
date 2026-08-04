@@ -15,6 +15,7 @@ namespace Zubrium.Content.Repository
             _db.CreateTableAsync<ArticleEntity>().Wait();
             _db.CreateTableAsync<CardEntity>().Wait();
             _db.CreateTableAsync<QuizBlockEntity>().Wait();
+            _db.CreateTableAsync<CategoryEntity>().Wait();
         }
 
         // ==========================================
@@ -72,6 +73,31 @@ namespace Zubrium.Content.Repository
         public async Task<List<QuizBlockEntity>> GetQuizBlocksByCategoryAsync(string categoryId)
         {
             return await _db.Table<QuizBlockEntity>().Where(q => q.CategoryId == categoryId).ToListAsync();
+        }
+
+        // ==========================================
+        // КАТЕГОРИИ (CATEGORIES)
+        // ==========================================
+
+        public async Task<CategoryEntity?> GetCategoryByNameAsync(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return null;
+            }
+
+            var normalizedName = name.Trim();
+            return await _db.Table<CategoryEntity>().Where(c => c.Name == normalizedName).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<CategoryEntity>> GetAllCategoriesAsync()
+        {
+            return await _db.Table<CategoryEntity>().ToListAsync();
+        }
+
+        public async Task<int> SaveCategoryAsync(CategoryEntity category)
+        {
+            return await _db.InsertOrReplaceAsync(category);
         }
 
         // ==========================================
