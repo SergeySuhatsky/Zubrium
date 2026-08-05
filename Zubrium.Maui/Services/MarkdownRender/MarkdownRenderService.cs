@@ -148,7 +148,11 @@ namespace Zubrium.Maui.Services.MarkdownRender
                     }
                 }
 
-                container.Children.Add(BuildCopyAllButton(markdown));
+                //////////////////////////////////////////////
+                ///Тут кнопка для копирования всего текста///
+                /////////////////////////////////////////////
+
+                //container.Children.Add(BuildCopyAllButton(markdown));
             }
             catch (OperationCanceledException)
             {

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Zubrium.Content.Parsing;
+using Microsoft.Maui.ApplicationModel;
 using Zubrium.Content.Repository;
 using Zubrium.Domain;
 using Zubrium.Maui.ViewModels;
@@ -105,6 +106,13 @@ partial void OnParsedContentSetChanged(ParsedContentSet? value)
 
             // Сразу подгружаем первую порцию для активной вкладки
             LoadNextChunk();
+
+            // Обновляем состояние кнопки импорта
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                (ImportCommand as IRelayCommand)?.NotifyCanExecuteChanged();
+                OnPropertyChanged(nameof(IsImportEnabled));
+            });
         }
 
         // Также подгружаем первую порцию, если пользователь просто переключил пустую вкладку
@@ -223,6 +231,8 @@ partial void OnParsedContentSetChanged(ParsedContentSet? value)
                 InputText = await Clipboard.Default.GetTextAsync();
                 // Парсируем контент при вставке текста
                 ParsedContentSet = _parser.Parse(InputText);
+
+                ShowToast("Код успешно вставлен!");
             }
         }
 
@@ -276,7 +286,7 @@ partial void OnParsedContentSetChanged(ParsedContentSet? value)
             await Shell.Current.GoToAsync(nameof(CategorySelectionPage), navigationParameter);
         }
 
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(CanImport))]
         public async Task Import()
         {
             IsImporting = true;
@@ -319,7 +329,9 @@ partial void OnParsedContentSetChanged(ParsedContentSet? value)
                 }
 
                 await _repository.InsertContentSet(result);
-                ShowToast("Контент успешно импортирован!");
+                ShowToast("Контент успешно импортирован! Сейчас вы вернётесь обратно");
+                await Task.Delay(1500);
+                await GoBack();
 
 
 
@@ -333,6 +345,20 @@ partial void OnParsedContentSetChanged(ParsedContentSet? value)
                 IsImporting = false;
             }
         }
+
+        private bool CanImport()
+        {
+            return !IsImporting && (HasCards || HasQuizzes || HasArticles);
+        }
+
+        partial void OnIsImportingChanged(bool value)
+        {
+            (ImportCommand as IRelayCommand)?.NotifyCanExecuteChanged();
+            OnPropertyChanged(nameof(IsImportEnabled));
+        }
+
+        // Вспомогательное свойство для привязки состояния кнопки в XAML
+        public bool IsImportEnabled => !IsImporting && (HasCards || HasQuizzes || HasArticles);
 
         private void ShowToast(string message)
         {

@@ -546,7 +546,16 @@
                         HeightRequest="56" 
                         CornerRadius="16" 
                         ImageSource="{mi:Material Icon=Download, IconColor=White}"
-                        Command="{Binding ImportCommand}"/>
+                        Command="{Binding ImportCommand}"
+                        IsEnabled="{Binding IsImportEnabled}">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button" Binding="{Binding IsImportEnabled}" Value="False">
+                                <Setter Property="BackgroundColor" Value="#A9A9A9" />
+                                <Setter Property="TextColor" Value="#666666" />
+                                <Setter Property="Opacity" Value="0.8" />
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
 
                 </VerticalStackLayout>
 
@@ -743,8 +752,8 @@
                                                     <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Options}">
                                                         <BindableLayout.ItemTemplate>
                                                             <DataTemplate x:DataType="domain:AnswerOption">
-                                                                <HorizontalStackLayout Spacing="8">
-                                                                    <Grid VerticalOptions="Center">
+                                                                <Grid ColumnDefinitions="Auto, *" ColumnSpacing="8">
+                                                                    <Grid Grid.Column="0" VerticalOptions="Center">
                                                                         <Image Source="{mi:Material Icon=CheckCircle, IconColor=#34C759}" WidthRequest="22" HeightRequest="22" IsVisible="{Binding IsCorrect}" />
                                                                         <Image Source="{mi:Material Icon=RadioButtonUnchecked, IconColor=#8E8E93}" WidthRequest="22" HeightRequest="22">
                                                                             <Image.Triggers>
@@ -755,8 +764,8 @@
                                                                         </Image>
                                                                     </Grid>
 
-                                                                    <controls:MarkdownView TextColor="Black" Text="{Binding TextMarkdown}" VerticalOptions="Center" />
-                                                                </HorizontalStackLayout>
+                                                                    <controls:MarkdownView Grid.Column="1" TextColor="Black" Text="{Binding TextMarkdown}" VerticalOptions="Center" />
+                                                                </Grid>
                                                             </DataTemplate>
                                                         </BindableLayout.ItemTemplate>
                                                     </VerticalStackLayout>
