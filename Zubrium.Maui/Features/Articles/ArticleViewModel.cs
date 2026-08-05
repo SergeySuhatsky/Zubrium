@@ -82,7 +82,13 @@ namespace Zubrium.Maui.Features.Articles
         [RelayCommand]
         public async Task OpenCategory(string categoryId)
         {
-            await Application.Current.MainPage.DisplayAlert("Клик", $"Открываем категорию: {categoryId}", "OK");
+            var navigationParameters = new Dictionary<string, object>
+            {
+                { "CategoryId", categoryId },
+                { "ContentType", Zubrium.Maui.Features.Generals.ContentType.Article }
+            };
+
+            await Shell.Current.GoToAsync(nameof(Zubrium.Maui.Features.Generals.CategoryContentPage), navigationParameters);
         }
 
         [RelayCommand]
