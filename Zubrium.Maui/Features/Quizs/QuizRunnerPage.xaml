@@ -10,145 +10,147 @@
              x:Name="RunnerPageRoot"
              BackgroundColor="#F4F5F8">
 
-    <Grid RowDefinitions="Auto, *, Auto" Padding="20">
-        <VerticalStackLayout Grid.Row="0" Spacing="8" Margin="0,0,0,16">
+    <Grid RowDefinitions="Auto, *">
+        <VerticalStackLayout Grid.Row="0" Spacing="8" Padding="20,20,20,10" BackgroundColor="White">
             <controls:DesktopBackButton />
-            <Label Text="{Binding QuizTitle}" FontSize="14" TextColor="#8E8E93" FontAttributes="Bold" TextTransform="Uppercase" />
-            <Label Text="{Binding ProgressText}" FontSize="24" FontAttributes="Bold" TextColor="#1C1C1E" />
+            <Label Text="{Binding QuizTitle}" FontSize="24" FontAttributes="Bold" TextColor="#1C1C1E" />
         </VerticalStackLayout>
 
         <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Always">
-            <VerticalStackLayout Spacing="24">
-                <controls:MarkdownView Text="{Binding QuestionMarkdown}" TextColor="Black" BaseFontSize="18" />
-
-                <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding Options}">
+            <VerticalStackLayout Spacing="32" Padding="20,20,20,60">
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Questions}" Spacing="32">
                     <BindableLayout.ItemTemplate>
-                        <DataTemplate x:DataType="local:QuizOptionViewModel">
-                            <Border StrokeThickness="2" Padding="16,12" BackgroundColor="White" Stroke="#EAECEF">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="12" />
-                                </Border.StrokeShape>
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding BindingContext.ToggleOptionCommand, Source={x:Reference RunnerPageRoot}}" CommandParameter="{Binding .}" />
-                                </Border.GestureRecognizers>
-                                <Border.Triggers>
-                                    <MultiTrigger TargetType="Border">
-                                        <MultiTrigger.Conditions>
-                                            <BindingCondition Binding="{Binding IsSelected}" Value="True" />
-                                            <BindingCondition Binding="{Binding IsAnswered}" Value="False" />
-                                        </MultiTrigger.Conditions>
-                                        <Setter Property="BackgroundColor" Value="#E0E6FF" />
-                                        <Setter Property="Stroke" Value="#6278E6" />
-                                    </MultiTrigger>
-                                    <MultiTrigger TargetType="Border">
-                                        <MultiTrigger.Conditions>
-                                            <BindingCondition Binding="{Binding IsAnswered}" Value="True" />
-                                            <BindingCondition Binding="{Binding IsCorrectOption}" Value="True" />
-                                        </MultiTrigger.Conditions>
-                                        <Setter Property="BackgroundColor" Value="#E8F5E9" />
-                                        <Setter Property="Stroke" Value="#4CAF50" />
-                                    </MultiTrigger>
-                                    <MultiTrigger TargetType="Border">
-                                        <MultiTrigger.Conditions>
-                                            <BindingCondition Binding="{Binding IsAnswered}" Value="True" />
-                                            <BindingCondition Binding="{Binding IsCorrectOption}" Value="False" />
-                                            <BindingCondition Binding="{Binding IsSelected}" Value="True" />
-                                        </MultiTrigger.Conditions>
-                                        <Setter Property="BackgroundColor" Value="#FFEBEE" />
-                                        <Setter Property="Stroke" Value="#F44336" />
-                                    </MultiTrigger>
-                                    <MultiTrigger TargetType="Border">
-                                        <MultiTrigger.Conditions>
-                                            <BindingCondition Binding="{Binding IsAnswered}" Value="True" />
-                                            <BindingCondition Binding="{Binding IsCorrectOption}" Value="False" />
-                                            <BindingCondition Binding="{Binding IsSelected}" Value="False" />
-                                        </MultiTrigger.Conditions>
-                                        <Setter Property="Opacity" Value="0.5" />
-                                    </MultiTrigger>
-                                </Border.Triggers>
+                        <DataTemplate x:DataType="local:QuizQuestionViewModel">
+                            <VerticalStackLayout Spacing="16">
+                                <controls:MarkdownView Text="{Binding QuestionMarkdown}" TextColor="Black" BaseFontSize="18" />
 
-                                <Grid ColumnDefinitions="Auto, *" ColumnSpacing="12" VerticalOptions="Center">
-                                    <Grid Grid.Column="0" VerticalOptions="Center">
-                                        <Image Source="{mi:Material Icon=RadioButtonUnchecked, IconColor=#8E8E93}" WidthRequest="24" HeightRequest="24" IsVisible="False">
-                                            <Image.Triggers>
-                                                <MultiTrigger TargetType="Image">
-                                                    <MultiTrigger.Conditions>
-                                                        <BindingCondition Binding="{Binding IsSingleChoice}" Value="True" />
-                                                        <BindingCondition Binding="{Binding IsSelected}" Value="False" />
-                                                    </MultiTrigger.Conditions>
-                                                    <Setter Property="IsVisible" Value="True" />
-                                                </MultiTrigger>
-                                            </Image.Triggers>
-                                        </Image>
-                                        <Image Source="{mi:Material Icon=RadioButtonChecked, IconColor=#6278E6}" WidthRequest="24" HeightRequest="24" IsVisible="False">
-                                            <Image.Triggers>
-                                                <MultiTrigger TargetType="Image">
-                                                    <MultiTrigger.Conditions>
-                                                        <BindingCondition Binding="{Binding IsSingleChoice}" Value="True" />
-                                                        <BindingCondition Binding="{Binding IsSelected}" Value="True" />
-                                                    </MultiTrigger.Conditions>
-                                                    <Setter Property="IsVisible" Value="True" />
-                                                </MultiTrigger>
-                                            </Image.Triggers>
-                                        </Image>
-                                        <Image Source="{mi:Material Icon=CheckBoxOutlineBlank, IconColor=#8E8E93}" WidthRequest="24" HeightRequest="24" IsVisible="False">
-                                            <Image.Triggers>
-                                                <MultiTrigger TargetType="Image">
-                                                    <MultiTrigger.Conditions>
-                                                        <BindingCondition Binding="{Binding IsSingleChoice}" Value="False" />
-                                                        <BindingCondition Binding="{Binding IsSelected}" Value="False" />
-                                                    </MultiTrigger.Conditions>
-                                                    <Setter Property="IsVisible" Value="True" />
-                                                </MultiTrigger>
-                                            </Image.Triggers>
-                                        </Image>
-                                        <Image Source="{mi:Material Icon=CheckBox, IconColor=#6278E6}" WidthRequest="24" HeightRequest="24" IsVisible="False">
-                                            <Image.Triggers>
-                                                <MultiTrigger TargetType="Image">
-                                                    <MultiTrigger.Conditions>
-                                                        <BindingCondition Binding="{Binding IsSingleChoice}" Value="False" />
-                                                        <BindingCondition Binding="{Binding IsSelected}" Value="True" />
-                                                    </MultiTrigger.Conditions>
-                                                    <Setter Property="IsVisible" Value="True" />
-                                                </MultiTrigger>
-                                            </Image.Triggers>
-                                        </Image>
-                                    </Grid>
+                                <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding Options}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate x:DataType="local:QuizOptionViewModel">
+                                            <Border StrokeThickness="2" Padding="16,12" BackgroundColor="White" Stroke="#EAECEF">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="12" />
+                                                </Border.StrokeShape>
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer 
+                                                        Command="{Binding BindingContext.ToggleOptionCommand, Source={RelativeSource AncestorType={x:Type VerticalStackLayout}}}" 
+                                                        CommandParameter="{Binding .}" />
+                                                </Border.GestureRecognizers>
+                                                <Border.Triggers>
+                                                    <MultiTrigger TargetType="Border">
+                                                        <MultiTrigger.Conditions>
+                                                            <BindingCondition Binding="{Binding IsSelected}" Value="True" />
+                                                            <BindingCondition Binding="{Binding IsAnswered}" Value="False" />
+                                                        </MultiTrigger.Conditions>
+                                                        <Setter Property="BackgroundColor" Value="#E0E6FF" />
+                                                        <Setter Property="Stroke" Value="#6278E6" />
+                                                    </MultiTrigger>
+                                                    <MultiTrigger TargetType="Border">
+                                                        <MultiTrigger.Conditions>
+                                                            <BindingCondition Binding="{Binding IsAnswered}" Value="True" />
+                                                            <BindingCondition Binding="{Binding IsCorrectOption}" Value="True" />
+                                                        </MultiTrigger.Conditions>
+                                                        <Setter Property="BackgroundColor" Value="#E8F5E9" />
+                                                        <Setter Property="Stroke" Value="#4CAF50" />
+                                                    </MultiTrigger>
+                                                    <MultiTrigger TargetType="Border">
+                                                        <MultiTrigger.Conditions>
+                                                            <BindingCondition Binding="{Binding IsAnswered}" Value="True" />
+                                                            <BindingCondition Binding="{Binding IsCorrectOption}" Value="False" />
+                                                            <BindingCondition Binding="{Binding IsSelected}" Value="True" />
+                                                        </MultiTrigger.Conditions>
+                                                        <Setter Property="BackgroundColor" Value="#FFEBEE" />
+                                                        <Setter Property="Stroke" Value="#F44336" />
+                                                    </MultiTrigger>
+                                                    <MultiTrigger TargetType="Border">
+                                                        <MultiTrigger.Conditions>
+                                                            <BindingCondition Binding="{Binding IsAnswered}" Value="True" />
+                                                            <BindingCondition Binding="{Binding IsCorrectOption}" Value="False" />
+                                                            <BindingCondition Binding="{Binding IsSelected}" Value="False" />
+                                                        </MultiTrigger.Conditions>
+                                                        <Setter Property="Opacity" Value="0.5" />
+                                                    </MultiTrigger>
+                                                </Border.Triggers>
 
-                                    <controls:MarkdownView Grid.Column="1" Text="{Binding TextMarkdown}" TextColor="Black" VerticalOptions="Center" />
-                                </Grid>
-                            </Border>
+                                                <Grid ColumnDefinitions="Auto, *" ColumnSpacing="12" VerticalOptions="Center">
+                                                    <Grid Grid.Column="0" VerticalOptions="Center">
+                                                        <Image Source="{mi:Material Icon=RadioButtonUnchecked, IconColor=#8E8E93}" WidthRequest="24" HeightRequest="24" IsVisible="False">
+                                                            <Image.Triggers>
+                                                                <MultiTrigger TargetType="Image">
+                                                                    <MultiTrigger.Conditions>
+                                                                        <BindingCondition Binding="{Binding IsSingleChoice}" Value="True" />
+                                                                        <BindingCondition Binding="{Binding IsSelected}" Value="False" />
+                                                                    </MultiTrigger.Conditions>
+                                                                    <Setter Property="IsVisible" Value="True" />
+                                                                </MultiTrigger>
+                                                            </Image.Triggers>
+                                                        </Image>
+                                                        <Image Source="{mi:Material Icon=RadioButtonChecked, IconColor=#6278E6}" WidthRequest="24" HeightRequest="24" IsVisible="False">
+                                                            <Image.Triggers>
+                                                                <MultiTrigger TargetType="Image">
+                                                                    <MultiTrigger.Conditions>
+                                                                        <BindingCondition Binding="{Binding IsSingleChoice}" Value="True" />
+                                                                        <BindingCondition Binding="{Binding IsSelected}" Value="True" />
+                                                                    </MultiTrigger.Conditions>
+                                                                    <Setter Property="IsVisible" Value="True" />
+                                                                </MultiTrigger>
+                                                            </Image.Triggers>
+                                                        </Image>
+                                                        <Image Source="{mi:Material Icon=CheckBoxOutlineBlank, IconColor=#8E8E93}" WidthRequest="24" HeightRequest="24" IsVisible="False">
+                                                            <Image.Triggers>
+                                                                <MultiTrigger TargetType="Image">
+                                                                    <MultiTrigger.Conditions>
+                                                                        <BindingCondition Binding="{Binding IsSingleChoice}" Value="False" />
+                                                                        <BindingCondition Binding="{Binding IsSelected}" Value="False" />
+                                                                    </MultiTrigger.Conditions>
+                                                                    <Setter Property="IsVisible" Value="True" />
+                                                                </MultiTrigger>
+                                                            </Image.Triggers>
+                                                        </Image>
+                                                        <Image Source="{mi:Material Icon=CheckBox, IconColor=#6278E6}" WidthRequest="24" HeightRequest="24" IsVisible="False">
+                                                            <Image.Triggers>
+                                                                <MultiTrigger TargetType="Image">
+                                                                    <MultiTrigger.Conditions>
+                                                                        <BindingCondition Binding="{Binding IsSingleChoice}" Value="False" />
+                                                                        <BindingCondition Binding="{Binding IsSelected}" Value="True" />
+                                                                    </MultiTrigger.Conditions>
+                                                                    <Setter Property="IsVisible" Value="True" />
+                                                                </MultiTrigger>
+                                                            </Image.Triggers>
+                                                        </Image>
+                                                    </Grid>
+                                                    <controls:MarkdownView Grid.Column="1" Text="{Binding TextMarkdown}" TextColor="Black" VerticalOptions="Center" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+
+                                <Button Text="Ответить"
+                                        Command="{Binding SubmitAnswerCommand}"
+                                        IsVisible="{Binding IsSubmitButtonVisible}"
+                                        BackgroundColor="#1C1C1E" TextColor="White" FontAttributes="Bold" HeightRequest="48" CornerRadius="12" HorizontalOptions="Start" Padding="32,0" />
+
+                                <Border IsVisible="{Binding HasExplanation}" BackgroundColor="#F4F5F8" StrokeThickness="0" Padding="16" Margin="0,8,0,0">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="12" />
+                                    </Border.StrokeShape>
+                                    <VerticalStackLayout Spacing="8">
+                                        <Label Text="ПОЯСНЕНИЕ" FontSize="11" FontAttributes="Bold" TextColor="#8E8E93" />
+                                        <controls:MarkdownView Text="{Binding ExplanationMarkdown}" TextColor="Black" />
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <BoxView HeightRequest="1" Color="#EAECEF" Margin="0,16" />
+                            </VerticalStackLayout>
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
 
-                <Border IsVisible="{Binding HasExplanation}" BackgroundColor="#F4F5F8" StrokeThickness="0" Padding="16" Margin="0,16,0,0">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="12" />
-                    </Border.StrokeShape>
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="ПОЯСНЕНИЕ" FontSize="11" FontAttributes="Bold" TextColor="#8E8E93" />
-                        <controls:MarkdownView Text="{Binding ExplanationMarkdown}" TextColor="Black" />
-                    </VerticalStackLayout>
-                </Border>
+                <Button Text="Завершить квиз"
+                        Command="{Binding FinishQuizCommand}"
+                        BackgroundColor="#34C759" TextColor="White" FontAttributes="Bold" HeightRequest="56" CornerRadius="16" Margin="0,16,0,0" />
             </VerticalStackLayout>
         </ScrollView>
-
-        <Grid Grid.Row="2" Margin="0,16,0,0">
-            <Button Text="Ответить"
-                    Command="{Binding SubmitAnswerCommand}"
-                    IsVisible="{Binding IsAnswered, Converter={toolkit:InvertedBoolConverter}}"
-                    BackgroundColor="#1C1C1E" TextColor="White" FontAttributes="Bold" HeightRequest="56" CornerRadius="16" />
-
-            <Button Text="Далее"
-                    Command="{Binding NextQuestionCommand}"
-                    IsVisible="{Binding IsNextVisible}"
-                    BackgroundColor="#6278E6" TextColor="White" FontAttributes="Bold" HeightRequest="56" CornerRadius="16" />
-
-            <Button Text="Завершить"
-                    Command="{Binding NextQuestionCommand}"
-                    IsVisible="{Binding IsFinishVisible}"
-                    BackgroundColor="#34C759" TextColor="White" FontAttributes="Bold" HeightRequest="56" CornerRadius="16" />
-        </Grid>
     </Grid>
 </ContentPage>

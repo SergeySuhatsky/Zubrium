@@ -175,7 +175,9 @@ namespace Zubrium.Maui.Services.MarkdownRender
             {
                 await Clipboard.Default.SetTextAsync(textToCopy);
                 var toast = Toast.Make("Content copied !", ToastDuration.Short, 14);
-                await toast.Show();
+                //To do Доделать, чтобы не было ошибки при вызове Show() в потоке, который не является UI-потоком
+
+                //await toast.Show();
             };
             view.GestureRecognizers.Add(tap);
         }
