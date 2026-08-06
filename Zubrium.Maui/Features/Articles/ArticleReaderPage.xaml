@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:Zubrium.Maui.Views.Controls"
+             xmlns:local="clr-namespace:Zubrium.Maui.Features.Articles"
+             x:Class="Zubrium.Maui.Features.Articles.ArticleReaderPage"
+             x:DataType="local:ArticleReaderViewModel"
+             BackgroundColor="#F4F5F8">
+
+    <Grid RowDefinitions="Auto, *">
+        <!-- Шапка -->
+        <VerticalStackLayout Grid.Row="0" Spacing="8" Padding="20,20,20,10" BackgroundColor="White">
+            <controls:DesktopBackButton />
+            <Label Text="{Binding ArticleTitle}" FontSize="24" FontAttributes="Bold" TextColor="#1C1C1E" />
+        </VerticalStackLayout>
+
+        <!-- Текст статьи -->
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Always">
+            <VerticalStackLayout Spacing="32" Padding="20,20,20,60">
+
+                <!-- Само содержимое статьи (форматируется MarkdownView) -->
+                <controls:MarkdownView Text="{Binding ArticleMarkdown}" TextColor="Black" BaseFontSize="16" />
+
+                <!-- Кнопка "Завершить чтение" в самом низу -->
+                <Button Text="Завершить чтение"
+                        Command="{Binding FinishReadingCommand}"
+                        BackgroundColor="#34C759" TextColor="White" FontAttributes="Bold" HeightRequest="56" CornerRadius="16" Margin="0,16,0,0" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+
+</ContentPage>

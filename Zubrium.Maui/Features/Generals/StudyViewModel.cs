@@ -24,5 +24,11 @@ namespace Zubrium.Maui.Features.Generals
         {
             await Shell.Current.GoToAsync(nameof(Quizs.PickQuizPage));
         }
+
+        [RelayCommand]
+        public async Task ReadArticle()
+        {
+            await Shell.Current.GoToAsync(nameof(Articles.PickArticlePage));
+        }
     }
 }
