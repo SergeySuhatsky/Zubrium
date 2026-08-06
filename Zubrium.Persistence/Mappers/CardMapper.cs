@@ -18,6 +18,7 @@ namespace Zubrium.Persistence.Mappers
                 DetailedMarkdown = card.DetailedMarkdown,
                 CategoryId = card.CategoryId,
                 IsKnown = card.IsKnown,
+                IsMastered = card.IsMastered,
                 State = card.State,
                 Step = card.Step,
                 Due = card.Due,
@@ -46,6 +47,7 @@ namespace Zubrium.Persistence.Mappers
             )
             {
                 IsKnown = cardEntity.IsKnown,
+                IsMastered = cardEntity.IsMastered,
                 State = cardEntity.State,
                 Step = cardEntity.Step,
                 Due = cardEntity.Due,

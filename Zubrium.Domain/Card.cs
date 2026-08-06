@@ -13,11 +13,11 @@ namespace Zubrium.Domain
             DetailedMarkdown = detailedMarkdown;
             CategoryId = categoryId;
 
-            // Инициализация по умолчанию
-            State = 1; // 1 = Learning (согласно FSRS.Core.Enums.State)
+            State = 1; 
             Step = 0;
             Due = DateTime.UtcNow;
             IsKnown = false;
+            IsMastered = false;
         }
 
         public string Id { get; set; }
@@ -27,17 +27,15 @@ namespace Zubrium.Domain
         public string? DetailedMarkdown { get; set; }
         public string? CategoryId { get; set; }
 
-        // === Пользовательский флаг (для свайпа "Уже знаю") ===
         public bool IsKnown { get; set; }
+        public bool IsMastered { get; set; }
 
-        // === FSRS ПОЛЯ ===
         public int State { get; set; }
         public int? Step { get; set; }
         public DateTime Due { get; set; }
         public double? Stability { get; set; }
         public double? Difficulty { get; set; }
 
-        // Аналитика, которую мы ведем сами (FSRS.Core их не хранит внутри)
         public int ElapsedDays { get; set; }
         public int ScheduledDays { get; set; }
         public int Reps { get; set; }
@@ -49,6 +47,7 @@ namespace Zubrium.Domain
             get 
             {
                 if (IsKnown) return "Уже изучено";
+                if (IsMastered) return "Выучено";
                 if (Reps == 0) return "Новая";
 
                 var diff = Due.Date - DateTime.UtcNow.Date;

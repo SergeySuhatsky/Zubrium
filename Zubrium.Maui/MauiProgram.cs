@@ -41,6 +41,10 @@ namespace Zubrium.Maui
             // Register spaced repetition service
             builder.Services.AddSingleton<ISpacedRepetitionService, FSRSService>();
 
+            // Register settings and interceptor
+            builder.Services.AddSingleton<Zubrium.Domain.IStudySettings, Zubrium.Maui.Services.Settings.StudySettingsService>();
+            builder.Services.AddSingleton<Zubrium.SpacedRepetition.StudyRulesInterceptor>();
+
 
             // Register pages and view models using reflection
             var assembly = Assembly.GetExecutingAssembly();

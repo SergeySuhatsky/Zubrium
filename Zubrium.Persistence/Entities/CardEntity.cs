@@ -8,7 +8,6 @@ namespace Zubrium.Persistence.Entities
     {
         [PrimaryKey]
         public string Id { get; set; }
-
         public string Title { get; set; }
         public string FrontMarkdown { get; set; }
         public string BriefMarkdown { get; set; }
@@ -18,6 +17,8 @@ namespace Zubrium.Persistence.Entities
         public string? CategoryId { get; set; }
 
         public bool IsKnown { get; set; }
+        public bool IsMastered { get; set; }
+
         public int State { get; set; }
         public int? Step { get; set; }
         [Indexed]
