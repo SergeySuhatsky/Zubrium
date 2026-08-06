@@ -4,7 +4,7 @@ namespace Zubrium.Domain
 {
     public class Card
     {
-        public Card(string id, string frontMarkdown, string briefMarkdown, string title="Заголовок карточки", string? detailedMarkdown = null, string? categoryId = null)
+        public Card(string id, string frontMarkdown, string briefMarkdown, string title = "Заголовок карточки", string? detailedMarkdown = null, string? categoryId = null)
         {
             Id = id;
             Title = title;
@@ -14,7 +14,8 @@ namespace Zubrium.Domain
             CategoryId = categoryId;
 
             // Инициализация по умолчанию
-            State = 0; 
+            State = 1; // 1 = Learning (согласно FSRS.Core.Enums.State)
+            Step = 0;
             Due = DateTime.UtcNow;
             IsKnown = false;
         }
@@ -26,21 +27,23 @@ namespace Zubrium.Domain
         public string? DetailedMarkdown { get; set; }
         public string? CategoryId { get; set; }
 
-        // === Пользовательские флаги ===
-        public bool IsKnown { get; set; } // Отсеивает карточки при первом знакомстве
+        // === Пользовательский флаг (для свайпа "Уже знаю") ===
+        public bool IsKnown { get; set; }
 
         // === FSRS ПОЛЯ ===
         public int State { get; set; }
+        public int? Step { get; set; }
         public DateTime Due { get; set; }
-        public double Stability { get; set; }
-        public double Difficulty { get; set; }
+        public double? Stability { get; set; }
+        public double? Difficulty { get; set; }
+
+        // Аналитика, которую мы ведем сами (FSRS.Core их не хранит внутри)
         public int ElapsedDays { get; set; }
         public int ScheduledDays { get; set; }
         public int Reps { get; set; }
         public int Lapses { get; set; }
         public DateTime? LastReview { get; set; }
 
-        // Вычисляемое свойство для списков (UI)
         public string NextReviewText 
         {
             get 

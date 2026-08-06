@@ -19,6 +19,7 @@ namespace Zubrium.Persistence.Mappers
                 CategoryId = card.CategoryId,
                 IsKnown = card.IsKnown,
                 State = card.State,
+                Step = card.Step,
                 Due = card.Due,
                 Stability = card.Stability,
                 Difficulty = card.Difficulty,
@@ -30,22 +31,23 @@ namespace Zubrium.Persistence.Mappers
             };
         }
 
-        public static Card ToDomain (this CardEntity cardEntity) 
+        public static Card ToDomain(this CardEntity cardEntity) 
         {
             if (cardEntity == null) return null;
 
-            var card = new Card
+            return new Card
             (
-                id : cardEntity.Id,
-                title : cardEntity.Title,
-                frontMarkdown : cardEntity.FrontMarkdown,
-                briefMarkdown : cardEntity.BriefMarkdown,
-                detailedMarkdown : cardEntity.DetailedMarkdown,
-                categoryId : cardEntity.CategoryId
+                id: cardEntity.Id,
+                title: cardEntity.Title,
+                frontMarkdown: cardEntity.FrontMarkdown,
+                briefMarkdown: cardEntity.BriefMarkdown,
+                detailedMarkdown: cardEntity.DetailedMarkdown,
+                categoryId: cardEntity.CategoryId
             )
             {
                 IsKnown = cardEntity.IsKnown,
                 State = cardEntity.State,
+                Step = cardEntity.Step,
                 Due = cardEntity.Due,
                 Stability = cardEntity.Stability,
                 Difficulty = cardEntity.Difficulty,
@@ -55,8 +57,6 @@ namespace Zubrium.Persistence.Mappers
                 Lapses = cardEntity.Lapses,
                 LastReview = cardEntity.LastReview
             };
-
-            return card;
         }
     }
 }
