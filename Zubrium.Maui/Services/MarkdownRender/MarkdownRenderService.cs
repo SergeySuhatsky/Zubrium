@@ -842,20 +842,32 @@ namespace Zubrium.Maui.Services.MarkdownRender
             }
 
             var size = painter.Measure();
-            float w = MathF.Ceiling(size.Width) + 6;
-            float h = MathF.Ceiling(size.Height) + 6;
 
-            var info = new SKImageInfo((int)w, (int)h, SKColorType.Rgba8888, SKAlphaType.Premul);
+            // ЛОГИЧЕСКИЕ размеры (то, сколько места картинка займет на экране)
+            float logicalW = MathF.Ceiling(size.Width) + 6;
+            float logicalH = MathF.Ceiling(size.Height) + 6;
+
+            // ФИЗИЧЕСКИЕ размеры (размер самой картинки в пикселях с учетом четкости)
+            float scale = options.LatexScaleFactor;
+            int pixelW = (int)MathF.Ceiling(logicalW * scale);
+            int pixelH = (int)MathF.Ceiling(logicalH * scale);
+
+            var info = new SKImageInfo(pixelW, pixelH, SKColorType.Rgba8888, SKAlphaType.Premul);
             using var surface = SKSurface.Create(info);
             var canvas = surface.Canvas;
             canvas.Clear(SKColors.Transparent);
+
+            // Масштабируем холст перед отрисовкой!
+            canvas.Scale(scale);
+
             painter.Draw(canvas);
 
             using var image = surface.Snapshot();
             using var skData = image.Encode(SKEncodedImageFormat.Png, 100);
             var bytes = skData.ToArray();
 
-            return (ImageSource.FromStream(() => new MemoryStream(bytes)), w, h);
+            // Возвращаем картинку высокого разрешения, но указываем MAUI ее логические (маленькие) размеры
+            return (ImageSource.FromStream(() => new MemoryStream(bytes)), logicalW, logicalH);
         }
 
         private static string PreprocessLatex(string latex)
