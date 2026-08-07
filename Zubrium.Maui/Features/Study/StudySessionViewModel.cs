@@ -18,8 +18,8 @@ namespace Zubrium.Maui.Features.Study
         private readonly StudyRulesInterceptor _interceptor;
         private readonly ISpacedRepetitionService _fsrsService;
 
-        private Queue<StudyCardItem> _mainQueue = new();
-        private Queue<StudyCardItem> _sessionQueue = new(); // Для свайпа вправо (Показать еще)
+        // Единая очередь!
+        private List<StudyCardItem> _queue = new();
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(HasCards))]
@@ -63,41 +63,35 @@ namespace Zubrium.Maui.Features.Study
             var allCardsEntities = new List<Persistence.Entities.CardEntity>();
 
             if (categoryIds.Count == 0)
-            {
                 allCardsEntities = await _repository.GetCardsAsync();
-            }
             else
-            {
                 foreach (var catId in categoryIds)
-                {
                     allCardsEntities.AddRange(await _repository.GetCardsByCategoryAsync(catId));
-                }
-            }
 
             var now = DateTime.UtcNow;
             var domainCards = allCardsEntities.Select(c => c.ToDomain()).ToList();
             var filteredCards = new List<Card>();
 
-            // Фильтрация в зависимости от режима
             foreach (var card in domainCards)
             {
                 if (card.IsKnown || card.IsMastered) continue;
 
-                bool isNew = card.Reps == 0;
-                bool isReview = card.Reps > 0 && card.Due <= now;
+                // Этап знакомства, только если карточку вообще НИКОГДА не открывали.
+                bool isNew = card.Reps == 0 && card.LastReview == null;
+                // Иначе она уже на этапе изучения/повторения
+                bool isReview = (card.Reps > 0 || card.LastReview != null) && card.Due <= now;
 
                 if (mode == StudyMode.NewCards && isNew) filteredCards.Add(card);
                 else if (mode == StudyMode.Review && isReview) filteredCards.Add(card);
                 else if (mode == StudyMode.Mixed && (isNew || isReview)) filteredCards.Add(card);
             }
 
-            // Перемешиваем и собираем очередь
+            // Перемешиваем ОДНУ общую очередь (и новые, и повторяемые будут вперемешку)
             var rnd = new Random();
             foreach (var card in filteredCards.OrderBy(x => rnd.Next()))
             {
-                // Если новая карточка - Этап 0 (Знакомство). Иначе - Этап 1 (Повторение)
-                var phase = card.Reps == 0 ? StudyCardPhase.Discovery : StudyCardPhase.Review;
-                _mainQueue.Enqueue(new StudyCardItem(card, phase));
+                var phase = (card.Reps == 0 && card.LastReview == null) ? StudyCardPhase.Discovery : StudyCardPhase.Review;
+                _queue.Add(new StudyCardItem(card, phase));
             }
 
             NextCard();
@@ -105,28 +99,33 @@ namespace Zubrium.Maui.Features.Study
 
         private void NextCard()
         {
-            if (_mainQueue.Count > 0)
+            if (_queue.Count > 0)
             {
-                CurrentCard = _mainQueue.Dequeue();
-            }
-            else if (_sessionQueue.Count > 0)
-            {
-                CurrentCard = _sessionQueue.Dequeue();
+                CurrentCard = _queue[0];
+                _queue.RemoveAt(0);
             }
             else
             {
                 CurrentCard = null;
             }
 
-            CardsLeft = _mainQueue.Count + _sessionQueue.Count + (CurrentCard != null ? 1 : 0);
+            CardsLeft = _queue.Count + (CurrentCard != null ? 1 : 0);
             IsHiddenMenuVisible = false;
+        }
+
+        private void ReinsertCurrentCard()
+        {
+            if (CurrentCard == null) return;
+            // Вставляем карточку на 2-4 позицию вперед, чтобы она появилась снова вперемешку с остальными
+            int insertIndex = Random.Shared.Next(1, Math.Min(4, _queue.Count + 1));
+            if (_queue.Count == 0) insertIndex = 0;
+            _queue.Insert(insertIndex, CurrentCard);
         }
 
         [RelayCommand]
         public void FlipCard()
         {
-            if (CurrentCard != null)
-                CurrentCard.IsFlipped = !CurrentCard.IsFlipped;
+            if (CurrentCard != null) CurrentCard.IsFlipped = !CurrentCard.IsFlipped;
         }
 
         // =====================================
@@ -146,13 +145,16 @@ namespace Zubrium.Maui.Features.Study
         public async Task StartLearning() // Свайп ВПРАВО
         {
             if (CurrentCard == null) return;
-            // Никакого FSRS, просто переводим карточку в статус изучения и кидаем в сессионную очередь
+
             CurrentCard.Phase = StudyCardPhase.Review;
             CurrentCard.IsFlipped = false;
-            CurrentCard.DomainCard.State = 1; // State.Learning
-            await _repository.SaveCardAsync(CurrentCard.DomainCard.ToEntity());
+            CurrentCard.DomainCard.State = 1; // Learning
+            CurrentCard.DomainCard.LastReview = DateTime.UtcNow; // Фиксируем, что мы ее видели
 
-            _sessionQueue.Enqueue(CurrentCard);
+            await _repository.SaveCardAsync(CurrentCard.DomainCard.ToEntity());
+            await _repository.LogDailyActivityAsync(DateTime.UtcNow.Date, 1, 0); // +1 изученная
+
+            ReinsertCurrentCard();
             NextCard();
         }
 
@@ -161,38 +163,25 @@ namespace Zubrium.Maui.Features.Study
         // =====================================
 
         [RelayCommand]
-        public async Task RateGood() // Свайп ВЛЕВО
-        {
-            await ApplyRatingAndProceed(Rating.Good);
-        }
-
-        [RelayCommand]
         public void ShowAgainInSession() // Свайп ВПРАВО
         {
             if (CurrentCard == null) return;
-            // Не трогаем алгоритм! Просто кидаем в конец очереди текущей сессии
             CurrentCard.IsFlipped = false;
-            _sessionQueue.Enqueue(CurrentCard);
+            ReinsertCurrentCard();
             NextCard();
         }
 
-        [RelayCommand]
-        public async Task RateHard() // Свайп ВВЕРХ
-        {
-            await ApplyRatingAndProceed(Rating.Hard);
-        }
-
-        [RelayCommand]
-        public async Task RateEasy() // Свайп ВНИЗ
-        {
-            await ApplyRatingAndProceed(Rating.Easy);
-        }
+        [RelayCommand] public async Task RateGood() => await ApplyRatingAndProceed(Rating.Good);
+        [RelayCommand] public async Task RateHard() => await ApplyRatingAndProceed(Rating.Hard);
+        [RelayCommand] public async Task RateEasy() => await ApplyRatingAndProceed(Rating.Easy);
+        [RelayCommand] public async Task RateAgain() => await ApplyRatingAndProceed(Rating.Again);
 
         private async Task ApplyRatingAndProceed(Rating rating)
         {
             if (CurrentCard == null) return;
             _interceptor.ApplyRatingAndRules(CurrentCard.DomainCard, rating, DateTime.UtcNow);
             await _repository.SaveCardAsync(CurrentCard.DomainCard.ToEntity());
+            await _repository.LogDailyActivityAsync(DateTime.UtcNow.Date, 0, 1); // +1 повторенная
             NextCard();
         }
 
@@ -201,35 +190,22 @@ namespace Zubrium.Maui.Features.Study
         // =====================================
 
         [RelayCommand]
-        public void ToggleHiddenMenu()
-        {
-            IsHiddenMenuVisible = !IsHiddenMenuVisible;
-        }
+        public void ToggleHiddenMenu() => IsHiddenMenuVisible = !IsHiddenMenuVisible;
 
         [RelayCommand]
-        public async Task RateAgain() // Показывать чаще (Again в FSRS)
-        {
-            await ApplyRatingAndProceed(Rating.Again);
-        }
-
-        [RelayCommand]
-        public async Task ResetProgress() // Обнулить прогресс совсем
+        public async Task ResetProgress() // Обнулить прогресс
         {
             if (CurrentCard == null) return;
             _fsrsService.ResetProgress(CurrentCard.DomainCard);
             await _repository.SaveCardAsync(CurrentCard.DomainCard.ToEntity());
 
-            // Возвращаем на этап знакомства
             CurrentCard.Phase = StudyCardPhase.Discovery;
             CurrentCard.IsFlipped = false;
-            _sessionQueue.Enqueue(CurrentCard);
+            ReinsertCurrentCard();
             NextCard();
         }
 
         [RelayCommand]
-        public async Task FinishSession()
-        {
-            await GoBack();
-        }
+        public async Task FinishSession() => await GoBack();
     }
 }
