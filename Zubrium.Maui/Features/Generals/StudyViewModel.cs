@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
+using Microsoft.Maui.Storage;
 using Zubrium.Content.Repository;
 using Zubrium.Maui.ViewModels;
 using Zubrium.Maui.Features.Study;
@@ -19,11 +21,24 @@ namespace Zubrium.Maui.Features.Generals
 
         public StudyViewModel(IContentRepository repository) : base(repository)
         {
+            // Восстанавливаем выбранные категории из памяти устройства при запуске
+            var savedName = Preferences.Default.Get("Study_SelectedCategoryName", "Все категории");
+            var savedIdsJson = Preferences.Default.Get("Study_SelectedCategoryIds", "[]");
+
+            SelectedCategoryName = savedName;
+            try
+            {
+                SelectedCategoryIds = JsonSerializer.Deserialize<List<string>>(savedIdsJson) ?? new List<string>();
+            }
+            catch
+            {
+                SelectedCategoryIds = new List<string>();
+            }
         }
 
         public override void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            // Ловим список категорий
+            // Ловим список категорий после выбора на странице CategorySelectionPage
             if (query.TryGetValue("SelectedCategories", out var catsObj) && catsObj is List<CategoryDraft> categories)
             {
                 if (categories.Count == 0)
@@ -36,6 +51,10 @@ namespace Zubrium.Maui.Features.Generals
                     SelectedCategoryIds = categories.Select(c => c.Id!).ToList();
                     SelectedCategoryName = string.Join(", ", categories.Select(c => c.Name));
                 }
+
+                // Сохраняем результат в Preferences
+                Preferences.Default.Set("Study_SelectedCategoryName", SelectedCategoryName);
+                Preferences.Default.Set("Study_SelectedCategoryIds", JsonSerializer.Serialize(SelectedCategoryIds));
             }
         }
 
@@ -65,11 +84,15 @@ namespace Zubrium.Maui.Features.Generals
         [RelayCommand]
         public async Task MixedMode() => await StartSession(StudyMode.Mixed);
 
+        // Новая команда для перехода на страницу прогресса
+        [RelayCommand]
+        public async Task OpenProgress() => await Shell.Current.GoToAsync(nameof(Study.ProgressPage));
+
         private async Task StartSession(StudyMode mode)
         {
             await Shell.Current.GoToAsync(nameof(Study.StudySessionPage), new Dictionary<string, object>
             {
-                { "CategoryIds", SelectedCategoryIds }, // Передаем List<string>
+                { "CategoryIds", SelectedCategoryIds }, 
                 { "StudyMode", mode }
             });
         }

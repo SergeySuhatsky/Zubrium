@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:Zubrium.Maui.Views.Controls"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             xmlns:local="clr-namespace:Zubrium.Maui.Features.Study"
+             x:Class="Zubrium.Maui.Features.Study.ProgressPage"
+             x:DataType="local:ProgressViewModel"
+             BackgroundColor="#F4F5F8">
+    <Grid RowDefinitions="Auto, *">
+
+        <!-- Шапка -->
+        <VerticalStackLayout Grid.Row="0" Spacing="16" Padding="20,20,20,10" BackgroundColor="White">
+            <controls:DesktopBackButton />
+            <Label Text="Прогресс" FontSize="28" FontAttributes="Bold" TextColor="#1C1C1E" />
+        </VerticalStackLayout>
+
+        <!-- Контент -->
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Always">
+            <VerticalStackLayout Padding="20" Spacing="20">
+
+                <!-- Выбор категории -->
+                <Label Text="КАТЕГОРИЯ" FontSize="13" TextColor="#9595A5" FontAttributes="Bold" Margin="4,0,0,0" />
+                <Border BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="16,14">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16" />
+                    </Border.StrokeShape>
+                    <Grid ColumnDefinitions="Auto, *, Auto">
+                        <Image Grid.Column="0" Source="{mi:Material Icon=Category, IconColor=#8E8E93}" WidthRequest="24" HeightRequest="24" Margin="0,0,12,0"/>
+                        <Label Grid.Column="1" Text="{Binding SelectedCategoryName}" TextColor="#1C1C1E" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Image Grid.Column="2" Source="{mi:Material Icon=KeyboardArrowRight, IconColor=#8E8E93}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
+                    </Grid>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectCategoryCommand}" />
+                    </Border.GestureRecognizers>
+                </Border>
+
+                <!-- Статистика -->
+                <Grid ColumnDefinitions="*, *, *" ColumnSpacing="12">
+                    <Border Grid.Column="0" BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="12">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                            <Label Text="{Binding TotalCards}" FontSize="20" FontAttributes="Bold" TextColor="#1C1C1E" HorizontalOptions="Center"/>
+                            <Label Text="Всего" FontSize="11" TextColor="#8E8E93" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="1" BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="12">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                            <Label Text="{Binding LearningCards}" FontSize="20" FontAttributes="Bold" TextColor="#FF9500" HorizontalOptions="Center"/>
+                            <Label Text="Учится" FontSize="11" TextColor="#8E8E93" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="2" BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="12">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                            <Label Text="{Binding MasteredCards}" FontSize="20" FontAttributes="Bold" TextColor="#34C759" HorizontalOptions="Center"/>
+                            <Label Text="Выучено" FontSize="11" TextColor="#8E8E93" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- Список карточек -->
+                <Label Text="ДЕТАЛИЗАЦИЯ (Только заголовки)" FontSize="13" TextColor="#9595A5" FontAttributes="Bold" Margin="4,10,0,0" IsVisible="{Binding HasCards}"/>
+
+                <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding Cards}" IsVisible="{Binding HasCards}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="local:CardProgressModel">
+                            <Border BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="16">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="12">
+                                    <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold" TextColor="#1C1C1E" />
+
+                                    <BoxView HeightRequest="1" Color="#F4F5F8" />
+
+                                    <Grid ColumnDefinitions="Auto, *, Auto, *" RowDefinitions="Auto, Auto" RowSpacing="8" ColumnSpacing="12">
+                                        <Label Grid.Row="0" Grid.Column="0" Text="Появление:" FontSize="12" TextColor="#8E8E93" />
+                                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding NextReview}" FontSize="12" FontAttributes="Bold" TextColor="#6278E6" />
+
+                                        <Label Grid.Row="0" Grid.Column="2" Text="Повторений:" FontSize="12" TextColor="#8E8E93" />
+                                        <Label Grid.Row="0" Grid.Column="3" Text="{Binding Reps}" FontSize="12" FontAttributes="Bold" TextColor="#1C1C1E" />
+
+                                        <Label Grid.Row="1" Grid.Column="0" Text="S (Stability):" FontSize="12" TextColor="#8E8E93" />
+                                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding StabilityText}" FontSize="12" FontAttributes="Bold" TextColor="#1C1C1E" />
+
+                                        <Label Grid.Row="1" Grid.Column="2" Text="D (Difficulty):" FontSize="12" TextColor="#8E8E93" />
+                                        <Label Grid.Row="1" Grid.Column="3" Text="{Binding DifficultyText}" FontSize="12" FontAttributes="Bold" TextColor="#1C1C1E" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>
