@@ -54,7 +54,7 @@
                         </Grid.Behaviors>
 
                         <Image Grid.Column="0" Source="{mi:Material Icon=Edit, IconColor=Gray}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" InputTransparent="True"/>
-                        <Label Grid.Column="1" Text="Выбрана 1 категория" FontSize="16" TextColor="#2C2C2E" VerticalOptions="Center" InputTransparent="True"/>
+                        <Label Grid.Column="1" Text="{Binding SelectedCategoryName}" FontSize="16" TextColor="#2C2C2E" VerticalOptions="Center" InputTransparent="True"/>
                         <Image Grid.Column="2" Source="{mi:Material Icon=Category, IconColor=Gray}" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" InputTransparent="True"/>
                     </Grid>
 

@@ -36,7 +36,7 @@
                     <Label Text="Пока не набрано это число повторений, карточка не может быть отложена дольше, чем на половину срока полного изучения." FontSize="12" TextColor="#8E8E93" />
 
                     <Grid ColumnDefinitions="*, Auto" ColumnSpacing="16" Margin="0,8,0,0">
-                        <Stepper Grid.Column="0" Minimum="1" Maximum="10" Increment="1" Value="{Binding MinRepetitions}" HorizontalOptions="Start" />
+                        <Stepper Background="Aqua" Grid.Column="0" Minimum="1" Maximum="10" Increment="1" Value="{Binding MinRepetitions}" HorizontalOptions="Start" />
                         <Label Grid.Column="1" Text="{Binding MinRepetitions, StringFormat='{0} раз(а)'}" FontAttributes="Bold" VerticalOptions="Center" WidthRequest="60" HorizontalTextAlignment="End" />
                     </Grid>
                 </VerticalStackLayout>
