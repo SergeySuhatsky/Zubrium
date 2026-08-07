@@ -38,5 +38,9 @@ namespace Zubrium.Content.Repository
 
         // --- Импорт ContentSet ---
         Task InsertContentSet(ParsedContentSet contentSet, bool isArticles = true, bool isQuizes = true, bool isCards = true);
+
+        // --- Активность (Activity) ---
+        Task LogDailyActivityAsync(DateTime date, int newCards, int reviewCards);
+        Task<List<Persistence.Entities.DailyActivityEntity>> GetDailyActivitiesAsync();
     }
 }

@@ -16,6 +16,7 @@ namespace Zubrium.Content.Repository
             _db.CreateTableAsync<CardEntity>().Wait();
             _db.CreateTableAsync<QuizBlockEntity>().Wait();
             _db.CreateTableAsync<CategoryEntity>().Wait();
+            _db.CreateTableAsync<DailyActivityEntity>().Wait();
         }
 
         // ==========================================
@@ -183,6 +184,37 @@ namespace Zubrium.Content.Repository
                     conn.InsertOrReplace(quiz);
                 }
             });
+        }
+
+        // ==========================================
+        // АНАЛИТИКА АКТИВНОСТИ
+        // ==========================================
+
+        public async Task LogDailyActivityAsync(DateTime date, int newCards, int reviewCards)
+        {
+            var dateOnly = date.Date;
+            var existing = await _db.Table<DailyActivityEntity>().Where(a => a.Date == dateOnly).FirstOrDefaultAsync();
+
+            if (existing != null)
+            {
+                existing.NewCardsStudied += newCards;
+                existing.ReviewCardsStudied += reviewCards;
+                await _db.UpdateAsync(existing);
+            }
+            else
+            {
+                await _db.InsertAsync(new DailyActivityEntity 
+                { 
+                    Date = dateOnly, 
+                    NewCardsStudied = newCards, 
+                    ReviewCardsStudied = reviewCards 
+                });
+            }
+        }
+
+        public async Task<List<DailyActivityEntity>> GetDailyActivitiesAsync()
+        {
+            return await _db.Table<DailyActivityEntity>().ToListAsync();
         }
     }
 }
