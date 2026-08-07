@@ -6,5 +6,6 @@ namespace Zubrium.Domain
         int MinRepetitions { get; set; }
         int DailyNewCardsTarget { get; set; }
         int DailyReviewCardsTarget { get; set; }
+        double DesiredRetention { get; set; } // Целевое удержание (R)
     }
 }

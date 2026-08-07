@@ -10,18 +10,35 @@ namespace Zubrium.SpacedRepetition
 {
     public class FSRSService : ISpacedRepetitionService
     {
-        private readonly IScheduler _scheduler;
+        private IScheduler _scheduler;
+        private readonly IStudySettings _settings;
 
-        public FSRSService()
+        public FSRSService(IStudySettings settings)
         {
-            // Используем стандартную фабрику и параметры FSRS
+            _settings = settings;
+            UpdateScheduler();
+        }
+
+        private void UpdateScheduler()
+        {
             var options = new SchedulerOptions();
+
+            // Безопасное присвоение Target Retention для используемой версии FSRS
+            var prop = options.GetType().GetProperty("TargetRetention") ?? options.GetType().GetProperty("DesiredRetention");
+            if (prop != null && prop.CanWrite)
+            {
+                object val = prop.PropertyType == typeof(float) ? (float)_settings.DesiredRetention : _settings.DesiredRetention;
+                prop.SetValue(options, val);
+            }
+
             var factory = new SchedulerFactory(options);
             _scheduler = factory.CreateScheduler();
         }
 
         public Dictionary<Rating, int> GetReviewOptions(Card domainCard, DateTime now)
         {
+            UpdateScheduler(); // Гарантируем актуальность настроек
+
             if (now.Kind != DateTimeKind.Utc) now = now.ToUniversalTime();
 
             var fsrsCard = MapToFsrsCard(domainCard);
@@ -41,6 +58,8 @@ namespace Zubrium.SpacedRepetition
 
         public void ApplyRating(Card domainCard, Rating rating, DateTime now)
         {
+            UpdateScheduler();
+
             if (now.Kind != DateTimeKind.Utc) now = now.ToUniversalTime();
 
             var fsrsCard = MapToFsrsCard(domainCard);

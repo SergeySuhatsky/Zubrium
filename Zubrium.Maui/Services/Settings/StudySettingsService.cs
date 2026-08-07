@@ -28,5 +28,11 @@ namespace Zubrium.Maui.Services.Settings
             get => Preferences.Default.Get(nameof(DailyReviewCardsTarget), 15);
             set => Preferences.Default.Set(nameof(DailyReviewCardsTarget), value);
         }
+
+        public double DesiredRetention
+        {
+            get => Preferences.Default.Get(nameof(DesiredRetention), 0.90);
+            set => Preferences.Default.Set(nameof(DesiredRetention), value);
+        }
     }
 }

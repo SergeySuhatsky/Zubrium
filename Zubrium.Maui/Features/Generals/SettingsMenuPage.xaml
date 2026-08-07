@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Zubrium.Maui.Features.Generals"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
              x:Class="Zubrium.Maui.Features.Generals.SettingsMenuPage"
              x:DataType="local:SettingsMenuViewModel"
              BackgroundColor="#F4F5F8"
@@ -12,13 +13,10 @@
 
             <!-- Настройка: Дней до выучивания -->
             <Border BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="16">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="16" />
-                </Border.StrokeShape>
+                <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Дней для полного изучения (Target Mastery)" FontAttributes="Bold" TextColor="#1C1C1E" />
                     <Label Text="Если стабильность карточки превысит это число, она считается выученной навсегда." FontSize="12" TextColor="#8E8E93" />
-
                     <Grid ColumnDefinitions="*, Auto" ColumnSpacing="16" Margin="0,8,0,0">
                         <Slider Grid.Column="0" Minimum="10" Maximum="180" Value="{Binding TargetMasteryDays}" VerticalOptions="Center" />
                         <Label Grid.Column="1" Text="{Binding TargetMasteryDays, StringFormat='{0} дн.'}" FontAttributes="Bold" VerticalOptions="Center" WidthRequest="60" HorizontalTextAlignment="End" />
@@ -28,13 +26,10 @@
 
             <!-- Настройка: Минимальное количество повторений -->
             <Border BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="16">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="16" />
-                </Border.StrokeShape>
+                <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Минимум повторений" FontAttributes="Bold" TextColor="#1C1C1E" />
-                    <Label Text="Пока не набрано это число повторений, карточка не может быть отложена дольше, чем на половину срока полного изучения." FontSize="12" TextColor="#8E8E93" />
-
+                    <Label Text="Пока не набрано это число повторений, карточка не может быть отложена." FontSize="12" TextColor="#8E8E93" />
                     <Grid ColumnDefinitions="*, Auto" ColumnSpacing="16" Margin="0,8,0,0">
                         <Stepper Background="Aqua" Grid.Column="0" Minimum="1" Maximum="10" Increment="1" Value="{Binding MinRepetitions}" HorizontalOptions="Start" />
                         <Label Grid.Column="1" Text="{Binding MinRepetitions, StringFormat='{0} раз(а)'}" FontAttributes="Bold" VerticalOptions="Center" WidthRequest="60" HorizontalTextAlignment="End" />
@@ -47,7 +42,6 @@
                 <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Цель: Новые карточки в день" FontAttributes="Bold" TextColor="#1C1C1E" />
-                    <Label Text="Сколько новых карточек вы хотите изучать ежедневно." FontSize="12" TextColor="#8E8E93" />
                     <Grid ColumnDefinitions="*, Auto" ColumnSpacing="16" Margin="0,8,0,0">
                         <Stepper Grid.Column="0" Minimum="0" Maximum="100" Increment="1" Value="{Binding DailyNewCardsTarget}" HorizontalOptions="Start" />
                         <Label Grid.Column="1" Text="{Binding DailyNewCardsTarget, StringFormat='{0} шт.'}" FontAttributes="Bold" VerticalOptions="Center" WidthRequest="60" HorizontalTextAlignment="End" />
@@ -60,13 +54,143 @@
                 <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Цель: Повторения в день" FontAttributes="Bold" TextColor="#1C1C1E" />
-                    <Label Text="Желаемое количество повторяемых карточек в день." FontSize="12" TextColor="#8E8E93" />
                     <Grid ColumnDefinitions="*, Auto" ColumnSpacing="16" Margin="0,8,0,0">
                         <Stepper Grid.Column="0" Minimum="0" Maximum="500" Increment="5" Value="{Binding DailyReviewCardsTarget}" HorizontalOptions="Start" />
                         <Label Grid.Column="1" Text="{Binding DailyReviewCardsTarget, StringFormat='{0} шт.'}" FontAttributes="Bold" VerticalOptions="Center" WidthRequest="60" HorizontalTextAlignment="End" />
                     </Grid>
                 </VerticalStackLayout>
             </Border>
+
+            <!-- ============================================== -->
+            <!-- СИМУЛЯТОР FSRS (Тёмная тема как на скриншоте)  -->
+            <!-- ============================================== -->
+            <Border BackgroundColor="#1A1A1A" StrokeThickness="0" Padding="20">
+                <Border.StrokeShape><RoundRectangle CornerRadius="20" /></Border.StrokeShape>
+                <VerticalStackLayout Spacing="16">
+
+                    <!-- Кнопки действий -->
+                    <HorizontalStackLayout Spacing="8">
+                        <Button Text="× Снова" Command="{Binding AddRatingCommand}" CommandParameter="Снова" BackgroundColor="Transparent" BorderColor="#444" BorderWidth="1" TextColor="#FF3B30" CornerRadius="8" HeightRequest="40" Padding="12,0"/>
+                        <Button Text="→ Трудно" Command="{Binding AddRatingCommand}" CommandParameter="Трудно" BackgroundColor="Transparent" BorderColor="#444" BorderWidth="1" TextColor="#FF9500" CornerRadius="8" HeightRequest="40" Padding="12,0"/>
+                        <Button Text="✓ Хорошо" Command="{Binding AddRatingCommand}" CommandParameter="Хорошо" BackgroundColor="Transparent" BorderColor="#444" BorderWidth="1" TextColor="#34C759" CornerRadius="8" HeightRequest="40" Padding="12,0"/>
+                        <Button Text="⚡ Легко" Command="{Binding AddRatingCommand}" CommandParameter="Легко" BackgroundColor="Transparent" BorderColor="#444" BorderWidth="1" TextColor="#6278E6" CornerRadius="8" HeightRequest="40" Padding="12,0"/>
+
+                        <Button ImageSource="{mi:Material Icon=Undo, IconColor=White}" Command="{Binding UndoStepCommand}" BackgroundColor="Transparent" BorderColor="#444" BorderWidth="1" CornerRadius="8" HeightRequest="40" WidthRequest="40"/>
+                        <Button ImageSource="{mi:Material Icon=Delete, IconColor=White}" Command="{Binding ClearSimulationCommand}" BackgroundColor="Transparent" BorderColor="#444" BorderWidth="1" CornerRadius="8" HeightRequest="40" WidthRequest="40"/>
+                    </HorizontalStackLayout>
+
+                    <!-- Выбранные шаги (Чипсы) -->
+                    <FlexLayout Wrap="Wrap" BindableLayout.ItemsSource="{Binding SimulationSteps}" IsVisible="{Binding SimulationSteps.Count}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="local:SimulationStep">
+                                <Border BackgroundColor="#333" Stroke="{Binding RatingColor}" StrokeThickness="1" Padding="10,6" Margin="0,0,8,8">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                                    <Label Text="{Binding ShortTitle}" TextColor="{Binding RatingColor}" FontSize="12" FontAttributes="Bold" />
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+
+                    <!-- Слайдер Целевого удержания (R) -->
+                    <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="16" Margin="0,10">
+                        <Label Text="Целевое удержание R" VerticalOptions="Center" TextColor="#CCC" FontSize="14" />
+                        <Slider Grid.Column="1" Minimum="0.70" Maximum="0.99" Value="{Binding DesiredRetention}" MinimumTrackColor="#555" MaximumTrackColor="#333" ThumbColor="#888" />
+                        <Label Grid.Column="2" Text="{Binding DesiredRetention, StringFormat='{0:P0}'}" FontAttributes="Bold" TextColor="White" VerticalOptions="Center" />
+                    </Grid>
+
+                    <!-- График Difficulty D (1-10) -->
+                    <VerticalStackLayout Spacing="8">
+                        <HorizontalStackLayout Spacing="8">
+                            <BoxView Color="#6278E6" WidthRequest="10" HeightRequest="10" CornerRadius="2" VerticalOptions="Center"/>
+                            <Label Text="Difficulty D (1-10)" TextColor="White" FontAttributes="Bold" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+
+                        <Grid HeightRequest="150">
+                            <BoxView Color="#333" HeightRequest="1" VerticalOptions="Start" />
+                            <BoxView Color="#333" HeightRequest="1" VerticalOptions="Center" />
+                            <BoxView Color="#333" HeightRequest="1" VerticalOptions="End" />
+
+                            <Path Data="{Binding DifficultyPathData}" Stroke="#6278E6" StrokeThickness="2" Aspect="Fill" Margin="0,5" />
+
+                            <AbsoluteLayout BindableLayout.ItemsSource="{Binding SimulationSteps}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="local:SimulationStep">
+                                        <Ellipse Fill="#FFB300" WidthRequest="10" HeightRequest="10" TranslationX="-5" TranslationY="-5" AbsoluteLayout.LayoutBounds="{Binding DifficultyBounds}" AbsoluteLayout.LayoutFlags="PositionProportional" />
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </AbsoluteLayout>
+                        </Grid>
+
+                        <!-- Подписи оси X -->
+                        <FlexLayout JustifyContent="SpaceBetween" BindableLayout.ItemsSource="{Binding SimulationSteps}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="local:SimulationStep">
+                                    <Label Text="{Binding StepNumber}" TextColor="#888" FontSize="12" />
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </FlexLayout>
+                    </VerticalStackLayout>
+
+                    <!-- График Stability S -->
+                    <VerticalStackLayout Spacing="8" Margin="0,16,0,0">
+                        <HorizontalStackLayout Spacing="8">
+                            <BoxView Color="#34C759" WidthRequest="10" HeightRequest="10" CornerRadius="2" VerticalOptions="Center"/>
+                            <Label Text="Stability S (дни, лог. шкала)" TextColor="White" FontAttributes="Bold" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+
+                        <Grid HeightRequest="150">
+                            <BoxView Color="#333" HeightRequest="1" VerticalOptions="Start" />
+                            <BoxView Color="#333" HeightRequest="1" VerticalOptions="Center" />
+                            <BoxView Color="#333" HeightRequest="1" VerticalOptions="End" />
+
+                            <Path Data="{Binding StabilityPathData}" Stroke="#34C759" StrokeThickness="2" Aspect="Fill" Margin="0,5" />
+
+                            <AbsoluteLayout BindableLayout.ItemsSource="{Binding SimulationSteps}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="local:SimulationStep">
+                                        <Ellipse Fill="#FFB300" WidthRequest="10" HeightRequest="10" TranslationX="-5" TranslationY="-5" AbsoluteLayout.LayoutBounds="{Binding StabilityBounds}" AbsoluteLayout.LayoutFlags="PositionProportional" />
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </AbsoluteLayout>
+                        </Grid>
+
+                        <!-- Подписи оси X -->
+                        <FlexLayout JustifyContent="SpaceBetween" BindableLayout.ItemsSource="{Binding SimulationSteps}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="local:SimulationStep">
+                                    <Label Text="{Binding StepNumber}" TextColor="#888" FontSize="12" />
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </FlexLayout>
+                    </VerticalStackLayout>
+
+                    <!-- Список истории (Журнал) -->
+                    <Border BackgroundColor="#222" Stroke="#333" StrokeThickness="1" Padding="16" Margin="0,16,0,0">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding SimulationSteps}" Spacing="12">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="local:SimulationStep">
+                                    <Grid ColumnDefinitions="Auto, *">
+                                        <HorizontalStackLayout Grid.Column="0" Spacing="4">
+                                            <Label Text="{Binding StepNumber, StringFormat='Шаг {0} —'}" TextColor="{Binding RatingColor}" />
+                                            <Label Text="{Binding RatingName}" TextColor="{Binding RatingColor}" />
+                                        </HorizontalStackLayout>
+                                        <HorizontalStackLayout Grid.Column="1" HorizontalOptions="End" Spacing="8">
+                                            <Label Text="{Binding DifficultyText, StringFormat='D: {0}'}" TextColor="#CCC" FontSize="13" VerticalOptions="Center"/>
+                                            <Label Text="{Binding StabilityText, StringFormat='S: {0} дн.'}" TextColor="White" FontSize="13" FontAttributes="Bold" VerticalOptions="Center"/>
+                                        </HorizontalStackLayout>
+                                    </Grid>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                            <BindableLayout.EmptyView>
+                                <Label Text="Нажмите кнопки рейтинга, чтобы начать симуляцию" TextColor="#666" HorizontalOptions="Center" />
+                            </BindableLayout.EmptyView>
+                        </VerticalStackLayout>
+                    </Border>
+
+                </VerticalStackLayout>
+            </Border>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
