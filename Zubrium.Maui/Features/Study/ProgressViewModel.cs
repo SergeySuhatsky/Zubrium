@@ -19,24 +19,16 @@ namespace Zubrium.Maui.Features.Study
 
         private string? _selectedCategoryId;
 
-        [ObservableProperty]
-        public partial int TotalCards { get; set; }
-
-        [ObservableProperty]
-        public partial int LearningCards { get; set; }
-
-        [ObservableProperty]
-        public partial int MasteredCards { get; set; }
-
-        [ObservableProperty]
-        public partial bool HasCards { get; set; }
+        [ObservableProperty] public partial int TotalCards { get; set; }
+        [ObservableProperty] public partial int KnownCards { get; set; }
+        [ObservableProperty] public partial int LearningCards { get; set; }
+        [ObservableProperty] public partial int MasteredCards { get; set; }
+        [ObservableProperty] public partial bool HasCards { get; set; }
 
         [ObservableProperty]
         public partial ObservableCollection<CardProgressModel> Cards { get; set; } = new();
 
-        public ProgressViewModel(IContentRepository repository) : base(repository)
-        {
-        }
+        public ProgressViewModel(IContentRepository repository) : base(repository) { }
 
         public override async void ApplyQueryAttributes(IDictionary<string, object> query)
         {
@@ -51,7 +43,6 @@ namespace Zubrium.Maui.Features.Study
         [RelayCommand]
         public async Task SelectCategory()
         {
-            // Здесь мы используем одиночный выбор категории (IsMultiSelect = false)
             var navParams = new Dictionary<string, object>
             {
                 { "IsMultiSelect", false },
@@ -64,9 +55,8 @@ namespace Zubrium.Maui.Features.Study
         {
             if (string.IsNullOrEmpty(_selectedCategoryId))
             {
-                TotalCards = 0; LearningCards = 0; MasteredCards = 0;
-                Cards.Clear();
-                HasCards = false;
+                TotalCards = 0; LearningCards = 0; MasteredCards = 0; KnownCards = 0;
+                Cards.Clear(); HasCards = false;
                 return;
             }
 
@@ -74,17 +64,15 @@ namespace Zubrium.Maui.Features.Study
             var domainCards = cardEntities.Select(c => c.ToDomain()).ToList();
 
             TotalCards = domainCards.Count;
-            MasteredCards = domainCards.Count(c => c.IsMastered);
-
-            // Изучается: те, которые имеют Reps > 0, но еще не Mastered и не отмечены как Known
-            LearningCards = domainCards.Count(c => !c.IsMastered && !c.IsKnown && c.Reps > 0);
+            // Изучено (свайп "Знаю")
+            KnownCards = domainCards.Count(c => c.IsKnown);
+            // Выучено алгоритмом (Достигнут таргет TargetMasteryDays)
+            MasteredCards = domainCards.Count(c => c.IsMastered && !c.IsKnown);
+            // Учится (Reps > 0 или LastReview есть)
+            LearningCards = domainCards.Count(c => !c.IsMastered && !c.IsKnown && (c.Reps > 0 || c.LastReview != null));
 
             Cards.Clear();
-            foreach (var card in domainCards)
-            {
-                Cards.Add(new CardProgressModel(card));
-            }
-
+            foreach (var card in domainCards) Cards.Add(new CardProgressModel(card));
             HasCards = Cards.Count > 0;
         }
     }

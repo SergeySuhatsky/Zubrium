@@ -41,6 +41,32 @@
                     </Grid>
                 </VerticalStackLayout>
             </Border>
+
+            <!-- Настройка: Дневной лимит новых -->
+            <Border BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="16">
+                <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Цель: Новые карточки в день" FontAttributes="Bold" TextColor="#1C1C1E" />
+                    <Label Text="Сколько новых карточек вы хотите изучать ежедневно." FontSize="12" TextColor="#8E8E93" />
+                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="16" Margin="0,8,0,0">
+                        <Stepper Grid.Column="0" Minimum="0" Maximum="100" Increment="1" Value="{Binding DailyNewCardsTarget}" HorizontalOptions="Start" />
+                        <Label Grid.Column="1" Text="{Binding DailyNewCardsTarget, StringFormat='{0} шт.'}" FontAttributes="Bold" VerticalOptions="Center" WidthRequest="60" HorizontalTextAlignment="End" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Настройка: Дневной лимит повторений -->
+            <Border BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="16">
+                <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Цель: Повторения в день" FontAttributes="Bold" TextColor="#1C1C1E" />
+                    <Label Text="Желаемое количество повторяемых карточек в день." FontSize="12" TextColor="#8E8E93" />
+                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="16" Margin="0,8,0,0">
+                        <Stepper Grid.Column="0" Minimum="0" Maximum="500" Increment="5" Value="{Binding DailyReviewCardsTarget}" HorizontalOptions="Start" />
+                        <Label Grid.Column="1" Text="{Binding DailyReviewCardsTarget, StringFormat='{0} шт.'}" FontAttributes="Bold" VerticalOptions="Center" WidthRequest="60" HorizontalTextAlignment="End" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

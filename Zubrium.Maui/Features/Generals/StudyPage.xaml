@@ -79,7 +79,7 @@
 
                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4" InputTransparent="True">
                             <Label Text="Учить новые слова" FontSize="16" TextColor="#2C2C2E" />
-                            <Label Text="Выучено сегодня: 0 из 5" FontSize="13" TextColor="#8E8E93" />
+                            <Label Text="{Binding NewCardsProgressText}" FontSize="13" TextColor="#8E8E93" />
                         </VerticalStackLayout>
                     </Grid>
 
@@ -104,7 +104,7 @@
 
                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4" InputTransparent="True">
                             <Label Text="Повторить слова" FontSize="16" TextColor="#2C2C2E" />
-                            <Label Text="В выбранных категориях нет слов для повторения" FontSize="13" TextColor="#8E8E93" LineBreakMode="WordWrap" />
+                            <Label Text="{Binding ReviewCardsProgressText}" FontSize="13" TextColor="#8E8E93" LineBreakMode="WordWrap" />
                         </VerticalStackLayout>
                     </Grid>
 
@@ -255,6 +255,30 @@
                             <Label Text="Статистика изучения и параметры алгоритма" FontSize="13" TextColor="#8E8E93" LineBreakMode="WordWrap" />
                         </VerticalStackLayout>
                     </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ГРАФИК АКТИВНОСТИ -->
+            <Label FontAttributes="Bold" FontSize="13" Margin="8,16,0,0" Text="График активности" TextColor="#9595A5" TextTransform="Uppercase"/>
+            <Border BackgroundColor="White" Padding="16" Stroke="#EAECEF" StrokeThickness="1">
+                <Border.StrokeShape><RoundRectangle CornerRadius="20"/></Border.StrokeShape>
+                <VerticalStackLayout Spacing="16">
+                    <Picker HorizontalOptions="Start" ItemsSource="{Binding ChartModes}" SelectedItem="{Binding SelectedChartMode}" Title="Период"/>
+
+                    <HorizontalStackLayout BindableLayout.ItemsSource="{Binding ChartBars}" HeightRequest="160" HorizontalOptions="Center" Spacing="8">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="local:ChartBarModel">
+                                <VerticalStackLayout Spacing="8" VerticalOptions="End">
+                                    <!-- Бар графика -->
+                                    <Grid HeightRequest="120" VerticalOptions="End" WidthRequest="30">
+                                        <RoundRectangle CornerRadius="6" Fill="#F2F2F6" HeightRequest="120" VerticalOptions="End"/>
+                                        <RoundRectangle CornerRadius="6" Fill="#6278E6" HeightRequest="{Binding DisplayHeight}" VerticalOptions="End"/>
+                                    </Grid>
+                                    <Label FontSize="10" HorizontalOptions="Center" Text="{Binding Label}" TextColor="#8E8E93"/>
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
                 </VerticalStackLayout>
             </Border>
 

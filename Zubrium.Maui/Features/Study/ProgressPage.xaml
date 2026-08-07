@@ -37,7 +37,7 @@
                 </Border>
 
                 <!-- Статистика -->
-                <Grid ColumnDefinitions="*, *, *" ColumnSpacing="12">
+                <Grid ColumnDefinitions="*, *, *, *" ColumnSpacing="12">
                     <Border Grid.Column="0" BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="12">
                         <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
                         <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
@@ -48,11 +48,18 @@
                     <Border Grid.Column="1" BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="12">
                         <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
                         <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                            <Label Text="{Binding KnownCards}" FontSize="20" FontAttributes="Bold" TextColor="#6278E6" HorizontalOptions="Center"/>
+                            <Label Text="Знаю" FontSize="11" TextColor="#8E8E93" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="2" BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="12">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
                             <Label Text="{Binding LearningCards}" FontSize="20" FontAttributes="Bold" TextColor="#FF9500" HorizontalOptions="Center"/>
                             <Label Text="Учится" FontSize="11" TextColor="#8E8E93" HorizontalOptions="Center"/>
                         </VerticalStackLayout>
                     </Border>
-                    <Border Grid.Column="2" BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="12">
+                    <Border Grid.Column="3" BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="12">
                         <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
                         <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
                             <Label Text="{Binding MasteredCards}" FontSize="20" FontAttributes="Bold" TextColor="#34C759" HorizontalOptions="Center"/>

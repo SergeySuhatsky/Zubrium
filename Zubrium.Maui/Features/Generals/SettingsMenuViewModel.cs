@@ -15,12 +15,20 @@ namespace Zubrium.Maui.Features.Generals
         [ObservableProperty]
         public partial int MinRepetitions { get; set; }
 
+        [ObservableProperty]
+        public partial int DailyNewCardsTarget { get; set; }
+
+        [ObservableProperty]
+        public partial int DailyReviewCardsTarget { get; set; }
+
         public SettingsMenuViewModel(IContentRepository repository, IStudySettings settings) : base(repository)
         {
             _settings = settings;
 
             TargetMasteryDays = _settings.TargetMasteryDays;
             MinRepetitions = _settings.MinRepetitions;
+            DailyNewCardsTarget = _settings.DailyNewCardsTarget;
+            DailyReviewCardsTarget = _settings.DailyReviewCardsTarget;
         }
 
         partial void OnTargetMasteryDaysChanged(int value)
@@ -32,6 +40,9 @@ namespace Zubrium.Maui.Features.Generals
         {
             _settings.MinRepetitions = value;
         }
+
+        partial void OnDailyNewCardsTargetChanged(int value) => _settings.DailyNewCardsTarget = value;
+        partial void OnDailyReviewCardsTargetChanged(int value) => _settings.DailyReviewCardsTarget = value;
 
         public override void ApplyQueryAttributes(IDictionary<string, object> query)
         {
