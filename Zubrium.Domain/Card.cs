@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Zubrium.Domain
 {
@@ -13,8 +14,6 @@ namespace Zubrium.Domain
             DetailedMarkdown = detailedMarkdown;
             CategoryId = categoryId;
 
-            State = 1; 
-            Step = 0;
             Due = DateTime.UtcNow;
             IsKnown = false;
             IsMastered = false;
@@ -30,17 +29,12 @@ namespace Zubrium.Domain
         public bool IsKnown { get; set; }
         public bool IsMastered { get; set; }
 
-        public int State { get; set; }
-        public int? Step { get; set; }
         public DateTime Due { get; set; }
-        public double? Stability { get; set; }
-        public double? Difficulty { get; set; }
-
-        public int ElapsedDays { get; set; }
-        public int ScheduledDays { get; set; }
         public int Reps { get; set; }
-        public int Lapses { get; set; }
         public DateTime? LastReview { get; set; }
+
+        // Универсальное хранилище данных для любого алгоритма
+        public Dictionary<string, string> AlgorithmData { get; set; } = new Dictionary<string, string>();
 
         public string NextReviewText 
         {
