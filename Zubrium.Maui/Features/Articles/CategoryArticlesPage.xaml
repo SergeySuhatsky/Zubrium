@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:Zubrium.Maui.Views.Controls"
+             xmlns:domain="clr-namespace:Zubrium.Domain"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             xmlns:local="clr-namespace:Zubrium.Maui.Features.Articles"
+             x:Class="Zubrium.Maui.Features.Articles.CategoryArticlesPage"
+             x:DataType="local:CategoryArticlesViewModel"
+             x:Name="CategoryArticlesPageRoot"
+             BackgroundColor="#F4F5F8">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,20,20,40" Spacing="20">
+            <controls:DesktopBackButton />
+
+            <Label Text="{Binding CategoryName, StringFormat='Статьи: {0}'}" FontSize="24" FontAttributes="Bold" TextColor="#1C1C1E" />
+
+            <CollectionView ItemsSource="{Binding Articles}" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="domain:Article">
+                        <Border BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="16" Margin="0,0,0,12">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="16" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding BindingContext.ReadArticleCommand, Source={x:Reference CategoryArticlesPageRoot}}" CommandParameter="{Binding Id}" />
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <Image Grid.Column="0" Source="{mi:Material Icon=Article, IconColor=#009688}" WidthRequest="24" HeightRequest="24" Margin="0,0,12,0" VerticalOptions="Center"/>
+                                <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                    <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold" TextColor="#1C1C1E" />
+                                    <Label Text="Нажмите, чтобы прочитать" FontSize="12" TextColor="#6278E6" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

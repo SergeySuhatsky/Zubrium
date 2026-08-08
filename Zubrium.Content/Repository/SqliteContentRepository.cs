@@ -15,6 +15,8 @@ namespace Zubrium.Content.Repository
             _db.CreateTableAsync<ArticleEntity>().Wait();
             _db.CreateTableAsync<CardEntity>().Wait();
             _db.CreateTableAsync<QuizBlockEntity>().Wait();
+            _db.CreateTableAsync<CategoryEntity>().Wait();
+            _db.CreateTableAsync<DailyActivityEntity>().Wait();
         }
 
         // ==========================================
@@ -72,6 +74,31 @@ namespace Zubrium.Content.Repository
         public async Task<List<QuizBlockEntity>> GetQuizBlocksByCategoryAsync(string categoryId)
         {
             return await _db.Table<QuizBlockEntity>().Where(q => q.CategoryId == categoryId).ToListAsync();
+        }
+
+        // ==========================================
+        // КАТЕГОРИИ (CATEGORIES)
+        // ==========================================
+
+        public async Task<CategoryEntity?> GetCategoryByNameAsync(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return null;
+            }
+
+            var normalizedName = name.Trim();
+            return await _db.Table<CategoryEntity>().Where(c => c.Name == normalizedName).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<CategoryEntity>> GetAllCategoriesAsync()
+        {
+            return await _db.Table<CategoryEntity>().ToListAsync();
+        }
+
+        public async Task<int> SaveCategoryAsync(CategoryEntity category)
+        {
+            return await _db.InsertOrReplaceAsync(category);
         }
 
         // ==========================================
@@ -157,6 +184,37 @@ namespace Zubrium.Content.Repository
                     conn.InsertOrReplace(quiz);
                 }
             });
+        }
+
+        // ==========================================
+        // АНАЛИТИКА АКТИВНОСТИ
+        // ==========================================
+
+        public async Task LogDailyActivityAsync(DateTime date, int newCards, int reviewCards)
+        {
+            var dateOnly = date.Date;
+            var existing = await _db.Table<DailyActivityEntity>().Where(a => a.Date == dateOnly).FirstOrDefaultAsync();
+
+            if (existing != null)
+            {
+                existing.NewCardsStudied += newCards;
+                existing.ReviewCardsStudied += reviewCards;
+                await _db.UpdateAsync(existing);
+            }
+            else
+            {
+                await _db.InsertAsync(new DailyActivityEntity 
+                { 
+                    Date = dateOnly, 
+                    NewCardsStudied = newCards, 
+                    ReviewCardsStudied = reviewCards 
+                });
+            }
+        }
+
+        public async Task<List<DailyActivityEntity>> GetDailyActivitiesAsync()
+        {
+            return await _db.Table<DailyActivityEntity>().ToListAsync();
         }
     }
 }

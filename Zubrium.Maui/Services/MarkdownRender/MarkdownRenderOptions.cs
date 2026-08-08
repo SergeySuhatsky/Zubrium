@@ -13,5 +13,6 @@ namespace Zubrium.Maui.Services.MarkdownRender
         public Color CodeBackgroundColor { get; set; } = Color.FromArgb("#F6F8FA");
         public Color QuoteBarColor { get; set; } = Color.FromArgb("#D0D7DE");
         public string FontFamily { get; set; } = "Segoe UI"; // Подставьте логику выбора платформы
+        public float LatexScaleFactor { get; set; } = 2.0f;
     }
 }
