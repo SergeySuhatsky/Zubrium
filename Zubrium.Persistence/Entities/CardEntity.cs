@@ -19,16 +19,12 @@ namespace Zubrium.Persistence.Entities
         public bool IsKnown { get; set; }
         public bool IsMastered { get; set; }
 
-        public int State { get; set; }
-        public int? Step { get; set; }
         [Indexed]
         public DateTime Due { get; set; }
-        public double? Stability { get; set; }
-        public double? Difficulty { get; set; }
-        public int ElapsedDays { get; set; }
-        public int ScheduledDays { get; set; }
         public int Reps { get; set; }
-        public int Lapses { get; set; }
         public DateTime? LastReview { get; set; }
+
+        // Текстовое поле для сохранения всех кастомных переменных алгоритма
+        public string? AlgorithmDataJson { get; set; }
     }
 }
