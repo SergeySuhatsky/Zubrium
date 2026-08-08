@@ -39,11 +39,10 @@ namespace Zubrium.Maui
             builder.Services.AddSingleton<IContentRepository>(s => new SqliteContentRepository(dbPath));
 
             // Register spaced repetition service
-            builder.Services.AddSingleton<ISpacedRepetitionService, FSRSService>();
+            builder.Services.AddSingleton<ISpacedRepetitionService, SimpleRepetitionService>();
 
-            // Register settings and interceptor
+            // Register settings
             builder.Services.AddSingleton<Zubrium.Domain.IStudySettings, Zubrium.Maui.Services.Settings.StudySettingsService>();
-            builder.Services.AddSingleton<Zubrium.SpacedRepetition.StudyRulesInterceptor>();
 
 
             // Register pages and view models using reflection

@@ -82,16 +82,12 @@ namespace Zubrium.Maui.Features.Study
         public string Title { get; }
         public string NextReview { get; }
         public int Reps { get; }
-        public string StabilityText { get; }
-        public string DifficultyText { get; }
 
         public CardProgressModel(Card card)
         {
             Title = string.IsNullOrWhiteSpace(card.Title) ? "Без названия" : card.Title;
             NextReview = card.NextReviewText;
             Reps = card.Reps;
-            StabilityText = card.Stability.HasValue ? card.Stability.Value.ToString("0.00") : "-";
-            DifficultyText = card.Difficulty.HasValue ? card.Difficulty.Value.ToString("0.00") : "-";
         }
     }
 }
