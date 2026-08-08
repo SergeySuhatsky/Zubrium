@@ -120,7 +120,33 @@ namespace Zubrium.Maui.Features.Generals
                 };
 
                 // Выполняем обзор точно в срок (перематываем время к Due)
-                var simTime = fsrsCard.Due;
+                DateTime simTime;
+
+                // Если карточка уже повторялась (есть LastReview) и у нее рассчитана стабильность S
+                if (fsrsCard.LastReview.HasValue && fsrsCard.Stability.HasValue)
+                {
+                    // Берем параметр S (Stability) и округляем до целого числа дней в меньшую сторону
+                    int daysToWait = (int)Math.Floor(fsrsCard.Stability.Value);
+
+                    // Проверяем, если округленное количество дней >= 1 (этап Review)
+                    if (daysToWait >= 1)
+                    {
+                        simTime = fsrsCard.LastReview.Value.AddDays(daysToWait);
+                    }
+                    else
+                    {
+                        // Если интервал меньше 1 дня (этап Learning / короткие шаги), 
+                        // логичнее использовать точный Due, чтобы не повторять карточку "прямо сейчас"
+                        simTime = fsrsCard.Due;
+                    }
+                }
+                else
+                {
+                    // Для самой первой итерации (карточка новая, LastReview == null)
+                    simTime = fsrsCard.Due;
+                }
+
+                // Выполняем обзор с новым, округленным simTime
                 var (updated, _) = scheduler.ReviewCard(fsrsCard, r, simTime);
 
                 // Передаем обновленное состояние в следующую итерацию
