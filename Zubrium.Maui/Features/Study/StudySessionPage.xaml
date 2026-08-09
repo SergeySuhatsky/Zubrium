@@ -57,36 +57,68 @@
                                 <Grid RowDefinitions="Auto, *, Auto, Auto" IsVisible="{Binding IsTopCard}">
 
                                     <!-- ВЕРХНЯЯ ЧАСТЬ: Заголовок и вопрос (Безопасная зона для свайпа) -->
-                                    <VerticalStackLayout Grid.Row="0" Margin="24,24,24,0" Spacing="16" InputTransparent="True">
+                                    <VerticalStackLayout Grid.Row="0" Margin="24,12,24,0" Spacing="16" InputTransparent="True">
+
+                                        <!-- Визуальный маркер-ручка для свайпа (Drag handle) -->
+                                        <BoxView HeightRequest="5" 
+                                            WidthRequest="40" 
+                                            Color="#D1D1D6" 
+                                            CornerRadius="2.5" 
+                                            HorizontalOptions="Center" 
+                                            Margin="0,0,0,8"/>
+
                                         <Label Text="{Binding DomainCard.Title}" FontSize="24" FontAttributes="Bold" TextColor="#1C1C1E" />
                                         <controls:MarkdownView Text="{Binding DomainCard.FrontMarkdown}" TextColor="#2C2C2E" />
                                         <BoxView HeightRequest="1" Color="#F2F2F6" IsVisible="{Binding IsBriefVisible}" />
                                     </VerticalStackLayout>
 
                                     <!-- СРЕДНЯЯ ЧАСТЬ: Ответы со скроллом -->
-                                    <!-- Свайпать карту можно везде, КРОМЕ этой зоны (т.к. здесь работает вертикальный скролл) -->
-                                    <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Always" Margin="24,8,24,0">
-                                        <VerticalStackLayout Spacing="16">
+                                    <Grid Grid.Row="1" Margin="24,8,24,0" RowDefinitions="Auto, *">
 
-                                            <!-- КРАТКИЙ ОТВЕТ -->
-                                            <VerticalStackLayout IsVisible="{Binding IsBriefVisible}" Spacing="8">
-                                                <Label Text="КРАТКИЙ ОТВЕТ" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold" />
-                                                <controls:MarkdownView Text="{Binding DomainCard.BriefMarkdown}" TextColor="#2C2C2E" InputTransparent="True" />
+                                        <!-- ПЕРЕКЛЮЧАТЕЛЬ СКРОЛЛА (Появляется при открытии полного ответа) -->
+                                        <Border Grid.Row="0" IsVisible="{Binding IsDetailedVisible}" 
+                                                BackgroundColor="#F4F5F8" StrokeThickness="0" 
+                                                HorizontalOptions="End" Padding="12,6" Margin="0,0,0,8">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="8" /></Border.StrokeShape>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding BindingContext.ToggleScrollCommand, Source={x:Reference SessionPage}}" CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                            <Label FontSize="12" FontAttributes="Bold" TextColor="#6278E6">
+                                                <Label.Triggers>
+                                                    <!-- По умолчанию скролл выключен, работает свайп за центр -->
+                                                    <DataTrigger TargetType="Label" Binding="{Binding IsScrollEnabled}" Value="False">
+                                                        <Setter Property="Text" Value="🔓 Разблокировать скролл" />
+                                                    </DataTrigger>
+                                                    <!-- Включен скролл, свайп за центр не работает -->
+                                                    <DataTrigger TargetType="Label" Binding="{Binding IsScrollEnabled}" Value="True">
+                                                        <Setter Property="Text" Value="🔒 Вернуть свайп" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+                                        </Border>
+
+                                        <!-- СКРОЛЛ (Блокируется по умолчанию через InvertedBoolConverter) -->
+                                        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Always"
+                                                    InputTransparent="{Binding IsScrollEnabled, Converter={toolkit:InvertedBoolConverter}}">
+                                            <VerticalStackLayout Spacing="16">
+
+                                                <VerticalStackLayout IsVisible="{Binding IsBriefVisible}" Spacing="8">
+                                                    <Label Text="КРАТКИЙ ОТВЕТ" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold" />
+                                                    <controls:MarkdownView Text="{Binding DomainCard.BriefMarkdown}" TextColor="#2C2C2E" InputTransparent="True" />
+                                                </VerticalStackLayout>
+
+                                                <ActivityIndicator IsRunning="{Binding IsLoadingDetailed}" IsVisible="{Binding IsLoadingDetailed}" Color="#6278E6" HorizontalOptions="Center" Margin="0,10,0,0" />
+
+                                                <BoxView HeightRequest="1" Color="#F2F2F6" IsVisible="{Binding IsDetailedVisible}" />
+
+                                                <VerticalStackLayout IsVisible="{Binding IsDetailedVisible}" Spacing="8" Padding="0,0,0,24">
+                                                    <Label Text="ПОДРОБНЫЙ ОТВЕТ" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold" />
+                                                    <controls:MarkdownView Text="{Binding DomainCard.DetailedMarkdown}" TextColor="#2C2C2E" InputTransparent="True" />
+                                                </VerticalStackLayout>
+
                                             </VerticalStackLayout>
-
-                                            <!-- СПИННЕР -->
-                                            <ActivityIndicator IsRunning="{Binding IsLoadingDetailed}" IsVisible="{Binding IsLoadingDetailed}" Color="#6278E6" HorizontalOptions="Center" Margin="0,10,0,0" />
-
-                                            <BoxView HeightRequest="1" Color="#F2F2F6" IsVisible="{Binding IsDetailedVisible}" />
-
-                                            <!-- ПОДРОБНЫЙ ОТВЕТ -->
-                                            <VerticalStackLayout IsVisible="{Binding IsDetailedVisible}" Spacing="8" Padding="0,0,0,24">
-                                                <Label Text="ПОДРОБНЫЙ ОТВЕТ" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold" />
-                                                <controls:MarkdownView Text="{Binding DomainCard.DetailedMarkdown}" TextColor="#2C2C2E" InputTransparent="True" />
-                                            </VerticalStackLayout>
-
-                                        </VerticalStackLayout>
-                                    </ScrollView>
+                                        </ScrollView>
+                                    </Grid>
 
                                     <!-- КНОПКА ПОКАЗА ОТВЕТА (Прячется, когда открыт полный ответ) -->
                                     <Border Grid.Row="2" BackgroundColor="#F4F5F8" StrokeThickness="0" Margin="16,0,16,16" Padding="16">

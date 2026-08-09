@@ -216,6 +216,12 @@ namespace Zubrium.Maui.Features.Study
             CurrentCard.IsDetailedVisible = true;
         }
 
+        [RelayCommand]
+        public void ToggleScroll(StudyCardItem card) => card.IsScrollEnabled = !card.IsScrollEnabled;
+
+        [RelayCommand]
+        public void UnlockScroll(StudyCardItem card) => card.IsScrollEnabled = true;
+
         [RelayCommand] public void ToggleHiddenMenu() => IsHiddenMenuVisible = !IsHiddenMenuVisible;
         [RelayCommand] public async Task FinishSession() => await GoBack();
 

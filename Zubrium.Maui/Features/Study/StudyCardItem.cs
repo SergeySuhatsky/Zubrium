@@ -14,6 +14,7 @@ namespace Zubrium.Maui.Features.Study
         [ObservableProperty] private bool isBriefVisible;
         [ObservableProperty] private bool isDetailedVisible;
         [ObservableProperty] private bool isLoadingDetailed;
+        [ObservableProperty] private bool isScrollEnabled;
 
         public StudyCardItem(Card card, StudyCardPhase phase)
         {
