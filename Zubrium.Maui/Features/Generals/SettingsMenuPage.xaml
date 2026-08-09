@@ -10,38 +10,6 @@
         <VerticalStackLayout Padding="20" Spacing="20">
             <Label Text="Настройки алгоритма" FontSize="28" FontAttributes="Bold" TextColor="#1C1C1E" />
 
-            <!-- Настройка: Дней до выучивания -->
-            <Border BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="16">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="16" />
-                </Border.StrokeShape>
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Дней для полного изучения (Target Mastery)" FontAttributes="Bold" TextColor="#1C1C1E" />
-                    <Label Text="Если стабильность карточки превысит это число, она считается выученной навсегда." FontSize="12" TextColor="#8E8E93" />
-
-                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="16" Margin="0,8,0,0">
-                        <Slider Grid.Column="0" Minimum="10" Maximum="180" Value="{Binding TargetMasteryDays}" VerticalOptions="Center" />
-                        <Label Grid.Column="1" Text="{Binding TargetMasteryDays, StringFormat='{0} дн.'}" FontAttributes="Bold" VerticalOptions="Center" WidthRequest="60" HorizontalTextAlignment="End" />
-                    </Grid>
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- Настройка: Минимальное количество повторений -->
-            <Border BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="16">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="16" />
-                </Border.StrokeShape>
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Минимум повторений" FontAttributes="Bold" TextColor="#1C1C1E" />
-                    <Label Text="Пока не набрано это число повторений, карточка не может быть отложена дольше, чем на половину срока полного изучения." FontSize="12" TextColor="#8E8E93" />
-
-                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="16" Margin="0,8,0,0">
-                        <Stepper Background="Aqua" Grid.Column="0" Minimum="1" Maximum="10" Increment="1" Value="{Binding MinRepetitions}" HorizontalOptions="Start" />
-                        <Label Grid.Column="1" Text="{Binding MinRepetitions, StringFormat='{0} раз(а)'}" FontAttributes="Bold" VerticalOptions="Center" WidthRequest="60" HorizontalTextAlignment="End" />
-                    </Grid>
-                </VerticalStackLayout>
-            </Border>
-
             <!-- Настройка: Дневной лимит новых -->
             <Border BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="16">
                 <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
@@ -69,4 +37,5 @@
             </Border>
         </VerticalStackLayout>
     </ScrollView>
+
 </ContentPage>

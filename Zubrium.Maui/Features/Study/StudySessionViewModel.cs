@@ -9,14 +9,13 @@ using Zubrium.Domain;
 using Zubrium.Maui.ViewModels;
 using Zubrium.Persistence.Mappers;
 using Zubrium.SpacedRepetition;
-using FSRS.Core.Enums;
 
 namespace Zubrium.Maui.Features.Study
 {
     public partial class StudySessionViewModel : BaseViewModel
     {
-        private readonly StudyRulesInterceptor _interceptor;
-        private readonly ISpacedRepetitionService _fsrsService;
+        private readonly ISpacedRepetitionService _spacedRepetitionService;
+        private readonly IStudySettings _settings;
 
         // Единая очередь!
         private List<StudyCardItem> _queue = new();
@@ -37,11 +36,11 @@ namespace Zubrium.Maui.Features.Study
 
         public StudySessionViewModel(
             IContentRepository repository,
-            StudyRulesInterceptor interceptor,
-            ISpacedRepetitionService fsrsService) : base(repository)
+            ISpacedRepetitionService spacedRepetitionService,
+            IStudySettings settings) : base(repository)
         {
-            _interceptor = interceptor;
-            _fsrsService = fsrsService;
+            _spacedRepetitionService = spacedRepetitionService;
+            _settings = settings;
         }
 
         public override async void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -70,23 +69,46 @@ namespace Zubrium.Maui.Features.Study
 
             var now = DateTime.UtcNow;
             var domainCards = allCardsEntities.Select(c => c.ToDomain()).ToList();
-            var filteredCards = new List<Card>();
+
+            // Разделяем карточки на две группы
+            var newCards = new List<Card>();
+            var reviewCards = new List<Card>();
 
             foreach (var card in domainCards)
             {
                 if (card.IsKnown || card.IsMastered) continue;
 
-                // Этап знакомства, только если карточку вообще НИКОГДА не открывали.
                 bool isNew = card.Reps == 0 && card.LastReview == null;
-                // Иначе она уже на этапе изучения/повторения
                 bool isReview = (card.Reps > 0 || card.LastReview != null) && card.Due <= now;
 
-                if (mode == StudyMode.NewCards && isNew) filteredCards.Add(card);
-                else if (mode == StudyMode.Review && isReview) filteredCards.Add(card);
-                else if (mode == StudyMode.Mixed && (isNew || isReview)) filteredCards.Add(card);
+                if (isNew) newCards.Add(card);
+                if (isReview) reviewCards.Add(card);
             }
 
-            // Перемешиваем ОДНУ общую очередь (и новые, и повторяемые будут вперемешку)
+            // --- ПРИМЕНЯЕМ ЛИМИТЫ ---
+            var today = DateTime.UtcNow.Date;
+            var activities = await _repository.GetDailyActivitiesAsync();
+            var todayActivity = activities.FirstOrDefault(a => a.Date == today);
+
+            int studiedNewToday = todayActivity?.NewCardsStudied ?? 0;
+            int studiedReviewToday = todayActivity?.ReviewCardsStudied ?? 0;
+
+            // Вычисляем, сколько карточек осталось добить до лимита
+            int remainingNew = Math.Max(0, _settings.DailyNewCardsTarget - studiedNewToday);
+            int remainingReview = Math.Max(0, _settings.DailyReviewCardsTarget - studiedReviewToday);
+
+            var filteredCards = new List<Card>();
+
+            if (mode == StudyMode.NewCards || mode == StudyMode.Mixed)
+            {
+                filteredCards.AddRange(newCards.Take(remainingNew));
+            }
+            if (mode == StudyMode.Review || mode == StudyMode.Mixed)
+            {
+                filteredCards.AddRange(reviewCards.Take(remainingReview));
+            }
+
+            // Перемешиваем ограниченную очередь
             var rnd = new Random();
             foreach (var card in filteredCards.OrderBy(x => rnd.Next()))
             {
@@ -148,7 +170,7 @@ namespace Zubrium.Maui.Features.Study
 
             CurrentCard.Phase = StudyCardPhase.Review;
             CurrentCard.IsFlipped = false;
-            CurrentCard.DomainCard.State = 1; // Learning
+
             CurrentCard.DomainCard.LastReview = DateTime.UtcNow; // Фиксируем, что мы ее видели
 
             await _repository.SaveCardAsync(CurrentCard.DomainCard.ToEntity());
@@ -171,17 +193,18 @@ namespace Zubrium.Maui.Features.Study
             NextCard();
         }
 
-        [RelayCommand] public async Task RateGood() => await ApplyRatingAndProceed(Rating.Good);
-        [RelayCommand] public async Task RateHard() => await ApplyRatingAndProceed(Rating.Hard);
-        [RelayCommand] public async Task RateEasy() => await ApplyRatingAndProceed(Rating.Easy);
-        [RelayCommand] public async Task RateAgain() => await ApplyRatingAndProceed(Rating.Again);
-
-        private async Task ApplyRatingAndProceed(Rating rating)
+        [RelayCommand]
+        public async Task RateGood() // Свайп ВПРАВО (Вспомнил)
         {
             if (CurrentCard == null) return;
-            _interceptor.ApplyRatingAndRules(CurrentCard.DomainCard, rating, DateTime.UtcNow);
+
+            // Вызываем наш новый простой алгоритм
+            _spacedRepetitionService.ApplySuccess(CurrentCard.DomainCard, DateTime.UtcNow);
+
+            // Сохраняем в БД
             await _repository.SaveCardAsync(CurrentCard.DomainCard.ToEntity());
             await _repository.LogDailyActivityAsync(DateTime.UtcNow.Date, 0, 1); // +1 повторенная
+
             NextCard();
         }
 
@@ -196,7 +219,7 @@ namespace Zubrium.Maui.Features.Study
         public async Task ResetProgress() // Обнулить прогресс
         {
             if (CurrentCard == null) return;
-            _fsrsService.ResetProgress(CurrentCard.DomainCard);
+            _spacedRepetitionService.ResetProgress(CurrentCard.DomainCard);
             await _repository.SaveCardAsync(CurrentCard.DomainCard.ToEntity());
 
             CurrentCard.Phase = StudyCardPhase.Discovery;

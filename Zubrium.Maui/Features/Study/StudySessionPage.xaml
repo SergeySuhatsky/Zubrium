@@ -94,7 +94,7 @@
                 </Button>
 
                 <!-- Кнопки для фазы 1: Изучение (После переворота) -->
-                <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="*, *" RowSpacing="12" ColumnSpacing="12">
+                <Grid ColumnDefinitions="*, *" ColumnSpacing="12">
                     <Grid.Triggers>
                         <DataTrigger TargetType="Grid" Binding="{Binding CurrentCard.Phase}" Value="Discovery">
                             <Setter Property="IsVisible" Value="False" />
@@ -104,10 +104,8 @@
                         </DataTrigger>
                     </Grid.Triggers>
 
-                    <Button Grid.Row="0" Grid.Column="0" Text="↑ Hard (Spinner)" Command="{Binding RateHardCommand}" BackgroundColor="#FF9500" TextColor="White" FontAttributes="Bold" HeightRequest="48" CornerRadius="12"/>
-                    <Button Grid.Row="0" Grid.Column="1" Text="↓ Easy (Spinner)" Command="{Binding RateEasyCommand}" BackgroundColor="#34C759" TextColor="White" FontAttributes="Bold" HeightRequest="48" CornerRadius="12"/>
-                    <Button Grid.Row="1" Grid.Column="0" Text="← Good" Command="{Binding RateGoodCommand}" BackgroundColor="#6278E6" TextColor="White" FontAttributes="Bold" HeightRequest="56" CornerRadius="12"/>
-                    <Button Grid.Row="1" Grid.Column="1" Text="Еще раз →" Command="{Binding ShowAgainInSessionCommand}" BackgroundColor="#EAECEF" TextColor="#1C1C1E" FontAttributes="Bold" HeightRequest="56" CornerRadius="12"/>
+                    <Button Grid.Column="0" Text="Снова" Command="{Binding ShowAgainInSessionCommand}" BackgroundColor="#EAECEF" TextColor="#1C1C1E" FontAttributes="Bold" HeightRequest="56" CornerRadius="12"/>
+                    <Button Grid.Column="1" Text="Вспомнил" Command="{Binding RateGoodCommand}" BackgroundColor="#6278E6" TextColor="White" FontAttributes="Bold" HeightRequest="56" CornerRadius="12"/>
                 </Grid>
 
             </Grid>
@@ -134,8 +132,6 @@
                     <Shadow Brush="Black" Offset="0,4" Radius="10" Opacity="0.1" />
                 </Border.Shadow>
                 <VerticalStackLayout WidthRequest="250">
-                    <Button Text="Показывать чаще (Again)" Command="{Binding RateAgainCommand}" BackgroundColor="Transparent" TextColor="#1C1C1E" HorizontalOptions="Start" Padding="16" />
-                    <BoxView HeightRequest="1" Color="#EAECEF" />
                     <Button Text="Обнулить прогресс карточки" Command="{Binding ResetProgressCommand}" BackgroundColor="Transparent" TextColor="#FF3B30" HorizontalOptions="Start" Padding="16" />
                 </VerticalStackLayout>
             </Border>

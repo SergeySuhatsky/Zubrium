@@ -10,12 +10,6 @@ namespace Zubrium.Maui.Features.Generals
         private readonly IStudySettings _settings;
 
         [ObservableProperty]
-        public partial int TargetMasteryDays { get; set; }
-
-        [ObservableProperty]
-        public partial int MinRepetitions { get; set; }
-
-        [ObservableProperty]
         public partial int DailyNewCardsTarget { get; set; }
 
         [ObservableProperty]
@@ -25,20 +19,8 @@ namespace Zubrium.Maui.Features.Generals
         {
             _settings = settings;
 
-            TargetMasteryDays = _settings.TargetMasteryDays;
-            MinRepetitions = _settings.MinRepetitions;
             DailyNewCardsTarget = _settings.DailyNewCardsTarget;
             DailyReviewCardsTarget = _settings.DailyReviewCardsTarget;
-        }
-
-        partial void OnTargetMasteryDaysChanged(int value)
-        {
-            _settings.TargetMasteryDays = value;
-        }
-
-        partial void OnMinRepetitionsChanged(int value)
-        {
-            _settings.MinRepetitions = value;
         }
 
         partial void OnDailyNewCardsTargetChanged(int value) => _settings.DailyNewCardsTarget = value;

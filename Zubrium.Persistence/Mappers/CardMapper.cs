@@ -1,4 +1,6 @@
-﻿using Zubrium.Domain;
+﻿using System.Collections.Generic;
+using System.Text.Json;
+using Zubrium.Domain;
 using Zubrium.Persistence.Entities;
 
 namespace Zubrium.Persistence.Mappers
@@ -19,22 +21,33 @@ namespace Zubrium.Persistence.Mappers
                 CategoryId = card.CategoryId,
                 IsKnown = card.IsKnown,
                 IsMastered = card.IsMastered,
-                State = card.State,
-                Step = card.Step,
                 Due = card.Due,
-                Stability = card.Stability,
-                Difficulty = card.Difficulty,
-                ElapsedDays = card.ElapsedDays,
-                ScheduledDays = card.ScheduledDays,
                 Reps = card.Reps,
-                Lapses = card.Lapses,
-                LastReview = card.LastReview
+                LastReview = card.LastReview,
+
+                // Сериализуем словарь AlgorithmData в JSON-строку для базы
+                AlgorithmDataJson = JsonSerializer.Serialize(card.AlgorithmData)
             };
         }
 
         public static Card ToDomain(this CardEntity cardEntity) 
         {
             if (cardEntity == null) return null;
+
+            // Десериализуем JSON обратно в Dictionary, а если поле пустое — создаем пустой словарь
+            Dictionary<string, string> algorithmData = null;
+            if (!string.IsNullOrEmpty(cardEntity.AlgorithmDataJson))
+            {
+                try
+                {
+                    algorithmData = JsonSerializer.Deserialize<Dictionary<string, string>>(cardEntity.AlgorithmDataJson);
+                }
+                catch
+                {
+                    // Резервный фоллбэк на случай поврежденной строки
+                    algorithmData = new Dictionary<string, string>();
+                }
+            }
 
             return new Card
             (
@@ -48,16 +61,12 @@ namespace Zubrium.Persistence.Mappers
             {
                 IsKnown = cardEntity.IsKnown,
                 IsMastered = cardEntity.IsMastered,
-                State = cardEntity.State,
-                Step = cardEntity.Step,
                 Due = cardEntity.Due,
-                Stability = cardEntity.Stability,
-                Difficulty = cardEntity.Difficulty,
-                ElapsedDays = cardEntity.ElapsedDays,
-                ScheduledDays = cardEntity.ScheduledDays,
                 Reps = cardEntity.Reps,
-                Lapses = cardEntity.Lapses,
-                LastReview = cardEntity.LastReview
+                LastReview = cardEntity.LastReview,
+
+                // Присваиваем десериализованный словарь обратно карточке
+                AlgorithmData = algorithmData ?? new Dictionary<string, string>()
             };
         }
     }
