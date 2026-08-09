@@ -16,22 +16,20 @@ namespace Zubrium.Maui.Features.Study
         private readonly ISpacedRepetitionService _spacedRepetitionService;
         private readonly IStudySettings _settings;
 
-        // Плагин SwipeCardView отлично работает с ObservableCollection
         public ObservableCollection<StudyCardItem> Queue { get; } = new();
+
+        private List<StudyCardItem> _deck = new();
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(HasCards))]
         [NotifyPropertyChangedFor(nameof(IsSessionFinished))]
-        private StudyCardItem? currentCard; // Сюда плагин автоматически кладет верхнюю карточку[cite: 2]
+        private StudyCardItem? currentCard;
 
         [ObservableProperty] private bool isHiddenMenuVisible;
         [ObservableProperty] private int cardsLeft;
-        [ObservableProperty] private bool isBriefVisible;
-        [ObservableProperty] private bool isDetailedVisible;
-        [ObservableProperty] private bool isLoadingDetailed;
 
         public bool HasCards => CurrentCard != null;
-        public bool IsSessionFinished => CurrentCard == null && Queue.Count == 0;
+        public bool IsSessionFinished => CurrentCard == null && Queue.Count == 0 && _deck.Count == 0;
 
         public StudySessionViewModel(
             IContentRepository repository,
@@ -100,93 +98,122 @@ namespace Zubrium.Maui.Features.Study
                 filteredCards.AddRange(reviewCards.Take(remainingReview));
 
             var rnd = new Random();
+            _deck.Clear();
             Queue.Clear();
+
             foreach (var card in filteredCards.OrderBy(x => rnd.Next()))
             {
                 var phase = (card.Reps == 0 && card.LastReview == null) ? StudyCardPhase.Discovery : StudyCardPhase.Review;
-                Queue.Add(new StudyCardItem(card, phase));
+                _deck.Add(new StudyCardItem(card, phase));
             }
 
-            CardsLeft = Queue.Count;
+            if (_deck.Count > 0) { Queue.Add(_deck[0]); _deck.RemoveAt(0); }
+            if (_deck.Count > 0) { Queue.Add(_deck[0]); _deck.RemoveAt(0); }
+
+            if (Queue.Count > 0)
+            {
+                Queue[0].IsTopCard = true;
+                CurrentCard = Queue[0];
+            }
+
+            CardsLeft = Queue.Count + _deck.Count;
         }
 
-        // Этот метод вызывается ПЛАГИНОМ, когда карточка улетела за экран[cite: 2]
         [RelayCommand]
         public async Task CardSwiped(SwipedCardEventArgs e)
         {
             if (e.Item is not StudyCardItem swipedCard) return;
 
-            // Удаляем карточку, чтобы двигаться дальше по очереди[cite: 2]
-            Queue.Remove(swipedCard);
+            bool needsRepeat = false;
 
             if (e.Direction == SwipeCardDirection.Left)
             {
                 if (swipedCard.Phase == StudyCardPhase.Discovery)
                 {
-                    // "Уже знаю"
                     swipedCard.DomainCard.IsKnown = true;
                     await _repository.SaveCardAsync(swipedCard.DomainCard.ToEntity());
                 }
                 else
                 {
-                    // "Отложить" (Сброс прогресса в сессии)
                     swipedCard.DomainCard.AlgorithmData["Step"] = "0";
                     swipedCard.DomainCard.Due = DateTime.UtcNow;
                     await _repository.SaveCardAsync(swipedCard.DomainCard.ToEntity());
-
                     swipedCard.IsFlipped = false;
-                    ReinsertCard(swipedCard);
+                    needsRepeat = true;
                 }
             }
             else if (e.Direction == SwipeCardDirection.Right)
             {
                 if (swipedCard.Phase == StudyCardPhase.Discovery)
                 {
-                    // "Начать учить"
                     swipedCard.Phase = StudyCardPhase.Review;
                     swipedCard.IsFlipped = false;
                     swipedCard.DomainCard.LastReview = DateTime.UtcNow;
                     await _repository.SaveCardAsync(swipedCard.DomainCard.ToEntity());
                     await _repository.LogDailyActivityAsync(DateTime.UtcNow.Date, 1, 0);
-
-                    ReinsertCard(swipedCard);
+                    needsRepeat = true;
                 }
                 else
                 {
-                    // "Вспомнил"
                     _spacedRepetitionService.ApplySuccess(swipedCard.DomainCard, DateTime.UtcNow);
                     await _repository.SaveCardAsync(swipedCard.DomainCard.ToEntity());
                     await _repository.LogDailyActivityAsync(DateTime.UtcNow.Date, 0, 1);
                 }
             }
 
-            // Сбрасываем UI для следующей карточки
-            CardsLeft = Queue.Count;
-            IsBriefVisible = false;
-            IsDetailedVisible = false;
-            IsLoadingDetailed = false;
+            if (needsRepeat)
+            {
+                swipedCard.IsBriefVisible = false;
+                swipedCard.IsDetailedVisible = false;
+                swipedCard.IsTopCard = false;
+
+                int insertIndex = Random.Shared.Next(0, Math.Min(3, _deck.Count + 1));
+                _deck.Insert(insertIndex, swipedCard);
+            }
+
+            Queue.Remove(swipedCard);
+
+            if (_deck.Count > 0 && Queue.Count < 2)
+            {
+                Queue.Add(_deck[0]);
+                _deck.RemoveAt(0);
+            }
+
+            if (Queue.Count > 0)
+            {
+                Queue[0].IsTopCard = true;
+                CurrentCard = Queue[0];
+            }
+            else
+            {
+                CurrentCard = null;
+            }
+
+            CardsLeft = Queue.Count + _deck.Count;
             IsHiddenMenuVisible = false;
+            OnPropertyChanged(nameof(IsSessionFinished));
         }
 
-        private void ReinsertCard(StudyCardItem card)
+        [RelayCommand] 
+        public void RevealBrief() 
         {
-            // Подмешиваем карточку на 1-4 позицию вперед
-            int insertIndex = Random.Shared.Next(1, Math.Min(4, Queue.Count + 1));
-            if (Queue.Count == 0) insertIndex = 0;
-            Queue.Insert(insertIndex, card);
+            if (CurrentCard != null)
+            {
+                CurrentCard.IsBriefVisible = true;
+            }
         }
-
-        [RelayCommand] public void RevealBrief() => IsBriefVisible = true;
 
         [RelayCommand]
         public async Task RevealDetailed()
         {
-            if (IsDetailedVisible) return;
-            IsLoadingDetailed = true;
-            await Task.Delay(600); // Имитация/Загрузка
-            IsLoadingDetailed = false;
-            IsBriefVisible = true;
-            IsDetailedVisible = true;
+            if (CurrentCard == null || CurrentCard.IsDetailedVisible) return;
+
+            CurrentCard.IsLoadingDetailed = true;
+            await Task.Delay(600);
+            CurrentCard.IsLoadingDetailed = false;
+
+            CurrentCard.IsBriefVisible = true;
+            CurrentCard.IsDetailedVisible = true;
         }
 
         [RelayCommand] public void ToggleHiddenMenu() => IsHiddenMenuVisible = !IsHiddenMenuVisible;

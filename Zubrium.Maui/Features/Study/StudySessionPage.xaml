@@ -47,68 +47,60 @@
 
                     <swipeCardView:SwipeCardView.ItemTemplate>
                         <DataTemplate x:DataType="local:StudyCardItem">
+                            <!-- Фиксируем размер карточки, чтобы она не "прыгала" при открытии контента -->
+                            <Border BackgroundColor="White" StrokeThickness="0" 
+                                    HorizontalOptions="Fill" VerticalOptions="Fill">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="24" /></Border.StrokeShape>
+                                <Border.Shadow><Shadow Brush="Black" Offset="0,8" Radius="16" Opacity="0.1" /></Border.Shadow>
 
-                            <Border BackgroundColor="White" StrokeThickness="0">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="24" />
-                                </Border.StrokeShape>
-                                <Border.Shadow>
-                                    <Shadow Brush="Black" Offset="0,8" Radius="16" Opacity="0.1" />
-                                </Border.Shadow>
+                                <!-- Разбиваем карту на: Шапку (Auto), Контент со скроллом (*), Кнопки (Auto, Auto) -->
+                                <Grid RowDefinitions="Auto, *, Auto, Auto" IsVisible="{Binding IsTopCard}">
 
-                                <Grid RowDefinitions="*, Auto">
+                                    <!-- ВЕРХНЯЯ ЧАСТЬ: Заголовок и вопрос (Безопасная зона для свайпа) -->
+                                    <VerticalStackLayout Grid.Row="0" Margin="24,24,24,0" Spacing="16" InputTransparent="True">
+                                        <Label Text="{Binding DomainCard.Title}" FontSize="24" FontAttributes="Bold" TextColor="#1C1C1E" />
+                                        <controls:MarkdownView Text="{Binding DomainCard.FrontMarkdown}" TextColor="#2C2C2E" />
+                                        <BoxView HeightRequest="1" Color="#F2F2F6" IsVisible="{Binding IsBriefVisible}" />
+                                    </VerticalStackLayout>
 
-                                    <Grid Grid.Row="0" Margin="24,24,24,0">
+                                    <!-- СРЕДНЯЯ ЧАСТЬ: Ответы со скроллом -->
+                                    <!-- Свайпать карту можно везде, КРОМЕ этой зоны (т.к. здесь работает вертикальный скролл) -->
+                                    <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Always" Margin="24,8,24,0">
                                         <VerticalStackLayout Spacing="16">
 
-                                            <!-- ВОПРОС -->
-                                            <Label Text="{Binding DomainCard.Title}" FontSize="24" FontAttributes="Bold" TextColor="#1C1C1E" />
-                                            <controls:MarkdownView Text="{Binding DomainCard.FrontMarkdown}" TextColor="#2C2C2E" InputTransparent="True" />
-
-                                            <!-- Разделитель -->
-                                            <BoxView HeightRequest="1" Color="#F2F2F6" Margin="0,8" 
-                                                     IsVisible="{Binding BindingContext.IsBriefVisible, Source={x:Reference SessionPage}}" />
-
                                             <!-- КРАТКИЙ ОТВЕТ -->
-                                            <VerticalStackLayout IsVisible="{Binding BindingContext.IsBriefVisible, Source={x:Reference SessionPage}}" Spacing="8">
+                                            <VerticalStackLayout IsVisible="{Binding IsBriefVisible}" Spacing="8">
                                                 <Label Text="КРАТКИЙ ОТВЕТ" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold" />
                                                 <controls:MarkdownView Text="{Binding DomainCard.BriefMarkdown}" TextColor="#2C2C2E" InputTransparent="True" />
                                             </VerticalStackLayout>
 
                                             <!-- СПИННЕР -->
-                                            <ActivityIndicator IsRunning="{Binding BindingContext.IsLoadingDetailed, Source={x:Reference SessionPage}}" 
-                                                               IsVisible="{Binding BindingContext.IsLoadingDetailed, Source={x:Reference SessionPage}}" 
-                                                               Color="#6278E6" HorizontalOptions="Center" Margin="0,10,0,0" />
+                                            <ActivityIndicator IsRunning="{Binding IsLoadingDetailed}" IsVisible="{Binding IsLoadingDetailed}" Color="#6278E6" HorizontalOptions="Center" Margin="0,10,0,0" />
 
-                                            <BoxView HeightRequest="1" Color="#F2F2F6" Margin="0,8" 
-                                                     IsVisible="{Binding BindingContext.IsDetailedVisible, Source={x:Reference SessionPage}}" />
+                                            <BoxView HeightRequest="1" Color="#F2F2F6" IsVisible="{Binding IsDetailedVisible}" />
 
                                             <!-- ПОДРОБНЫЙ ОТВЕТ -->
-                                            <ScrollView IsVisible="{Binding BindingContext.IsDetailedVisible, Source={x:Reference SessionPage}}" VerticalScrollBarVisibility="Always">
-                                                <VerticalStackLayout Spacing="8" Padding="0,0,0,24">
-                                                    <Label Text="ПОДРОБНЫЙ ОТВЕТ" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold" />
-                                                    <controls:MarkdownView Text="{Binding DomainCard.DetailedMarkdown}" TextColor="#2C2C2E" InputTransparent="True" />
-                                                </VerticalStackLayout>
-                                            </ScrollView>
+                                            <VerticalStackLayout IsVisible="{Binding IsDetailedVisible}" Spacing="8" Padding="0,0,0,24">
+                                                <Label Text="ПОДРОБНЫЙ ОТВЕТ" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold" />
+                                                <controls:MarkdownView Text="{Binding DomainCard.DetailedMarkdown}" TextColor="#2C2C2E" InputTransparent="True" />
+                                            </VerticalStackLayout>
 
                                         </VerticalStackLayout>
-                                    </Grid>
+                                    </ScrollView>
 
-                                    <!-- КНОПКА ПОКАЗА ОТВЕТА (ВНИЗУ КАРТОЧКИ) -->
-                                    <Border Grid.Row="1" BackgroundColor="#F4F5F8" StrokeThickness="0" Margin="16" Padding="16">
-                                        <Border.StrokeShape>
-                                            <RoundRectangle CornerRadius="16" />
-                                        </Border.StrokeShape>
+                                    <!-- КНОПКА ПОКАЗА ОТВЕТА (Прячется, когда открыт полный ответ) -->
+                                    <Border Grid.Row="2" BackgroundColor="#F4F5F8" StrokeThickness="0" Margin="16,0,16,16" Padding="16">
+                                        <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
 
+                                        <!-- Убраны CommandParameter (ViewModel сама берет CurrentCard) -->
                                         <Border.Behaviors>
-                                            <toolkit:TouchBehavior DefaultBackgroundColor="#F4F5F8" 
-                                                                   PressedBackgroundColor="#EAECEF"
-                                                                   Command="{Binding BindingContext.RevealBriefCommand, Source={x:Reference SessionPage}}"
+                                            <toolkit:TouchBehavior DefaultBackgroundColor="#F4F5F8" PressedBackgroundColor="#EAECEF"
+                                                                   Command="{Binding BindingContext.RevealBriefCommand, Source={x:Reference SessionPage}}" 
                                                                    LongPressCommand="{Binding BindingContext.RevealDetailedCommand, Source={x:Reference SessionPage}}" />
                                         </Border.Behaviors>
 
                                         <Border.Triggers>
-                                            <DataTrigger TargetType="Border" Binding="{Binding BindingContext.IsDetailedVisible, Source={x:Reference SessionPage}}" Value="True">
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsDetailedVisible}" Value="True">
                                                 <Setter Property="IsVisible" Value="False" />
                                             </DataTrigger>
                                         </Border.Triggers>
@@ -116,90 +108,84 @@
                                         <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8" InputTransparent="True">
                                             <Grid WidthRequest="20" HeightRequest="20">
                                                 <Image Source="{mi:Material Icon=Visibility, IconColor=#8E8E93}" IsVisible="True">
-                                                    <Image.Triggers>
-                                                        <DataTrigger TargetType="Image" Binding="{Binding BindingContext.IsBriefVisible, Source={x:Reference SessionPage}}" Value="True">
-                                                            <Setter Property="IsVisible" Value="False" />
-                                                        </DataTrigger>
-                                                    </Image.Triggers>
+                                                    <Image.Triggers><DataTrigger TargetType="Image" Binding="{Binding IsBriefVisible}" Value="True"><Setter Property="IsVisible" Value="False" /></DataTrigger></Image.Triggers>
                                                 </Image>
                                                 <Image Source="{mi:Material Icon=MoreHoriz, IconColor=#8E8E93}" IsVisible="False">
-                                                    <Image.Triggers>
-                                                        <DataTrigger TargetType="Image" Binding="{Binding BindingContext.IsBriefVisible, Source={x:Reference SessionPage}}" Value="True">
-                                                            <Setter Property="IsVisible" Value="True" />
-                                                        </DataTrigger>
-                                                    </Image.Triggers>
+                                                    <Image.Triggers><DataTrigger TargetType="Image" Binding="{Binding IsBriefVisible}" Value="True"><Setter Property="IsVisible" Value="True" /></DataTrigger></Image.Triggers>
                                                 </Image>
                                             </Grid>
                                             <Label FontSize="14" FontAttributes="Bold" TextColor="#8E8E93" VerticalOptions="Center">
                                                 <Label.Triggers>
-                                                    <DataTrigger TargetType="Label" Binding="{Binding BindingContext.IsBriefVisible, Source={x:Reference SessionPage}}" Value="False">
-                                                        <Setter Property="Text" Value="Показать ответ" />
-                                                    </DataTrigger>
-                                                    <DataTrigger TargetType="Label" Binding="{Binding BindingContext.IsBriefVisible, Source={x:Reference SessionPage}}" Value="True">
-                                                        <Setter Property="Text" Value="Зажмите для подробностей" />
-                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding IsBriefVisible}" Value="False"><Setter Property="Text" Value="Показать ответ" /></DataTrigger>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding IsBriefVisible}" Value="True"><Setter Property="Text" Value="Зажмите для подробностей" /></DataTrigger>
                                                 </Label.Triggers>
                                             </Label>
                                         </HorizontalStackLayout>
                                     </Border>
+
+                                    <!-- НИЖНЯЯ ПАНЕЛЬ С КНОПКАМИ СВАЙПА -->
+                                    <Grid Grid.Row="3" ColumnDefinitions="*, 1, *" HeightRequest="64" BackgroundColor="#F4F5F8">
+
+                                        <Border Grid.Column="0" BackgroundColor="Transparent" StrokeThickness="0">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnSwipeLeftClicked" />
+                                            </Border.GestureRecognizers>
+                                            <Label HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" FontSize="16">
+                                                <Label.Triggers>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding Phase}" Value="Discovery">
+                                                        <Setter Property="Text" Value="Уже знаю" />
+                                                        <Setter Property="TextColor" Value="#8E8E93" />
+                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding Phase}" Value="Review">
+                                                        <Setter Property="Text" Value="Отложить" />
+                                                        <Setter Property="TextColor" Value="#FF3B30" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+                                        </Border>
+
+                                        <!-- Перегородка -->
+                                        <BoxView Grid.Column="1" Color="#EAECEF" Margin="0,16" />
+
+                                        <Border Grid.Column="2" BackgroundColor="Transparent" StrokeThickness="0">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnSwipeRightClicked" />
+                                            </Border.GestureRecognizers>
+                                            <Label HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" FontSize="16">
+                                                <Label.Triggers>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding Phase}" Value="Discovery">
+                                                        <Setter Property="Text" Value="Учить" />
+                                                        <Setter Property="TextColor" Value="#1C1C1E" />
+                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding Phase}" Value="Review">
+                                                        <Setter Property="Text" Value="Вспомнил" />
+                                                        <Setter Property="TextColor" Value="#34C759" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+                                        </Border>
+                                    </Grid>
+
                                 </Grid>
                             </Border>
                         </DataTemplate>
                     </swipeCardView:SwipeCardView.ItemTemplate>
+
                 </swipeCardView:SwipeCardView>
             </Grid>
 
-            <!-- НИЖНИЕ КНОПКИ УПРАВЛЕНИЯ -->
-            <Grid Grid.Row="2" ColumnDefinitions="*, *" ColumnSpacing="16" Padding="20,10,20,30">
-
-                <Button Grid.Column="0" Clicked="OnSwipeLeftClicked" HeightRequest="64" CornerRadius="32" FontAttributes="Bold" FontSize="16"
-                        BackgroundColor="White" BorderColor="#EAECEF" BorderWidth="2">
-                    <Button.Triggers>
-                        <DataTrigger TargetType="Button" Binding="{Binding CurrentCard.Phase}" Value="Discovery">
-                            <Setter Property="Text" Value="Уже знаю" />
-                            <Setter Property="TextColor" Value="#8E8E93" />
-                        </DataTrigger>
-                        <DataTrigger TargetType="Button" Binding="{Binding CurrentCard.Phase}" Value="Review">
-                            <Setter Property="Text" Value="Отложить" />
-                            <Setter Property="TextColor" Value="#FF3B30" />
-                        </DataTrigger>
-                    </Button.Triggers>
-                </Button>
-
-                <Button Grid.Column="1" Clicked="OnSwipeRightClicked" HeightRequest="64" CornerRadius="32" FontAttributes="Bold" FontSize="16" TextColor="White">
-                    <Button.Triggers>
-                        <DataTrigger TargetType="Button" Binding="{Binding CurrentCard.Phase}" Value="Discovery">
-                            <Setter Property="Text" Value="Начать учить" />
-                            <Setter Property="BackgroundColor" Value="#1C1C1E" />
-                        </DataTrigger>
-                        <DataTrigger TargetType="Button" Binding="{Binding CurrentCard.Phase}" Value="Review">
-                            <Setter Property="Text" Value="Вспомнил" />
-                            <Setter Property="BackgroundColor" Value="#34C759" />
-                        </DataTrigger>
-                    </Button.Triggers>
-                </Button>
-            </Grid>
-        </Grid>
-
-        <!-- СКРЫТОЕ МЕНЮ (OVERLAY) -->
-        <Grid BackgroundColor="#80000000" IsVisible="{Binding IsHiddenMenuVisible}" InputTransparent="False">
-            <Grid.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding ToggleHiddenMenuCommand}" />
-            </Grid.GestureRecognizers>
-
-            <Border BackgroundColor="White" VerticalOptions="End" StrokeThickness="0" Margin="16,0,16,32" Padding="8">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="20" />
-                </Border.StrokeShape>
-                <VerticalStackLayout Spacing="0">
-                    <Button Text="Откатить на 1 стадию" Command="{Binding RollbackProgressCommand}" BackgroundColor="Transparent" TextColor="#1C1C1E" FontSize="16" HeightRequest="56" />
-                    <BoxView HeightRequest="1" Color="#EAECEF" Margin="16,0" />
-                    <Button Text="Сбросить прогресс" Command="{Binding ResetProgressCommand}" BackgroundColor="Transparent" TextColor="#1C1C1E" FontSize="16" HeightRequest="56" />
-                    <BoxView HeightRequest="1" Color="#EAECEF" Margin="16,0" />
-                    <Button Text="Удалить слово" Command="{Binding DeleteCardCommand}" BackgroundColor="Transparent" TextColor="#FF3B30" FontAttributes="Bold" FontSize="16" HeightRequest="56" />
+            <!-- СКРЫТОЕ МЕНЮ (Выдвижное сбоку) -->
+            <Grid Grid.Row="2" ColumnDefinitions="*, Auto" IsVisible="{Binding IsHiddenMenuVisible}">
+                <BoxView Grid.Column="0" Color="Black" Opacity="0.3" />
+                <VerticalStackLayout Grid.Column="1" WidthRequest="250" BackgroundColor="White">
+                    <Button Text="Откатить на 1 стадию" Command="{Binding RollbackProgressCommand}" BackgroundColor="Transparent" TextColor="#1C1C1E" HorizontalOptions="Start" Padding="16" />
+                    <BoxView HeightRequest="1" Color="#EAECEF" />
+                    <Button Text="Обнулить прогресс слова" Command="{Binding ResetProgressCommand}" BackgroundColor="Transparent" TextColor="#FF9500" HorizontalOptions="Start" Padding="16" />
+                    <BoxView HeightRequest="1" Color="#EAECEF" />
+                    <Button Text="Удалить карточку" Command="{Binding DeleteCardCommand}" BackgroundColor="Transparent" TextColor="#FF3B30" HorizontalOptions="Start" Padding="16" />
                 </VerticalStackLayout>
-            </Border>
-        </Grid>
+            </Grid>
 
+        </Grid>
     </Grid>
 </ContentPage>
