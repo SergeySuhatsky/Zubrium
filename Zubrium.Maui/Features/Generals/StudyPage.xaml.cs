@@ -14,4 +14,13 @@ public partial class StudyPage : ContentPage
 
     }
 
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        if (BindingContext is StudyViewModel vm)
+        {
+            vm.RefreshDataCommand.Execute(null);
+        }
+    }
+
 }

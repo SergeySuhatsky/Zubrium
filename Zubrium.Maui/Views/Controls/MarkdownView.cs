@@ -14,6 +14,11 @@ namespace Zubrium.Maui.Views.Controls
         private IMarkdownRenderService? _renderService;
         private CancellationTokenSource? _renderCts;
 
+        // Внутренние элементы для отображения загрузки и контента
+        private readonly Grid _rootGrid;
+        private readonly ActivityIndicator _loadingIndicator;
+        private readonly ContentView _markdownContainer;
+
         #region Bindable Properties
 
         public static readonly BindableProperty TextProperty = BindableProperty.Create(
@@ -106,6 +111,32 @@ namespace Zubrium.Maui.Views.Controls
         {
             // Устанавливаем базовые отступы, если нужно
             Padding = new Thickness(0);
+
+            // Создаем спиннер загрузки
+            _loadingIndicator = new ActivityIndicator
+            {
+                IsRunning = false,
+                IsVisible = false,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                Margin = new Thickness(10),
+                WidthRequest = 24,
+                HeightRequest = 24
+            };
+
+            // Привязываем цвет спиннера к цвету текста компонента
+            _loadingIndicator.SetBinding(ActivityIndicator.ColorProperty, new Binding(nameof(TextColor), source: this));
+
+            // Контейнер, в который будет помещаться отрендеренный Markdown
+            _markdownContainer = new ContentView();
+
+            // Сетка, накладывающая спиннер поверх текста
+            _rootGrid = new Grid();
+            _rootGrid.Children.Add(_markdownContainer);
+            _rootGrid.Children.Add(_loadingIndicator);
+
+            // Устанавливаем сетку как единственный корневой элемент контрола
+            this.Content = _rootGrid;
         }
 
         /// <summary>
@@ -129,35 +160,44 @@ namespace Zubrium.Maui.Views.Controls
             _renderCts = new CancellationTokenSource();
             var token = _renderCts.Token;
 
-            // Ждем 100мс перед рендером, объединяя частые изменения в один вызов
-            Task.Delay(100, token).ContinueWith(async t =>
+            // Ждем 100мс в фоне (Debounce)
+            Task.Run(async () =>
             {
-                if (t.IsCanceled) return;
-                await PerformRenderAsync(token);
-            }, TaskScheduler.Default);
+                await Task.Delay(100, token);
+
+                if (token.IsCancellationRequested) return;
+
+                // ВАЖНО: Переключаемся на ГЛАВНЫЙ ПОТОК ДО того, как начнем создавать UI элементы!
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    if (token.IsCancellationRequested) return;
+                    await PerformRenderAsync(token);
+                });
+            }, token);
         }
 
         private async Task PerformRenderAsync(CancellationToken token)
         {
-            // 1. Получаем сервис из DI (если еще не получен)
             EnsureServiceResolved();
 
             if (_renderService == null)
-                return; // Если сервис так и не удалось получить
+                return;
 
             var currentText = Text;
 
-            // 2. Если текст пуст, очищаем контент
             if (string.IsNullOrWhiteSpace(currentText))
             {
-                if (!token.IsCancellationRequested)
-                {
-                    MainThread.BeginInvokeOnMainThread(() => Content = null);
-                }
+                _markdownContainer.Content = null;
+                _loadingIndicator.IsRunning = false;
+                _loadingIndicator.IsVisible = false;
                 return;
             }
 
-            // 3. Собираем опции на основе текущих BindableProperties
+            // Так как мы уже в MainThread, можно менять UI напрямую
+            _loadingIndicator.IsVisible = true;
+            _loadingIndicator.IsRunning = true;
+            _markdownContainer.Opacity = 0.5;
+
             var options = new MarkdownRenderOptions
             {
                 TextColor = this.TextColor,
@@ -169,16 +209,16 @@ namespace Zubrium.Maui.Views.Controls
                 FontFamily = this.FontFamily
             };
 
-            // 4. Запрашиваем готовое визуальное дерево у синглтон-сервиса
-            var renderedView = await _renderService.RenderToViewAsync(currentText, options);
+            // Вызываем рендер. Сервис будет собирать UI в главном потоке,
+            // но тяжелые формулы (CreateLatexViewAsync) будут сами "уходить" в фон благодаря Task.Run внутри сервиса.
+            var renderedView = await _renderService.RenderToViewAsync(currentText, options, token);
 
-            // 5. Обновляем UI в главном потоке
             if (!token.IsCancellationRequested)
             {
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    this.Content = renderedView;
-                });
+                _markdownContainer.Content = renderedView;
+                _markdownContainer.Opacity = 1.0;
+                _loadingIndicator.IsRunning = false;
+                _loadingIndicator.IsVisible = false;
             }
         }
 

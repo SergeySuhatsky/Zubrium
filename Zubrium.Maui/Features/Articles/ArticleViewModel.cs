@@ -1,50 +1,100 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Zubrium.Content;
-using Zubrium.Domain;
+using Microsoft.Maui.Graphics;
+using System.Collections.ObjectModel;
+using Zubrium.Content.Repository;
 using Zubrium.Maui.ViewModels;
 
-namespace Zubrium.Maui.Features.Articles;
-
-public partial class ArticleViewModel : BaseViewModel
+namespace Zubrium.Maui.Features.Articles
 {
-    [ObservableProperty]
-    public partial string Title { get; set; } = "sdads";
-
-    [ObservableProperty]
-    public partial string BodyMarkdown { get; set; } = "asdasadca $x^3+2/5$ \n asdas dsve";
-
-    public ArticleViewModel(IContentRepository repository): base(repository) { }
-
-    public override async void ApplyQueryAttributes(IDictionary<string, object> query)
+    public partial class ArticleViewModel : BaseViewModel
     {
-        if (query.TryGetValue("articleId", out var articleIdObj) && articleIdObj is string articleId)
-        {
-            var article = await _repository.GetArticleAsync(articleId);
+        [ObservableProperty]
+        public partial string SearchText { get; set; } = string.Empty;
 
-            Title = article.Title;
-            BodyMarkdown = article.BodyMarkdown;
+        [ObservableProperty]
+        public partial ObservableCollection<CategoryDisplayModel> Categories { get; set; } = new();
+
+        private List<CategoryDisplayModel> _allCategories = new();
+
+        public ArticleViewModel(IContentRepository repository) : base(repository)
+        {
+        }
+
+        public override async void ApplyQueryAttributes(IDictionary<string, object> query)
+        {
+            //await LoadCategoriesAsync();
+        }
+
+        [RelayCommand]
+        public async Task LoadCategories()
+        {
+            await LoadCategoriesAsync();
+        }
+
+        private async Task LoadCategoriesAsync()
+        {
+            var dbCategories = await _repository.GetAllCategoriesAsync();
+            _allCategories.Clear();
+
+            var colors = new[] { "#8E95A4", "#66BB6A", "#FFA726", "#42A5F5", "#AB47BC" };
+            int colorIndex = 0;
+
+            foreach (var cat in dbCategories)
+            {
+                var articles = await _repository.GetArticlesByCategoryAsync(cat.DbId);
+
+                if (articles.Count == 0) continue;
+
+                _allCategories.Add(new CategoryDisplayModel
+                {
+                    CategoryId = cat.DbId,
+                    Name = cat.Name,
+                    ItemCount = articles.Count,
+                    ItemCountText = $"{articles.Count} статей",
+                    IconColor = Color.FromArgb(colors[colorIndex % colors.Length])
+                });
+                colorIndex++;
+            }
+
+            FilterCategories();
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            FilterCategories();
+        }
+
+        private void FilterCategories()
+        {
+            Categories.Clear();
+            var query = SearchText?.Trim() ?? string.Empty;
+
+            foreach (var cat in _allCategories)
+            {
+                if (string.IsNullOrEmpty(query) || cat.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
+                {
+                    Categories.Add(cat);
+                }
+            }
+        }
+
+        [RelayCommand]
+        public async Task OpenCategory(string categoryId)
+        {
+            var navigationParameters = new Dictionary<string, object>
+            {
+                { "CategoryId", categoryId },
+                { "ContentType", Zubrium.Maui.Features.Generals.ContentType.Article }
+            };
+
+            await Shell.Current.GoToAsync(nameof(Zubrium.Maui.Features.Generals.CategoryContentPage), navigationParameters);
+        }
+
+        [RelayCommand]
+        public async Task Import()
+        {
+            await Shell.Current.GoToAsync(nameof(Generals.ImportPage));
         }
     }
-
-    [RelayCommand]
-    public async Task PushDataToDb() 
-    {
-
-        await _repository.PushData();
-    }
-
-    [RelayCommand]
-    public async Task LoadArticle(string articleId)
-    {
-        var article = await _repository.GetArticleAsync("2");
-
-        Title = article.Title;
-        BodyMarkdown = article.BodyMarkdown;
-
-    }
-
 }

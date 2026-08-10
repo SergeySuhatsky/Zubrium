@@ -14,7 +14,7 @@ namespace Zubrium.Maui.Services.MarkdownRender
         /// <summary>
         /// Рендерит строку Markdown в готовое визуальное дерево (View).
         /// </summary>
-        Task<View> RenderToViewAsync(string markdown, MarkdownRenderOptions options);
+        Task<View> RenderToViewAsync(string markdown, MarkdownRenderOptions options, CancellationToken token=default);
 
         /// <summary>
         /// Позволяет добавить кастомный шрифт для формул из потока.

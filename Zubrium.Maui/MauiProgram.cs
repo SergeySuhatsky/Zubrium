@@ -8,6 +8,9 @@ using MauiIcons.Material;
 using Zubrium.Maui.Features.Quizs;
 using Microsoft.Maui.Controls;
 using System.Reflection;
+using Zubrium.Content.Repository;
+using Zubrium.Content.Parsing;
+using Zubrium.SpacedRepetition;
 
 namespace Zubrium.Maui
 {
@@ -28,10 +31,18 @@ namespace Zubrium.Maui
 
             // Register markdown render service
             builder.Services.AddSingleton<IMarkdownRenderService, MarkdownRenderService>();
+            // Register markdown parser service
+            builder.Services.AddSingleton<IDeckSourceParser, DeckSourceParser>();
 
             // Register SQLite content repository
             string dbPath = Path.Combine(FileSystem.AppDataDirectory, "ZubriumData.db3");
             builder.Services.AddSingleton<IContentRepository>(s => new SqliteContentRepository(dbPath));
+
+            // Register spaced repetition service
+            builder.Services.AddSingleton<ISpacedRepetitionService, SimpleRepetitionService>();
+
+            // Register settings
+            builder.Services.AddSingleton<Zubrium.Domain.IStudySettings, Zubrium.Maui.Services.Settings.StudySettingsService>();
 
 
             // Register pages and view models using reflection

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:Zubrium.Maui.Views.Controls"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             xmlns:local="clr-namespace:Zubrium.Maui.Features.Generals"
+             xmlns:domain="clr-namespace:Zubrium.Domain"
+             x:Class="Zubrium.Maui.Features.Generals.CategoryContentPage"
+             x:DataType="local:CategoryContentViewModel"
+             BackgroundColor="#F4F5F8">
+
+    <Grid RowDefinitions="Auto, *">
+        <Grid Padding="20,20,20,10" ColumnDefinitions="Auto, *, Auto, Auto" BackgroundColor="White">
+            <Button Text="Назад"
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="#6278E6"
+                    FontAttributes="Bold"
+                    Padding="0"
+                    VerticalOptions="Center" />
+
+            <Entry Grid.Column="1"
+                   Text="{Binding CategoryName}"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   TextColor="#1C1C1E"
+                   BackgroundColor="Transparent"
+                   ClearButtonVisibility="WhileEditing"
+                   HorizontalOptions="FillAndExpand"
+                   VerticalOptions="Center"
+                   Margin="16,0" />
+
+            <Button Grid.Column="2"
+                    Text="Сохранить"
+                    Command="{Binding SaveCategoryNameCommand}"
+                    BackgroundColor="#6278E6"
+                    TextColor="White"
+                    CornerRadius="8"
+                    HeightRequest="36"
+                    Padding="12,0"
+                    VerticalOptions="Center" />
+
+            <Button Grid.Column="3"
+                    Text="Удалить"
+                    Command="{Binding DeleteCategoryCommand}"
+                    BackgroundColor="#FF3B30"
+                    TextColor="White"
+                    CornerRadius="8"
+                    HeightRequest="36"
+                    Padding="12,0"
+                    VerticalOptions="Center"
+                    Margin="8,0,0,0" />
+        </Grid>
+
+        <ScrollView Grid.Row="1" x:Name="MainScrollView" Scrolled="OnScrollViewScrolled" VerticalScrollBarVisibility="Always">
+            <VerticalStackLayout Padding="20,20,20,40" Spacing="20">
+
+                <Label Text="{Binding PageTitle}"
+                       FontSize="28"
+                       FontAttributes="Bold"
+                       TextColor="#1C1C1E"
+                       Margin="0,0,0,0" />
+
+                <Border BackgroundColor="White" StrokeThickness="0" Padding="16,8">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16" />
+                    </Border.StrokeShape>
+                    <Grid ColumnDefinitions="Auto, *">
+                        <Image Grid.Column="0" Source="{mi:Material Icon=Search, IconColor=#8E8E93}" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" Margin="0,0,12,0" />
+                        <Entry Grid.Column="1" Text="{Binding SearchText}" Placeholder="Поиск..." TextColor="#1C1C1E" BackgroundColor="Transparent" VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <Label Text="Нет результатов" TextColor="#8E8E93" HorizontalOptions="Center" IsVisible="{Binding DisplayCards.Count, Converter={StaticResource ZeroToBoolConverter}}" />
+
+                <VerticalStackLayout IsVisible="{Binding IsCardsVisible}" Spacing="16" BindableLayout.ItemsSource="{Binding DisplayCards}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="domain:Card">
+                            <Border BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="16">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="16" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="8">
+                                    <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,8">
+                                        <Label Grid.Column="0" Text="{Binding Title}" FontSize="16" FontAttributes="Bold" TextColor="#1C1C1E" VerticalOptions="Center" />
+                                        <HorizontalStackLayout Grid.Column="1" Spacing="16" VerticalOptions="Center">
+                                            <ImageButton Source="{mi:Material Icon=Edit, IconColor=#6278E6}" WidthRequest="22" HeightRequest="22" BackgroundColor="Transparent"
+                                                         Command="{Binding BindingContext.OpenEditOverlayCommand, Source={x:Reference MainScrollView}}"
+                                                         CommandParameter="{Binding .}" />
+                                            <ImageButton Source="{mi:Material Icon=Delete, IconColor=#FF3B30}" WidthRequest="22" HeightRequest="22" BackgroundColor="Transparent"
+                                                         Command="{Binding BindingContext.DeleteItemCommand, Source={x:Reference MainScrollView}}"
+                                                         CommandParameter="{Binding .}" />
+                                        </HorizontalStackLayout>
+                                    </Grid>
+                                    <Label Text="ЛИЦЕВАЯ СТОРОНА" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold" Margin="0,8,0,0" />
+                                    <controls:MarkdownView TextColor="Black" Text="{Binding FrontMarkdown}" />
+                                    <BoxView HeightRequest="1" Color="#EAECEF" Margin="0,4" />
+                                    <Label Text="КРАТКИЙ ОТВЕТ" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold" />
+                                    <controls:MarkdownView TextColor="Black" Text="{Binding BriefMarkdown}" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout IsVisible="{Binding IsArticlesVisible}" Spacing="16" BindableLayout.ItemsSource="{Binding DisplayArticles}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="domain:Article">
+                            <Border BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="16">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="16" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="8">
+                                    <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,8">
+                                        <Label Grid.Column="0" Text="{Binding Title}" FontSize="18" FontAttributes="Bold" TextColor="#1C1C1E" VerticalOptions="Center" />
+                                        <HorizontalStackLayout Grid.Column="1" Spacing="16" VerticalOptions="Center">
+                                            <ImageButton Source="{mi:Material Icon=Edit, IconColor=#6278E6}" WidthRequest="22" HeightRequest="22" BackgroundColor="Transparent"
+                                                         Command="{Binding BindingContext.OpenEditOverlayCommand, Source={x:Reference MainScrollView}}"
+                                                         CommandParameter="{Binding .}" />
+                                            <ImageButton Source="{mi:Material Icon=Delete, IconColor=#FF3B30}" WidthRequest="22" HeightRequest="22" BackgroundColor="Transparent"
+                                                         Command="{Binding BindingContext.DeleteItemCommand, Source={x:Reference MainScrollView}}"
+                                                         CommandParameter="{Binding .}" />
+                                        </HorizontalStackLayout>
+                                    </Grid>
+                                    <controls:MarkdownView TextColor="Black" Text="{Binding BodyMarkdown}" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout IsVisible="{Binding IsQuizzesVisible}" Spacing="16" BindableLayout.ItemsSource="{Binding DisplayQuizzes}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="domain:QuizBlock">
+                            <Border BackgroundColor="White" Stroke="#EAECEF" StrokeThickness="1" Padding="16">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="16" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="16">
+                                    <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,8">
+                                        <Label Grid.Column="0" Text="{Binding Title}" FontSize="16" FontAttributes="Bold" TextColor="#1C1C1E" VerticalOptions="Center" />
+                                        <HorizontalStackLayout Grid.Column="1" Spacing="16" VerticalOptions="Center">
+                                            <ImageButton Source="{mi:Material Icon=Edit, IconColor=#6278E6}" WidthRequest="22" HeightRequest="22" BackgroundColor="Transparent"
+                                                         Command="{Binding BindingContext.OpenEditOverlayCommand, Source={x:Reference MainScrollView}}"
+                                                         CommandParameter="{Binding .}" />
+                                            <ImageButton Source="{mi:Material Icon=Delete, IconColor=#FF3B30}" WidthRequest="22" HeightRequest="22" BackgroundColor="Transparent"
+                                                         Command="{Binding BindingContext.DeleteItemCommand, Source={x:Reference MainScrollView}}"
+                                                         CommandParameter="{Binding .}" />
+                                        </HorizontalStackLayout>
+                                    </Grid>
+                                    <VerticalStackLayout Spacing="24" BindableLayout.ItemsSource="{Binding Questions}">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate x:DataType="domain:QuizQuestion">
+                                                <VerticalStackLayout Spacing="12">
+                                                    <Label Text="ВОПРОС" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold" />
+                                                    <controls:MarkdownView TextColor="Black" Text="{Binding QuestionMarkdown}" />
+                                                </VerticalStackLayout>
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+                                    </VerticalStackLayout>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- ОВЕРЛЕЙ РЕДАКТИРОВАНИЯ (ПОЛНОЭКРАННЫЙ) -->
+        <Grid Grid.RowSpan="2" BackgroundColor="#E6000000" IsVisible="{Binding IsEditOverlayVisible}" InputTransparent="False">
+            <Border BackgroundColor="#F4F5F8" Margin="20,40" Padding="0" StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <Grid RowDefinitions="Auto, *, Auto" Padding="20">
+                    <Label Grid.Row="0" Text="Редактирование" FontSize="22" FontAttributes="Bold" TextColor="#1C1C1E" HorizontalOptions="Center" Margin="0,0,0,16"/>
+
+                    <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Always">
+                        <VerticalStackLayout Spacing="16">
+                            <VerticalStackLayout IsVisible="{Binding IsEditingCard}" Spacing="12">
+                                <Label Text="ЗАГОЛОВОК" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold"/>
+                                <Entry Text="{Binding EditTitle}" BackgroundColor="White" TextColor="Black" />
+
+                                <Label Text="ЛИЦЕВАЯ СТОРОНА (MARKDOWN)" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold"/>
+                                <Editor Text="{Binding EditFront}" BackgroundColor="White" TextColor="Black" AutoSize="TextChanges" MinimumHeightRequest="80" />
+
+                                <Label Text="КРАТКИЙ ОТВЕТ (MARKDOWN)" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold"/>
+                                <Editor Text="{Binding EditBrief}" BackgroundColor="White" TextColor="Black" AutoSize="TextChanges" MinimumHeightRequest="80" />
+
+                                <Label Text="ПОДРОБНЫЙ ОТВЕТ (MARKDOWN)" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold"/>
+                                <Editor Text="{Binding EditDetailed}" BackgroundColor="White" TextColor="Black" AutoSize="TextChanges" MinimumHeightRequest="80" />
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout IsVisible="{Binding IsEditingArticle}" Spacing="12">
+                                <Label Text="ЗАГОЛОВОК" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold"/>
+                                <Entry Text="{Binding EditTitle}" BackgroundColor="White" TextColor="Black" />
+
+                                <Label Text="ТЕКСТ СТАТЬИ (MARKDOWN)" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold"/>
+                                <Editor Text="{Binding EditBody}" BackgroundColor="White" TextColor="Black" AutoSize="TextChanges" MinimumHeightRequest="200" />
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout IsVisible="{Binding IsEditingQuiz}" Spacing="12">
+                                <Label Text="ЗАГОЛОВОК КВИЗА" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold"/>
+                                <Entry Text="{Binding EditTitle}" BackgroundColor="White" TextColor="Black" />
+                                <Label Text="Вопросы квиза пока можно отредактировать только через повторный импорт Markdown кода." FontSize="12" TextColor="#FF3B30" />
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </ScrollView>
+
+                    <Grid Grid.Row="2" ColumnDefinitions="*, *" ColumnSpacing="16" Margin="0,16,0,0">
+                        <Button Grid.Column="0" Text="Отмена" Command="{Binding CloseEditOverlayCommand}" BackgroundColor="#EAECEF" TextColor="#1C1C1E" CornerRadius="12" HeightRequest="48" FontAttributes="Bold"/>
+                        <Button Grid.Column="1" Text="Сохранить" Command="{Binding SaveEditCommand}" BackgroundColor="#6278E6" TextColor="White" CornerRadius="12" HeightRequest="48" FontAttributes="Bold"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</ContentPage>

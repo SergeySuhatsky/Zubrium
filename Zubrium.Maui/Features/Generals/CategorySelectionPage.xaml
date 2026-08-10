@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Zubrium.Maui.Features.Generals"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="Zubrium.Maui.Features.Generals.CategorySelectionPage"
+             x:DataType="local:CategorySelectionViewModel"
+             x:Name="PageRoot"
+             BackgroundColor="#F4F5F8">
+
+    <Grid RowDefinitions="*, Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="20" Spacing="16">
+                <Label Text="Категория" FontSize="20" FontAttributes="Bold" TextColor="#1C1C1E" />
+                <Entry Text="{Binding SearchText}" Placeholder="Поиск..." />
+
+                <CollectionView ItemsSource="{Binding Categories}" SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="local:CategoryDraft">
+                            <Border Stroke="#EAECEF" StrokeThickness="1" Padding="14" Margin="0,0,0,12">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding BindingContext.SelectCommand, Source={x:Reference PageRoot}}" CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+
+                                <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="4" VerticalOptions="Center">
+                                        <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" TextColor="#1C1C1E" />
+                                        <Label Text="Создать новую категорию" FontSize="12" TextColor="#6278E6" IsVisible="{Binding IsNew}" />
+                                    </VerticalStackLayout>
+
+                                    <!-- Чекбокс виден только если включен IsMultiSelect -->
+                                    <CheckBox Grid.Column="1" 
+                                              IsChecked="{Binding IsSelected}" 
+                                              Color="#6278E6" 
+                                              IsVisible="{Binding BindingContext.IsMultiSelect, Source={x:Reference PageRoot}}" 
+                                              InputTransparent="True" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Button Text="Назад" Command="{Binding GoBackCommand}" BackgroundColor="#E0E0E0" TextColor="#1C1C1C" CornerRadius="12" HeightRequest="48" IsVisible="{Binding IsMultiSelect, Converter={toolkit:InvertedBoolConverter}}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Кнопка применить внизу экрана для режима мультивыбора -->
+        <Border Grid.Row="1" BackgroundColor="White" Padding="20" StrokeThickness="0" IsVisible="{Binding IsMultiSelect}">
+            <Border.Shadow>
+                <Shadow Brush="Black" Offset="0,-4" Radius="10" Opacity="0.05" />
+            </Border.Shadow>
+            <Button Text="Применить" 
+                    Command="{Binding ApplySelectionCommand}" 
+                    BackgroundColor="#6278E6" 
+                    TextColor="White" 
+                    FontAttributes="Bold" 
+                    CornerRadius="12" 
+                    HeightRequest="56" />
+        </Border>
+    </Grid>
+</ContentPage>

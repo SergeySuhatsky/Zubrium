@@ -1,6 +1,6 @@
 ﻿using SQLite;
 
-namespace Zubrium.Persistence
+namespace Zubrium.Persistence.Entities
 {
     [Table("Articles")]
     public class ArticleEntity
@@ -11,5 +11,8 @@ namespace Zubrium.Persistence
         public string Title { get; set; }
 
         public string BodyMarkdown { get; set; }
+
+        [Indexed]
+        public string? CategoryId { get; set; }
     }
 }
