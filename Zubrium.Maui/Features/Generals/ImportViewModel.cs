@@ -317,13 +317,22 @@ partial void OnParsedContentSetChanged(ParsedContentSet? value)
 
                     if (SelectedCategory.IsNew)
                     {
-                        var newCategoryEntity = new CategoryEntity
+                        var existingCategory = await _repository.GetCategoryByNameAsync(SelectedCategory.Name);
+                        if (existingCategory != null)
                         {
-                            DbId = finalCategoryId,
-                            Name = SelectedCategory.Name
-                        };
+                            finalCategoryId = existingCategory.DbId;
+                        }
+                        else
+                        {
+                            var newCategoryEntity = new CategoryEntity
+                            {
+                                DbId = finalCategoryId,
+                                Name = SelectedCategory.Name
+                            };
 
-                        await _repository.SaveCategoryAsync(newCategoryEntity);
+                            await _repository.SaveCategoryAsync(newCategoryEntity);
+                        }
+
                         SelectedCategory.Id = finalCategoryId;
                     }
 

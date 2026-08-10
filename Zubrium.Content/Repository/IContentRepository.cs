@@ -16,6 +16,7 @@ namespace Zubrium.Content.Repository
         Task<List<ArticleEntity>> GetArticlesByCategoryAsync(string categoryId);
         Task SaveArticlesAsync(IEnumerable<ArticleEntity> articles);
         Task<int> SaveArticleAsync(ArticleEntity article);
+        Task DeleteArticleAsync(string articleId);
 
         // --- Карточки (Cards) ---
         Task<CardEntity> GetCardAsync(string cardId);
@@ -31,11 +32,13 @@ namespace Zubrium.Content.Repository
         Task<List<QuizBlockEntity>> GetQuizBlocksByCategoryAsync(string categoryId);
         Task<int> SaveQuizBlockAsync(QuizBlockEntity quiz);
         Task SaveQuizBlocksAsync(IEnumerable<QuizBlockEntity> quizzes);
+        Task DeleteQuizBlockAsync(string quizId);
 
         // --- Категории (Categories) ---
         Task<CategoryEntity?> GetCategoryByNameAsync(string name);
         Task<List<CategoryEntity>> GetAllCategoriesAsync();
         Task<int> SaveCategoryAsync(CategoryEntity category);
+        Task DeleteCategoryAsync(string categoryId);
 
         // --- Импорт ContentSet ---
         Task InsertContentSet(ParsedContentSet contentSet, bool isArticles = true, bool isQuizes = true, bool isCards = true);

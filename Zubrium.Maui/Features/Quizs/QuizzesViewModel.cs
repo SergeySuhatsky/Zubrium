@@ -23,7 +23,7 @@ namespace Zubrium.Maui.Features.Quizs
 
         public override async void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            await LoadCategoriesAsync();
+            //await LoadCategoriesAsync();
         }
 
         [RelayCommand]

@@ -221,5 +221,30 @@ namespace Zubrium.Content.Repository
         {
             return await _db.Table<DailyActivityEntity>().ToListAsync();
         }
+
+        // ==========================================
+        // МЕТОДЫ УДАЛЕНИЯ (ДОБАВЛЕНО)
+        // ==========================================
+
+        public async Task DeleteArticleAsync(string articleId)
+        {
+            await _db.Table<ArticleEntity>().Where(a => a.Id == articleId).DeleteAsync();
+        }
+
+        public async Task DeleteQuizBlockAsync(string quizId)
+        {
+            await _db.Table<QuizBlockEntity>().Where(q => q.Id == quizId).DeleteAsync();
+        }
+
+        public async Task DeleteCategoryAsync(string categoryId)
+        {
+            await _db.RunInTransactionAsync(conn =>
+            {
+                conn.Table<CardEntity>().Delete(c => c.CategoryId == categoryId);
+                conn.Table<ArticleEntity>().Delete(a => a.CategoryId == categoryId);
+                conn.Table<QuizBlockEntity>().Delete(q => q.CategoryId == categoryId);
+                conn.Table<CategoryEntity>().Delete(c => c.DbId == categoryId);
+            });
+        }
     }
 }

@@ -23,7 +23,7 @@ namespace Zubrium.Maui.Features.Cards
 
         public override async void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            await LoadCategoriesAsync();
+            //await LoadCategoriesAsync();
         }
 
         [RelayCommand]
@@ -34,7 +34,10 @@ namespace Zubrium.Maui.Features.Cards
 
         private async Task LoadCategoriesAsync()
         {
-            var dbCategories = await _repository.GetAllCategoriesAsync();
+            var dbCategories = (await _repository.GetAllCategoriesAsync())
+                                .GroupBy(c => c.Name.Trim().ToLower())
+                                .Select(g => g.First())
+                                .ToList();
             _allCategories.Clear();
 
             var colors = new[] { "#8E95A4", "#66BB6A", "#FFA726", "#42A5F5", "#AB47BC" };

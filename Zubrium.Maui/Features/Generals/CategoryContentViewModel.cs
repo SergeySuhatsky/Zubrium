@@ -214,5 +214,168 @@ namespace Zubrium.Maui.Features.Generals
             _categoryEntity.Name = trimmed;
             await _repository.SaveCategoryAsync(_categoryEntity);
         }
+
+        [RelayCommand]
+        public async Task DeleteCategory()
+        {
+            if (_categoryEntity == null) return;
+
+            bool confirm = await Shell.Current.CurrentPage.DisplayAlert(
+                "Удаление категории",
+                "Вы уверены, что хотите удалить эту категорию и весь связанный с ней контент? Это действие нельзя отменить.",
+                "Удалить",
+                "Отмена");
+
+            if (confirm)
+            {
+                await _repository.DeleteCategoryAsync(_categoryEntity.DbId);
+                await Shell.Current.GoToAsync("..");
+            }
+        }
+
+        [RelayCommand]
+        public async Task DeleteItem(object item)
+        {
+            bool confirm = await Shell.Current.CurrentPage.DisplayAlert("Удаление", "Удалить этот элемент?", "Да", "Нет");
+            if (!confirm) return;
+
+            if (item is Card card)
+            {
+                await _repository.DeleteCardAsync(card.Id);
+                _allCards.Remove(card);
+                _filteredCards.Remove(card);
+                DisplayCards.Remove(card);
+            }
+            else if (item is Article article)
+            {
+                await _repository.DeleteArticleAsync(article.Id);
+                _allArticles.Remove(article);
+                _filteredArticles.Remove(article);
+                DisplayArticles.Remove(article);
+            }
+            else if (item is QuizBlock quiz)
+            {
+                await _repository.DeleteQuizBlockAsync(quiz.Id);
+                _allQuizzes.Remove(quiz);
+                _filteredQuizzes.Remove(quiz);
+                DisplayQuizzes.Remove(quiz);
+            }
+
+            ApplyFilter();
+        }
+
+        // === СВОЙСТВА ДЛЯ ОВЕРЛЕЯ РЕДАКТИРОВАНИЯ ===
+        [ObservableProperty] private bool isEditOverlayVisible;
+        [ObservableProperty] private bool isEditingCard;
+        [ObservableProperty] private bool isEditingArticle;
+        [ObservableProperty] private bool isEditingQuiz;
+
+        [ObservableProperty] private string editTitle = string.Empty;
+        [ObservableProperty] private string editFront = string.Empty;
+        [ObservableProperty] private string editBrief = string.Empty;
+        [ObservableProperty] private string editDetailed = string.Empty;
+        [ObservableProperty] private string editBody = string.Empty;
+
+        private object? _currentEditingItem;
+
+        [RelayCommand]
+        public void OpenEditOverlay(object item)
+        {
+            _currentEditingItem = item;
+            IsEditingCard = item is Card;
+            IsEditingArticle = item is Article;
+            IsEditingQuiz = item is QuizBlock;
+
+            if (item is Card c)
+            {
+                EditTitle = c.Title ?? string.Empty;
+                EditFront = c.FrontMarkdown ?? string.Empty;
+                EditBrief = c.BriefMarkdown ?? string.Empty;
+                EditDetailed = c.DetailedMarkdown ?? string.Empty;
+            }
+            else if (item is Article a)
+            {
+                EditTitle = a.Title ?? string.Empty;
+                EditBody = a.BodyMarkdown ?? string.Empty;
+            }
+            else if (item is QuizBlock q)
+            {
+                EditTitle = q.Title ?? string.Empty;
+            }
+
+            IsEditOverlayVisible = true;
+        }
+
+        [RelayCommand]
+        public void CloseEditOverlay() => IsEditOverlayVisible = false;
+
+        [RelayCommand]
+        public async Task SaveEdit()
+        {
+            if (_currentEditingItem is Card c)
+            {
+                c.Title = EditTitle;
+                c.FrontMarkdown = EditFront;
+                c.BriefMarkdown = EditBrief;
+                c.DetailedMarkdown = EditDetailed;
+
+                var entity = await _repository.GetCardAsync(c.Id);
+                if (entity != null)
+                {
+                    entity.Title = c.Title;
+                    entity.FrontMarkdown = c.FrontMarkdown;
+                    entity.BriefMarkdown = c.BriefMarkdown;
+                    entity.DetailedMarkdown = c.DetailedMarkdown;
+                    await _repository.SaveCardAsync(entity);
+                }
+
+                var index = DisplayCards.IndexOf(c);
+                if (index >= 0)
+                {
+                    DisplayCards[index] = null!;
+                    DisplayCards[index] = c;
+                }
+            }
+            else if (_currentEditingItem is Article a)
+            {
+                a.Title = EditTitle;
+                a.BodyMarkdown = EditBody;
+
+                var entity = await _repository.GetArticleAsync(a.Id);
+                if (entity != null)
+                {
+                    entity.Title = a.Title;
+                    entity.BodyMarkdown = a.BodyMarkdown;
+                    await _repository.SaveArticleAsync(entity);
+                }
+
+                var index = DisplayArticles.IndexOf(a);
+                if (index >= 0)
+                {
+                    DisplayArticles[index] = null!;
+                    DisplayArticles[index] = a;
+                }
+            }
+            else if (_currentEditingItem is QuizBlock q)
+            {
+                q.Title = EditTitle;
+
+                var entity = await _repository.GetQuizBlockAsync(q.Id);
+                if (entity != null)
+                {
+                    entity.Title = q.Title;
+                    await _repository.SaveQuizBlockAsync(entity);
+                }
+
+                var index = DisplayQuizzes.IndexOf(q);
+                if (index >= 0)
+                {
+                    DisplayQuizzes[index] = null!;
+                    DisplayQuizzes[index] = q;
+                }
+            }
+
+            IsEditOverlayVisible = false;
+        }
     }
 }
