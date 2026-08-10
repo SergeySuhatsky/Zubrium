@@ -23,6 +23,7 @@ namespace Zubrium.Content.Repository
         Task<List<CardEntity>> GetCardsByCategoryAsync(string categoryId);
         Task<int> SaveCardAsync(CardEntity card);
         Task SaveCardsAsync(IEnumerable<CardEntity> cards);
+        Task DeleteCardAsync(string cardId);
 
         // --- Квизы (Quizzes) ---
         Task<QuizBlockEntity> GetQuizBlockAsync(string quizId);

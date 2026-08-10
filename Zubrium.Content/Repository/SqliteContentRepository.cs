@@ -57,6 +57,11 @@ namespace Zubrium.Content.Repository
             return await _db.Table<CardEntity>().Where(c => c.CategoryId == categoryId).ToListAsync();
         }
 
+        public async Task DeleteCardAsync(string cardId)
+        {
+            await _db.Table<CardEntity>().Where(c => c.Id == cardId).DeleteAsync();
+        }
+
         // ==========================================
         // МЕТОДЫ ДЛЯ КВИЗОВ (QUIZZES)
         // ==========================================
