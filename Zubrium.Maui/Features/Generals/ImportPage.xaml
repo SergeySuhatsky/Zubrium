@@ -21,13 +21,14 @@
 
                 <Grid Margin="0,0,0,24">
                     <controls:DesktopBackButton />
-                    <Label Grid.Column="1" 
-                           Text="Добавить контент" 
-                           FontSize="20" 
-                           FontAttributes="Bold" 
-                           TextColor="#1C1C1E" 
-                           HorizontalOptions="Center" 
-                           VerticalOptions="Center"/>
+                    <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8">
+                        <Label Text="Добавить контент" FontSize="20" FontAttributes="Bold" TextColor="#1C1C1E" VerticalOptions="Center"/>
+                        <ImageButton Source="{mi:Material Icon=HelpOutline, IconColor=#8E8E93}" 
+                                     WidthRequest="24" HeightRequest="24" 
+                                     BackgroundColor="Transparent"
+                                     VerticalOptions="Center" 
+                                     Command="{Binding TogglePromptOverlayCommand}"/>
+                    </HorizontalStackLayout>
                 </Grid>
 
                 <!-- Вкладки: Вставить текст / Файл -->
@@ -847,13 +848,13 @@
             </Border>
         </Grid>
         <Border Grid.RowSpan="2" 
-                BackgroundColor="#1C1C1E"
-                Padding="24,12"
-                HorizontalOptions="Center"
-                VerticalOptions="End"
-                Margin="0,0,0,100"
-                IsVisible="{Binding IsToastVisible}"
-                InputTransparent="True">
+            BackgroundColor="#1C1C1E"
+            Padding="24,12"
+            HorizontalOptions="Center"
+            VerticalOptions="End"
+            Margin="0,0,0,100"
+            IsVisible="{Binding IsToastVisible}"
+            InputTransparent="True">
             <!-- InputTransparent="True" позволяет кликать "сквозь" уведомление, если оно висит -->
 
             <Border.StrokeShape>
@@ -870,5 +871,32 @@
                    FontSize="14"
                    HorizontalOptions="Center" />
         </Border>
+        
+        <!-- ОВЕРЛЕЙ С ПРОМПТОМ -->
+        <Grid Grid.RowSpan="2" BackgroundColor="#80000000" IsVisible="{Binding IsPromptOverlayVisible}">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding TogglePromptOverlayCommand}" />
+            </Grid.GestureRecognizers>
+            
+            <Border BackgroundColor="White" Margin="24,80" Padding="20" VerticalOptions="Center" StrokeThickness="0">
+                <Border.StrokeShape><RoundRectangle CornerRadius="20" /></Border.StrokeShape>
+                <Border.GestureRecognizers><TapGestureRecognizer /></Border.GestureRecognizers>
+                
+                <Grid RowDefinitions="Auto, *, Auto" RowSpacing="16" MaximumHeightRequest="400">
+                    <Label Grid.Row="0" Text="Вставьте этот промпт в нейросеть (ChatGPT, Claude и т.д.) и попросите её создать контент на заданную вами тему:" 
+                           FontSize="14" TextColor="#1C1C1E" FontAttributes="Bold" />
+                    
+                    <Border Grid.Row="1" BackgroundColor="#F4F5F8" StrokeThickness="0" Padding="12">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                        <ScrollView>
+                            <Label Text="{Binding PromptText}" FontSize="13" TextColor="#8E8E93" LineBreakMode="WordWrap" />
+                        </ScrollView>
+                    </Border>
+                    
+                    <Button Grid.Row="2" Text="Скопировать промпт" Command="{Binding CopyPromptCommand}" 
+                            BackgroundColor="#6278E6" TextColor="White" FontAttributes="Bold" CornerRadius="12" HeightRequest="48" />
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </ContentPage>
