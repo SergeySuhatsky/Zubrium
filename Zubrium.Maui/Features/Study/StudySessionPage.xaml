@@ -9,7 +9,9 @@
              x:Class="Zubrium.Maui.Features.Study.StudySessionPage"
              x:DataType="local:StudySessionViewModel"
              x:Name="SessionPage"
-             BackgroundColor="#F4F5F8">
+             BackgroundColor="#F4F5F8"
+             Shell.TabBarIsVisible="False"
+             Shell.NavBarIsVisible="False">
 
     <Grid>
         <!-- ЭКРАН ЗАВЕРШЕНИЯ -->
@@ -22,15 +24,15 @@
         <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
         <Grid IsVisible="{Binding HasCards}" RowDefinitions="Auto, *, Auto">
 
-            <!-- Шапка -->
-            <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Padding="20,16">
-                <ImageButton Grid.Column="0" Source="{mi:Material Icon=Close, IconColor=#1C1C1E}" BackgroundColor="Transparent" WidthRequest="32" HeightRequest="32" Command="{Binding FinishSessionCommand}" />
-                <Label Grid.Column="1" Text="{Binding CardsLeft, StringFormat='Осталось: {0}'}" FontSize="16" FontAttributes="Bold" TextColor="#1C1C1E" HorizontalOptions="Center" VerticalOptions="Center" />
-                <ImageButton Grid.Column="2" Source="{mi:Material Icon=MoreVert, IconColor=#1C1C1E}" BackgroundColor="Transparent" WidthRequest="32" HeightRequest="32" Command="{Binding ToggleHiddenMenuCommand}" />
+             <!--Шапка--> 
+            <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Padding="10,-10">
+                <ImageButton Grid.Column="0" Source="{mi:Material Icon=Close, IconColor=#1C1C1E, IconSize=32}" Aspect="Center" BackgroundColor="Transparent" WidthRequest="8" HeightRequest="1" Command="{Binding FinishSessionCommand}" />
+                <Label Grid.Column="1" Text="{Binding CardsLeft, StringFormat='Осталось: {0}'}" FontSize="10" FontAttributes="Bold" TextColor="#1C1C1E" HorizontalOptions="Center" VerticalOptions="Center" />
+                <ImageButton Grid.Column="2" Source="{mi:Material Icon=MoreVert, IconColor=#1C1C1E, IconSize=32}" Aspect="Center" BackgroundColor="Transparent" WidthRequest="8" HeightRequest="1" Command="{Binding ToggleHiddenMenuCommand}" />
             </Grid>
 
             <!-- КАРТОЧКИ (SwipeCardView Plugin) -->
-            <Grid Grid.Row="1" Padding="20,10,20,20">
+            <Grid Grid.Row="1" Padding="10,0,10,5">
                 <swipeCardView:SwipeCardView
                     x:Name="CardSwipeView"
                     ItemsSource="{Binding Queue}"
@@ -43,7 +45,8 @@
                     StackScaleStep="0.04"
                     AnimationLength="250"
                     BackCardScale="0.95"
-                    CardRotation="15">
+                    CardRotation="15"
+                    Threshold="50">
 
                     <swipeCardView:SwipeCardView.ItemTemplate>
                         <DataTemplate x:DataType="local:StudyCardItem">
@@ -67,8 +70,8 @@
                                             HorizontalOptions="Center" 
                                             Margin="0,0,0,8"/>
 
-                                        <Label Text="{Binding DomainCard.Title}" FontSize="24" FontAttributes="Bold" TextColor="#1C1C1E" />
-                                        <controls:MarkdownView Text="{Binding DomainCard.FrontMarkdown}" TextColor="#2C2C2E" />
+                                        
+                                        <controls:MarkdownView Text="{Binding DomainCard.FrontMarkdown}" TextColor="#2C2C2E" BaseFontSize="20" LatexFontSize="16" />
                                         <BoxView HeightRequest="1" Color="#F2F2F6" IsVisible="{Binding IsBriefVisible}" />
                                     </VerticalStackLayout>
 
@@ -104,7 +107,10 @@
 
                                                 <VerticalStackLayout IsVisible="{Binding IsBriefVisible}" Spacing="8">
                                                     <Label Text="КРАТКИЙ ОТВЕТ" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold" />
-                                                    <controls:MarkdownView Text="{Binding DomainCard.BriefMarkdown}" TextColor="#2C2C2E" InputTransparent="True" />
+                                                    <controls:MarkdownView Text="{Binding DomainCard.BriefMarkdown}" 
+                                                                           TextColor="#2C2C2E" InputTransparent="True" 
+                                                                           BaseFontSize="{Binding BindingContext.BaseFontSize, Source={x:Reference SessionPage}}" 
+                                                                            LatexFontSize="{Binding BindingContext.LatexFontSize, Source={x:Reference SessionPage}}"/>
                                                 </VerticalStackLayout>
 
                                                 <ActivityIndicator IsRunning="{Binding IsLoadingDetailed}" IsVisible="{Binding IsLoadingDetailed}" Color="#6278E6" HorizontalOptions="Center" Margin="0,10,0,0" />
@@ -113,7 +119,9 @@
 
                                                 <VerticalStackLayout IsVisible="{Binding IsDetailedVisible}" Spacing="8" Padding="0,0,0,24">
                                                     <Label Text="ПОДРОБНЫЙ ОТВЕТ" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold" />
-                                                    <controls:MarkdownView Text="{Binding DomainCard.DetailedMarkdown}" TextColor="#2C2C2E" InputTransparent="True" />
+                                                    <controls:MarkdownView Text="{Binding DomainCard.DetailedMarkdown}" TextColor="#2C2C2E" InputTransparent="True" 
+                                                                           BaseFontSize="{Binding BindingContext.BaseFontSize, Source={x:Reference SessionPage}}" 
+                                                                            LatexFontSize="{Binding BindingContext.LatexFontSize, Source={x:Reference SessionPage}}"/>
                                                 </VerticalStackLayout>
 
                                             </VerticalStackLayout>
@@ -208,8 +216,31 @@
 
             <!-- СКРЫТОЕ МЕНЮ (Выдвижное сбоку) -->
             <Grid Grid.Row="2" ColumnDefinitions="*, Auto" IsVisible="{Binding IsHiddenMenuVisible}">
-                <BoxView Grid.Column="0" Color="Black" Opacity="0.3" />
+                <BoxView Grid.Column="0" Color="Black" Opacity="0.3">
+                    <BoxView.GestureRecognizers>
+                        <!-- Закрывать меню при клике на темный фон -->
+                        <TapGestureRecognizer Command="{Binding ToggleHiddenMenuCommand}" />
+                    </BoxView.GestureRecognizers>
+                </BoxView>
+
                 <VerticalStackLayout Grid.Column="1" WidthRequest="250" BackgroundColor="White">
+
+                    <!-- НАСТРОЙКИ ШРИФТА -->
+                    <Label Text="РАЗМЕР ТЕКСТА" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold" Margin="16,16,16,8" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8" Margin="16,0">
+                        <Button Grid.Column="0" Text="А-" Command="{Binding DecreaseBaseFontCommand}" BackgroundColor="#F4F5F8" TextColor="#1C1C1E" HeightRequest="40" Padding="0" />
+                        <Button Grid.Column="1" Text="А+" Command="{Binding IncreaseBaseFontCommand}" BackgroundColor="#F4F5F8" TextColor="#1C1C1E" HeightRequest="40" Padding="0" />
+                    </Grid>
+
+                    <Label Text="РАЗМЕР ФОРМУЛ (LATEX)" FontSize="11" TextColor="#8E8E93" FontAttributes="Bold" Margin="16,16,16,8" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8" Margin="16,0">
+                        <Button Grid.Column="0" Text="А-" Command="{Binding DecreaseLatexFontCommand}" BackgroundColor="#F4F5F8" TextColor="#1C1C1E" HeightRequest="40" Padding="0" />
+                        <Button Grid.Column="1" Text="А+" Command="{Binding IncreaseLatexFontCommand}" BackgroundColor="#F4F5F8" TextColor="#1C1C1E" HeightRequest="40" Padding="0" />
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="#EAECEF" Margin="0,16,0,0" />
+                    <!-- КОНЕЦ НАСТРОЕК ШРИФТА -->
+
                     <Button Text="Откатить на 1 стадию" Command="{Binding RollbackProgressCommand}" BackgroundColor="Transparent" TextColor="#1C1C1E" HorizontalOptions="Start" Padding="16" />
                     <BoxView HeightRequest="1" Color="#EAECEF" />
                     <Button Text="Обнулить прогресс слова" Command="{Binding ResetProgressCommand}" BackgroundColor="Transparent" TextColor="#FF9500" HorizontalOptions="Start" Padding="16" />

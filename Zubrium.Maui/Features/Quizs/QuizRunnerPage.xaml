@@ -11,10 +11,10 @@
              BackgroundColor="#F4F5F8">
 
     <Grid RowDefinitions="Auto, *">
-        <VerticalStackLayout Grid.Row="0" Spacing="8" Padding="20,20,20,10" BackgroundColor="White">
+        <!--<VerticalStackLayout Grid.Row="0" Spacing="8" Padding="20,20,20,10" BackgroundColor="White">
             <controls:DesktopBackButton />
             <Label Text="{Binding QuizTitle}" FontSize="24" FontAttributes="Bold" TextColor="#1C1C1E" />
-        </VerticalStackLayout>
+        </VerticalStackLayout>-->
 
         <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Always">
             <VerticalStackLayout Spacing="32" Padding="20,20,20,60">

@@ -9,10 +9,10 @@
 
     <Grid RowDefinitions="Auto, *">
         <!-- Шапка -->
-        <VerticalStackLayout Grid.Row="0" Spacing="8" Padding="20,20,20,10" BackgroundColor="White">
+        <!--<VerticalStackLayout Grid.Row="0" Spacing="8" Padding="20,20,20,10" BackgroundColor="White">
             <controls:DesktopBackButton />
             <Label Text="{Binding ArticleTitle}" FontSize="24" FontAttributes="Bold" TextColor="#1C1C1E" />
-        </VerticalStackLayout>
+        </VerticalStackLayout>-->
 
         <!-- Текст статьи -->
         <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Always">

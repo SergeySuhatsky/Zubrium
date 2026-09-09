@@ -8,8 +8,15 @@
              xmlns:domain="clr-namespace:Zubrium.Domain"
              x:Class="Zubrium.Maui.Features.Generals.CategoryContentPage"
              x:DataType="local:CategoryContentViewModel"
-             BackgroundColor="#F4F5F8">
+             BackgroundColor="#F4F5F8"
+             xmlns:converters="clr-namespace:Zubrium.Maui.Converters">
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:ZeroToBoolConverter x:Key="ZeroToBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    
     <Grid RowDefinitions="Auto, *">
         <Grid Padding="20,20,20,10" ColumnDefinitions="Auto, *, Auto, Auto" BackgroundColor="White">
             <Button Text="Назад"

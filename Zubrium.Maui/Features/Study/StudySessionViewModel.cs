@@ -119,6 +119,22 @@ namespace Zubrium.Maui.Features.Study
             CardsLeft = Queue.Count + _deck.Count;
         }
 
+        [ObservableProperty] public partial double BaseFontSize { get; set; } = 16.0;
+        [ObservableProperty] public partial double LatexFontSize { get; set; } = 16.0;
+
+        [RelayCommand]
+        public void IncreaseBaseFont() => BaseFontSize += 2;
+
+        [RelayCommand]
+        public void DecreaseBaseFont() => BaseFontSize = Math.Max(10, BaseFontSize - 2); // Ограничиваем минимум в 10px
+
+        [RelayCommand]
+        public void IncreaseLatexFont() => LatexFontSize += 2;
+
+        [RelayCommand]
+        public void DecreaseLatexFont() => LatexFontSize = Math.Max(10, LatexFontSize - 2);
+
+
         [RelayCommand]
         public async Task CardSwiped(SwipedCardEventArgs e)
         {

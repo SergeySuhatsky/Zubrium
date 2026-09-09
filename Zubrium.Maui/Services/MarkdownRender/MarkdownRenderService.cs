@@ -718,7 +718,13 @@ namespace Zubrium.Maui.Services.MarkdownRender
                 switch (inline)
                 {
                     case LineBreakInline lb:
-                        var lblBreak = new Label { Text = lb.IsHard ? "\n" : " ", FontFamily = options.FontFamily, TextColor = options.TextColor };
+                        var lblBreak = new Label
+                        {
+                            Text = lb.IsHard ? "\n" : " ",
+                            FontFamily = options.FontFamily,
+                            TextColor = options.TextColor,
+                            FontSize = options.BaseFontSize
+                        };
                         views.Add(new RenderedBlock(lblBreak, lb.IsHard ? "\n" : " "));
                         break;
 
