@@ -18,6 +18,8 @@ namespace Zubrium.Content.Repository
         Task<int> SaveArticleAsync(ArticleEntity article);
         Task DeleteArticleAsync(string articleId);
 
+        Task DeleteAllAsync();
+
         // --- Карточки (Cards) ---
         Task<CardEntity> GetCardAsync(string cardId);
         Task<List<CardEntity>> GetCardsAsync();

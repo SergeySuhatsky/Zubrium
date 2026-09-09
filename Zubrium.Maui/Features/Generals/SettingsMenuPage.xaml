@@ -35,6 +35,8 @@
                     </Grid>
                 </VerticalStackLayout>
             </Border>
+
+            <Button Text="Очитсить базу данных" Command="{Binding DeleteAllDbCommand}"/>
         </VerticalStackLayout>
     </ScrollView>
 

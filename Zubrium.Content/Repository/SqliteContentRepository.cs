@@ -246,5 +246,22 @@ namespace Zubrium.Content.Repository
                 conn.Table<CategoryEntity>().Delete(c => c.DbId == categoryId);
             });
         }
+
+        public async Task DeleteAllAsync()
+        {
+
+            await _db.DeleteAllAsync<ArticleEntity>();
+            await _db.DeleteAllAsync<CardEntity>();
+            await _db.DeleteAllAsync<QuizBlockEntity>();
+            await _db.DeleteAllAsync<CategoryEntity>();
+            await _db.DeleteAllAsync<DailyActivityEntity>();
+
+            await _db.CreateTableAsync<ArticleEntity>();
+            await _db.CreateTableAsync<CardEntity>();
+            await _db.CreateTableAsync<QuizBlockEntity>();
+            await _db.CreateTableAsync<CategoryEntity>();
+            await _db.CreateTableAsync<DailyActivityEntity>();
+
+        }
     }
 }

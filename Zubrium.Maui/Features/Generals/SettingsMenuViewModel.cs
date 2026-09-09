@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Zubrium.Content.Repository;
 using Zubrium.Domain;
 using Zubrium.Maui.ViewModels;
@@ -28,6 +29,13 @@ namespace Zubrium.Maui.Features.Generals
 
         public override void ApplyQueryAttributes(IDictionary<string, object> query)
         {
+        }
+
+        [RelayCommand]
+        public void DeleteAllDb ()
+        {
+            _repository.DeleteAllAsync();
+            
         }
     }
 }
