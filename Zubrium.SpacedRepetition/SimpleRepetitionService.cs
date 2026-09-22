@@ -19,23 +19,23 @@ namespace Zubrium.SpacedRepetition
                 currentStep = parsedStep;
             }
 
-            // Защита от выхода за пределы массива
-            int intervalIndex = Math.Min(currentStep, _intervals.Length - 1);
-            int daysToAdd = _intervals[intervalIndex];
-
-            // Применяем новые значения
-            card.Due = now.AddDays(daysToAdd);
             card.LastReview = now;
             card.Reps++;
 
-            // Увеличиваем шаг и сохраняем обратно в словарь
-            currentStep++;
-            card.AlgorithmData["Step"] = currentStep.ToString();
-
-            // Если прошли все 5 шагов — отмечаем как полностью выученную
+            // Если карточка уже прошла все интервалы (мы успешно вспомнили её после 25 дней)
             if (currentStep >= _intervals.Length)
             {
                 card.IsMastered = true;
+            }
+            else
+            {
+                // Применяем интервал и сдвигаем дату
+                int daysToAdd = _intervals[currentStep];
+                card.Due = now.AddDays(daysToAdd);
+
+                // Увеличиваем шаг и сохраняем обратно в словарь
+                currentStep++;
+                card.AlgorithmData["Step"] = currentStep.ToString();
             }
         }
 
